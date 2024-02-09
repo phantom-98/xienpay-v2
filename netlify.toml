@@ -6,3 +6,8 @@
   [redirects.headers]
     X-From = "Netlify"
     X-Api-Key = "ZW2zyFUjxJP38qM"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
