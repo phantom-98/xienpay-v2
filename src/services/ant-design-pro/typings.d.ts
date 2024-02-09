@@ -56,6 +56,30 @@ declare namespace API {
     success?: boolean;
   };
 
+  type MerchantListItem = {
+    return_url?: string;
+    max_payin?: number;
+    min_payin?: number;
+    secret_key?: string;
+    notify_url?: string;
+    site_url?: string;
+    api_key?: string;
+    updated_at?: string;
+    id?: number;
+    notes?: string;
+    code?: string;
+    is_test_mode: boolean;
+    created_at?: string;
+    payin_commission?: number;
+  };
+
+  type MerchantList = {
+    data?: MerchantListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
   type FakeCaptcha = {
     code?: number;
     status?: string;

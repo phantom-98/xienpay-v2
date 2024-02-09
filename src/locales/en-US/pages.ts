@@ -67,4 +67,17 @@ export default {
   'pages.searchTable.tenThousand': '0000',
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
+
+
+  'pages.merchantTable.title': 'Merchants',
+  'pages.merchantTable.updateForm.merchantName.nameLabel': 'Code',
+  'pages.merchantTable.siteUrl': 'Site',
+  'pages.merchantTable.returnUrl': 'Return Url',
+  'pages.merchantTable.notifyUrl': 'Notify Url',
+  'pages.merchantTable.apiKey': 'API Key',
+  'pages.merchantTable.testMode': 'Test?',
+  'pages.merchantTable.payin': 'Payin',
+  'pages.merchantTable.minPayin': 'Payin (min)',
+  'pages.merchantTable.maxPayin': 'Payin (max)',
+  'pages.merchantTable.payinCommission': 'Payin Commission',
 };

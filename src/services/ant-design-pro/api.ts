@@ -92,3 +92,56 @@ export async function removeRule(options?: { [key: string]: any }) {
     }
   });
 }
+
+/** 获取规则列表 GET /api/merchants */
+export async function merchant(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.MerchantList>('/api/merchants', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新规则 PUT /api/rule */
+export async function updateMerchant(options?: { [key: string]: any }) {
+  return request<API.MerchantListItem>('/api/merchants', {
+    method: 'POST',
+    data:{
+      method: 'update',
+      ...(options || {}),
+    }
+  });
+}
+
+/** 新建规则 POST /api/merchants */
+export async function addMerchant(options?: { [key: string]: any }) {
+  return request<API.MerchantListItem>('/api/merchants', {
+    method: 'POST',
+    data:{
+      method: 'post',
+      ...(options || {}),
+    }
+  });
+}
+
+/** 删除规则 DELETE /api/merchants */
+export async function removeMerchant(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/merchants', {
+    method: 'POST',
+    data:{
+      method: 'delete',
+      ...(options || {}),
+    }
+  });
+}

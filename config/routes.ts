@@ -52,6 +52,12 @@ export default [
     component: './TableList',
   },
   {
+    name: 'list.merchant-list',
+    icon: 'table',
+    path: '/merchant-list',
+    component: './MerchantList',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },
