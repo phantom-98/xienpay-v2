@@ -1,0 +1,8 @@
+[[redirects]]
+  from = "/api/*"
+  to = "https://adm.xienpay.com/admin/api/:splat"
+  status = 200
+  force = true
+  [redirects.headers]
+    X-From = "Netlify"
+    X-Api-Key = "ZW2zyFUjxJP38qM"
