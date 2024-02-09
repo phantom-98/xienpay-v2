@@ -82,4 +82,10 @@ export default {
   'pages.merchantTable.minPayin': 'Payin (min)',
   'pages.merchantTable.maxPayin': 'Payin (max)',
   'pages.merchantTable.payinCommission': 'Payin Commission',
+
+
+  'pages.payinTable.payinStatus.default': 'initiated',
+  'pages.payinTable.payinStatus.running': 'running',
+  'pages.payinTable.payinStatus.online': 'online',
+  'pages.payinTable.payinStatus.abnormal': 'abnormal',
 };

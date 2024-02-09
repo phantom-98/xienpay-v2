@@ -156,7 +156,53 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
-      valueType: 'textarea',
+      valueEnum: {
+        'initiated': {
+          text: (
+            <FormattedMessage
+              id="pages.payinTable.payinStatus.default"
+              defaultMessage="Shut down"
+            />
+          ),
+          status: 'Default',
+        },
+        'assigned': {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.running" defaultMessage="Running" />
+          ),
+          status: 'Processing',
+        },
+        'pending': {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.running" defaultMessage="Running" />
+          ),
+          status: 'Processing',
+        },
+        'success': {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.online" defaultMessage="Online" />
+          ),
+          status: 'Success',
+        },
+        'failed': {
+          text: (
+            <FormattedMessage
+              id="pages.payinTable.payinStatus.abnormal"
+              defaultMessage="Abnormal"
+            />
+          ),
+          status: 'Error',
+        },
+        'dropped': {
+          text: (
+            <FormattedMessage
+              id="pages.payinTable.payinStatus.abnormal"
+              defaultMessage="Abnormal"
+            />
+          ),
+          status: 'Error',
+        },
+      },
     },
     {
       title: (
