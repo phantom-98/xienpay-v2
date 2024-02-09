@@ -147,7 +147,7 @@ declare namespace API {
   };
 
 
-  type PayinStatus = 'initiated' | 'assigned' | 'pending' | 'dropped' | 'success' | 'failure' | 'pending' | 'submitted';
+  type PayinStatus = 'initiated' | 'assigned' | 'pending' | 'dropped' | 'success' | 'failed' | 'pending' | 'submitted';
 
   type PayinListItem = {
     id: number;

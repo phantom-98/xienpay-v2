@@ -159,46 +159,37 @@ const PayinList: React.FC = () => {
       valueEnum: {
         'initiated': {
           text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.default"
-              defaultMessage="Shut down"
-            />
+            <FormattedMessage id="pages.payinTable.payinStatus.default" defaultMessage="Initiated" />
           ),
           status: 'Default',
         },
         'assigned': {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.running" defaultMessage="Running" />
+            <FormattedMessage id="pages.payinTable.payinStatus.assigned" defaultMessage="Assigned" />
           ),
           status: 'Processing',
         },
         'pending': {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.running" defaultMessage="Running" />
+            <FormattedMessage id="pages.payinTable.payinStatus.pending" defaultMessage="Pending" />
           ),
           status: 'Processing',
         },
         'success': {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.online" defaultMessage="Online" />
+            <FormattedMessage id="pages.payinTable.payinStatus.success" defaultMessage="Success" />
           ),
           status: 'Success',
         },
         'failed': {
           text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
+            <FormattedMessage id="pages.payinTable.payinStatus.failed" defaultMessage="Failed" />
           ),
           status: 'Error',
         },
         'dropped': {
           text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.abnormal"
-              defaultMessage="Abnormal"
-            />
+            <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
           ),
           status: 'Error',
         },

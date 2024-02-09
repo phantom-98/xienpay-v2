@@ -85,7 +85,9 @@ export default {
 
 
   'pages.payinTable.payinStatus.default': 'initiated',
-  'pages.payinTable.payinStatus.running': 'running',
-  'pages.payinTable.payinStatus.online': 'online',
-  'pages.payinTable.payinStatus.abnormal': 'abnormal',
+  'pages.payinTable.payinStatus.assigned': 'assigned',
+  'pages.payinTable.payinStatus.pending': 'pending',
+  'pages.payinTable.payinStatus.success': 'success',
+  'pages.payinTable.payinStatus.failed': 'failed',
+  'pages.payinTable.payinStatus.dropped': 'dropped',
 };
