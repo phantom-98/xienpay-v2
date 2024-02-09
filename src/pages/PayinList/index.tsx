@@ -150,6 +150,12 @@ const PayinList: React.FC = () => {
       <span>{record.merchant_order_id}<br/><i>{record.merchant}</i></span>
     },
     {
+      title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
+      dataIndex: 'is_test_mode',
+      renderText: (val: boolean) =>
+        <Switch checked={val}/>
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
       dataIndex: 'agent',
       valueType: 'textarea'

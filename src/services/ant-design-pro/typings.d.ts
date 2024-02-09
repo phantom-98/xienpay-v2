@@ -157,6 +157,7 @@ declare namespace API {
     merchant:string;
     merchant_order_id: number;
     user_submitted_utr: string;
+    is_test_mode: boolean;
     uuid: string;
     currency: string;
     status: PayinStatus;
