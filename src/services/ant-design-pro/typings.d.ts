@@ -133,6 +133,7 @@ declare namespace API {
     upi_id: string;
     is_approved: boolean;
     is_enabled: boolean;
+    is_logged_in: boolean;
     last_login: string;
     last_logout: string;
     updated_at: string;

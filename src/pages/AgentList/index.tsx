@@ -152,9 +152,9 @@ const AgentList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.agentTable.online?" defaultMessage="Online?" />,
-      dataIndex: 'last_login',
-      renderText: (val: string) =>
-        <Switch checked={val != ''}/>
+      dataIndex: 'is_logged_in',
+      renderText: (val: boolean) =>
+        <Switch checked={val}/>
     },
     {
       title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Enabled?" />,
@@ -167,6 +167,13 @@ const AgentList: React.FC = () => {
       dataIndex: 'is_approved',
       renderText: (val: boolean) =>
         <Switch checked={val}/>
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in"/>,
+      dataIndex: 'last_login',
+      valueType: 'dateTime',
+      render: (_, record) =>
+        record.is_logged_in? record.last_login : record.last_logout
     },
   ];
 
