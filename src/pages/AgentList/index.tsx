@@ -151,13 +151,13 @@ const AgentList: React.FC = () => {
       valueEnum: {
         'upi-mc': {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.default" defaultMessage="Intent" />
+            <FormattedMessage id="pages.payinTable.remit.upi-mc" defaultMessage="Intent" />
           ),
           status: 'Success',
         },
         'upi-p2p': {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.assigned" defaultMessage="Collect" />
+            <FormattedMessage id="pages.payinTable.remit.upi-p2p" defaultMessage="Collect" />
           ),
           status: 'Processing',
         },

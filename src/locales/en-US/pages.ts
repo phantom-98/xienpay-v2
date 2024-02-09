@@ -90,4 +90,7 @@ export default {
   'pages.payinTable.payinStatus.success': 'success',
   'pages.payinTable.payinStatus.failed': 'failed',
   'pages.payinTable.payinStatus.dropped': 'dropped',
+
+  'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
+  'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)'
 };
