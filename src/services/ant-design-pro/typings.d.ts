@@ -153,9 +153,8 @@ declare namespace API {
     id: number;
     amount: number;
     utr_id: string;
-    agent_id: number;
-    agent_acct_id: number;
-    merchant_id: number;
+    agent: string;
+    merchant:string;
     merchant_order_id: number;
     user_submitted_utr: string;
     uuid: string;

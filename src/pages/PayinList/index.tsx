@@ -143,10 +143,16 @@ const PayinList: React.FC = () => {
       </span>
     },
     {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
+      title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />,
+      dataIndex: 'merchant_order_id',
       valueType: 'textarea',
-      render: (dom, entity, index, action, schema) =>
-      <span>{entity.agent_id} ({entity.agent_acct_id})</span>
+      render: (_, record) =>
+      <span>{record.merchant_order_id}<br/><i>{record.merchant}</i></span>
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
+      dataIndex: 'agent',
+      valueType: 'textarea'
     },
     {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,

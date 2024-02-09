@@ -146,6 +146,24 @@ const AgentList: React.FC = () => {
                           maximumFractionDigits={2}/>
     },
     {
+      title: <FormattedMessage id="pages.agentTable.remitType" defaultMessage="Type" />,
+      dataIndex: 'remit_acct_type',
+      valueEnum: {
+        'upi-mc': {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.default" defaultMessage="Intent" />
+          ),
+          status: 'Success',
+        },
+        'upi-p2p': {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.assigned" defaultMessage="Collect" />
+          ),
+          status: 'Processing',
+        },
+      },
+    },
+    {
       title: <FormattedMessage id="pages.agentTable.upi" defaultMessage="UPI" />,
       dataIndex: 'upi_id',
       valueType: 'textarea',
