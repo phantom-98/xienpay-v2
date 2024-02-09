@@ -152,16 +152,16 @@ const MerchantList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.merchantTable.payin" defaultMessage="Max Payin" />,
-      render: (dom, entity, index, action, schema) =>
+      render: (_, record) =>
         <span>
         ₹
-        <FormattedNumber value={entity.min_payin}
+        <FormattedNumber value={record.min_payin}
                        currencySign='accounting'
                        minimumFractionDigits={2}
                        maximumFractionDigits={2}/>
         &nbsp;-&nbsp;
        ₹
-       <FormattedNumber value={entity.max_payin}
+       <FormattedNumber value={record.max_payin}
                       currencySign='accounting'
                       minimumFractionDigits={2}
                       maximumFractionDigits={2}/>
