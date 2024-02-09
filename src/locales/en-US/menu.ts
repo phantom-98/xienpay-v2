@@ -51,4 +51,6 @@ export default {
   'menu.editor.koni': 'Koni Editor',
 
   'menu.list.merchant-list': 'Merchants',
+  'menu.list.agent-list': 'Agents',
+  'menu.list.payin-list': 'Payins',
 };

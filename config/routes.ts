@@ -28,34 +28,46 @@ export default [
     icon: 'smile',
     component: './Welcome',
   },
-  {
-    path: '/admin',
-    name: 'admin',
-    icon: 'crown',
-    access: 'canAdmin',
-    routes: [
-      {
-        path: '/admin',
-        redirect: '/admin/sub-page',
-      },
-      {
-        path: '/admin/sub-page',
-        name: 'sub-page',
-        component: './Admin',
-      },
-    ],
-  },
-  {
-    name: 'list.table-list',
-    icon: 'table',
-    path: '/list',
-    component: './TableList',
-  },
+  // {
+  //   path: '/admin',
+  //   name: 'admin',
+  //   icon: 'crown',
+  //   access: 'canAdmin',
+  //   routes: [
+  //     {
+  //       path: '/admin',
+  //       redirect: '/admin/sub-page',
+  //     },
+  //     {
+  //       path: '/admin/sub-page',
+  //       name: 'sub-page',
+  //       component: './Admin',
+  //     },
+  //   ],
+  // },
+  // {
+  //   name: 'list.table-list',
+  //   icon: 'table',
+  //   path: '/list',
+  //   component: './TableList',
+  // },
   {
     name: 'list.merchant-list',
-    icon: 'table',
+    icon: 'GlobalOutlined',
     path: '/merchant-list',
     component: './MerchantList',
+  },
+  {
+    name: 'list.agent-list',
+    icon: 'team',
+    path: '/agent-list',
+    component: './AgentList',
+  },
+  {
+    name: 'list.payin-list',
+    icon: 'MoneyCollectOutlined',
+    path: '/payin-list',
+    component: './PayinList',
   },
   {
     path: '/',
