@@ -168,10 +168,10 @@ const MerchantList: React.FC = () => {
       </span>
       },
     {
-      title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Test?" />,
+      title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
       dataIndex: 'is_test_mode',
       renderText: (val: boolean) =>
-        <Switch checked={val} style={{backgroundColor: val ? 'orange' : 'green'}}/>
+        <Switch checked={val} style={{backgroundColor: !val ? 'green' : 'grey'}}/>
     },
     {
       title: (

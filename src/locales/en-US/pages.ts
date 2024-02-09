@@ -77,7 +77,7 @@ export default {
   'pages.merchantTable.returnUrl': 'Return Url',
   'pages.merchantTable.notifyUrl': 'Notify Url',
   'pages.merchantTable.apiKey': 'API Key',
-  'pages.merchantTable.testMode': 'Test?',
+  'pages.merchantTable.liveMode': 'Live?',
   'pages.merchantTable.payin': 'Payin',
   'pages.merchantTable.minPayin': 'Payin (min)',
   'pages.merchantTable.maxPayin': 'Payin (max)',
