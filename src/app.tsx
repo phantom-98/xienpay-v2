@@ -6,6 +6,7 @@ import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history, Link } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+import type { RequestConfig } from '@umijs/max';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import React from 'react';
 const isDev = process.env.NODE_ENV === 'development';
@@ -131,6 +132,32 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
  * 它基于 axios 和 ahooks 的 useRequest 提供了一套统一的网络请求和错误处理方案。
  * @doc https://umijs.org/docs/max/request#配置
  */
+const authHeaderInterceptor = (url: string, options: RequestConfig) => {
+  const token = localStorage.getItem('xien.auth.0');
+  if (token) {
+    const authHeader = { Authorization: `Bearer ${token}` };
+    return {
+      url: `${url}`,
+      options: {...options, interceptors: true, headers: authHeader }
+    };
+  } else {
+    return {url, options};
+  }
+};
+
+const loginTokenInterceptor = (response: Response) => {
+  if (response.config.url === '/api/login/account') {
+    const token = response.data.token;
+    if (token != null) {
+      localStorage.setItem('xien.auth.0', token);
+    }
+  }
+
+  return response;
+};
+
 export const request = {
   ...errorConfig,
+  requestInterceptors: [authHeaderInterceptor],
+  responseInterceptors: [loginTokenInterceptor]
 };
