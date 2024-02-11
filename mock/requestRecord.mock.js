@@ -319,7 +319,6 @@ module.exports = {
   'POST /api/login/account': {
     status: 'ok',
     type: 'account',
-    token: 'jaffa123',
     currentAuthority: 'admin',
   },
 };
