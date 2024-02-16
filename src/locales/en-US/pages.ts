@@ -1,8 +1,7 @@
 export default {
   // 'pages.layouts.userLayout.title':
   //   'Ant Design is the most influential web design specification in Xihu district',
-  'pages.layouts.userLayout.title':
-    'XienPay is People centered Payment Gateway',
+  'pages.layouts.userLayout.title': 'XienPay is People centered Payment Gateway',
   'pages.login.accountLogin.tab': 'Account Login',
   'pages.login.accountLogin.errorMessage': 'Incorrect username/password(admin/ant.design)',
   'pages.login.failure': 'Login failed, please try again!',
@@ -70,7 +69,6 @@ export default {
   'pages.searchTable.batchDeletion': 'batch deletion',
   'pages.searchTable.batchApproval': 'batch approval',
 
-
   'pages.merchantTable.title': 'Merchants',
   'pages.merchantTable.updateForm.merchantName.nameLabel': 'Code',
   'pages.merchantTable.siteUrl': 'Site',
@@ -83,14 +81,14 @@ export default {
   'pages.merchantTable.maxPayin': 'Payin (max)',
   'pages.merchantTable.payinCommission': 'Payin Commission',
 
-
   'pages.payinTable.payinStatus.default': 'initiated',
   'pages.payinTable.payinStatus.assigned': 'assigned',
   'pages.payinTable.payinStatus.pending': 'pending',
   'pages.payinTable.payinStatus.success': 'success',
   'pages.payinTable.payinStatus.failed': 'failed',
   'pages.payinTable.payinStatus.dropped': 'dropped',
+  'pages.payinTable.payinStatus.dispute': 'dispute',
 
   'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
-  'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)'
+  'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)',
 };

@@ -222,7 +222,7 @@ const PayinList: React.FC = () => {
         },
         dispute: {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
+            <FormattedMessage id="pages.payinTable.payinStatus.dispute" defaultMessage="Dispute" />
           ),
           status: 'Warning',
         },
