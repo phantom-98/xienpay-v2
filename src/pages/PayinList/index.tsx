@@ -1,4 +1,4 @@
-import { addPayin, removePayin, payin, updatePayin } from '@/services/ant-design-pro/api';
+import { addPayin, payin, removePayin, updatePayin } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -10,8 +10,8 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, IntlProvider, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message, Switch } from 'antd';
+import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { Button, Drawer, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -133,32 +133,41 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
-      renderText: (val: number) =>
-      <span>
-      ₹
-      <FormattedNumber value={val}
-                     currencySign='accounting'
-                     minimumFractionDigits={2}
-                     maximumFractionDigits={2}/>
-      </span>
+      renderText: (val: number) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={val}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
     },
     {
-      title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />,
+      title: (
+        <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
+      ),
       dataIndex: 'merchant_order_id',
       valueType: 'textarea',
-      render: (_, record) =>
-      <span>{record.merchant_order_id}<br/><i>{record.merchant}</i></span>
+      render: (_, record) => (
+        <span>
+          {record.merchant_order_id}
+          <br />
+          <i>{record.merchant}</i>
+        </span>
+      ),
     },
     {
       title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
       dataIndex: 'is_test_mode',
-      renderText: (val: boolean) =>
-        <Switch checked={val}/>
+      renderText: (val: boolean) => <Switch checked={val} />,
     },
     {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
       dataIndex: 'agent',
-      valueType: 'textarea'
+      valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
@@ -169,54 +178,61 @@ const PayinList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
       valueEnum: {
-        'initiated': {
+        initiated: {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.default" defaultMessage="Initiated" />
+            <FormattedMessage
+              id="pages.payinTable.payinStatus.default"
+              defaultMessage="Initiated"
+            />
           ),
           status: 'Default',
         },
-        'assigned': {
+        assigned: {
           text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.assigned" defaultMessage="Assigned" />
+            <FormattedMessage
+              id="pages.payinTable.payinStatus.assigned"
+              defaultMessage="Assigned"
+            />
           ),
           status: 'Processing',
         },
-        'pending': {
+        pending: {
           text: (
             <FormattedMessage id="pages.payinTable.payinStatus.pending" defaultMessage="Pending" />
           ),
           status: 'Processing',
         },
-        'success': {
+        success: {
           text: (
             <FormattedMessage id="pages.payinTable.payinStatus.success" defaultMessage="Success" />
           ),
           status: 'Success',
         },
-        'failed': {
+        failed: {
           text: (
             <FormattedMessage id="pages.payinTable.payinStatus.failed" defaultMessage="Failed" />
           ),
           status: 'Error',
         },
-        'dropped': {
+        dropped: {
           text: (
             <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
           ),
           status: 'Error',
         },
+        dispute: {
+          text: (
+            <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
+          ),
+          status: 'Warning',
+        },
       },
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.payinTable.updatedAt"
-          defaultMessage="Last updated"
-        />
-      ),
+      title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated" />,
       dataIndex: 'updated_at',
       hideInForm: true,
-      valueType: 'dateTime'
+      valueType: 'dateTime',
     },
   ];
 
