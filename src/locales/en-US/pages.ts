@@ -24,7 +24,7 @@ export default {
   'pages.login.submit': 'Login',
   'pages.login.loginWith': 'Login with :',
   'pages.login.registerAccount': 'Register Account',
-  'pages.welcome.link': 'Welcome',
+  'pages.welcome.link': 'Dashboard',
   'pages.welcome.alertMessage': 'Faster and stronger heavy-duty components have been released.',
   'pages.404.subTitle': 'Sorry, the page you visited does not exist.',
   'pages.404.buttonText': 'Back Home',
