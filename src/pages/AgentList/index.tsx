@@ -1,4 +1,4 @@
-import { addAgent, removeAgent, agent, updateAgent } from '@/services/ant-design-pro/api';
+import { addAgent, agent, removeAgent, updateAgent } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -10,8 +10,8 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, IntlProvider, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message, Switch } from 'antd';
+import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { Button, Drawer, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -139,26 +139,25 @@ const AgentList: React.FC = () => {
       title: <FormattedMessage id="pages.agentTable.balance" defaultMessage="Balance" />,
       dataIndex: 'balance',
       valueType: 'textarea',
-      renderText: (val: boolean) =>
-        <FormattedNumber value={val}
-                          currencySign='accounting'
-                          minimumFractionDigits={2}
-                          maximumFractionDigits={2}/>
+      renderText: (val: boolean) => (
+        <FormattedNumber
+          value={val}
+          currencySign="accounting"
+          minimumFractionDigits={2}
+          maximumFractionDigits={2}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.agentTable.remitType" defaultMessage="Type" />,
       dataIndex: 'remit_acct_type',
       valueEnum: {
         'upi-mc': {
-          text: (
-            <FormattedMessage id="pages.payinTable.remit.upi-mc" defaultMessage="Intent" />
-          ),
+          text: <FormattedMessage id="pages.payinTable.remit.upi-mc" defaultMessage="Intent" />,
           status: 'Success',
         },
         'upi-p2p': {
-          text: (
-            <FormattedMessage id="pages.payinTable.remit.upi-p2p" defaultMessage="Collect" />
-          ),
+          text: <FormattedMessage id="pages.payinTable.remit.upi-p2p" defaultMessage="Collect" />,
           status: 'Processing',
         },
       },
@@ -171,27 +170,23 @@ const AgentList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.agentTable.online?" defaultMessage="Online?" />,
       dataIndex: 'is_logged_in',
-      renderText: (val: boolean) =>
-        <Switch checked={val}/>
+      renderText: (val: boolean) => <Switch checked={val} />,
     },
     {
       title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Enabled?" />,
       dataIndex: 'is_enabled',
-      renderText: (val: boolean) =>
-        <Switch checked={val}/>
+      renderText: (val: boolean) => <Switch checked={val} />,
     },
     {
       title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Approved?" />,
       dataIndex: 'is_approved',
-      renderText: (val: boolean) =>
-        <Switch checked={val}/>
+      renderText: (val: boolean) => <Switch checked={val} />,
     },
     {
-      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in"/>,
+      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
       dataIndex: 'last_login',
       valueType: 'dateTime',
-      render: (_, record) =>
-        record.is_logged_in? record.last_login : record.last_logout
+      render: (_, record) => (record.is_logged_in ? record.last_login : record.last_logout),
     },
   ];
 

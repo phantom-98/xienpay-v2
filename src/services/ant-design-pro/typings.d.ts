@@ -123,7 +123,6 @@ declare namespace API {
     success?: boolean;
   };
 
-
   type AgentListItem = {
     id: number;
     name: string;
@@ -146,15 +145,22 @@ declare namespace API {
     success?: boolean;
   };
 
-
-  type PayinStatus = 'initiated' | 'assigned' | 'pending' | 'dropped' | 'success' | 'failed' | 'pending' | 'submitted';
+  type PayinStatus =
+    | 'initiated'
+    | 'assigned'
+    | 'pending'
+    | 'dropped'
+    | 'success'
+    | 'failed'
+    | 'pending'
+    | 'submitted';
 
   type PayinListItem = {
     id: number;
     amount: number;
     utr_id: string;
     agent: string;
-    merchant:string;
+    merchant: string;
     merchant_order_id: number;
     user_submitted_utr: string;
     is_test_mode: boolean;

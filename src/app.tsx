@@ -1,14 +1,12 @@
-import { Footer, Question, SelectLang, AvatarDropdown, AvatarName } from '@/components';
+import { AvatarDropdown, AvatarName, Footer, Question, SelectLang } from '@/components';
+import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
-import type { RunTimeLayoutConfig } from '@umijs/max';
-import { history, Link } from '@umijs/max';
+import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
+import { Link, history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
-import type { RequestConfig } from '@umijs/max';
-import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
-import React from 'react';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -138,17 +136,17 @@ const authHeaderInterceptor = (url: string, options: RequestConfig) => {
     const authHeader = { Authorization: `Bearer ${token}` };
     return {
       url: `${url}`,
-      options: {...options, interceptors: true, headers: authHeader }
+      options: { ...options, interceptors: true, headers: authHeader },
     };
   } else {
-    return {url, options};
+    return { url, options };
   }
 };
 
 const loginTokenInterceptor = (response: Response) => {
   if (response.config.url === '/api/login/account') {
     const token = response.data.token;
-    if (token != null) {
+    if (token !== null) {
       localStorage.setItem('xien.auth.0', token);
     }
   }
@@ -159,5 +157,5 @@ const loginTokenInterceptor = (response: Response) => {
 export const request = {
   ...errorConfig,
   requestInterceptors: [authHeaderInterceptor],
-  responseInterceptors: [loginTokenInterceptor]
+  responseInterceptors: [loginTokenInterceptor],
 };

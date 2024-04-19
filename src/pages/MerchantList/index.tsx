@@ -1,4 +1,9 @@
-import { addMerchant, removeMerchant, merchant, updateMerchant } from '@/services/ant-design-pro/api';
+import {
+  addMerchant,
+  merchant,
+  removeMerchant,
+  updateMerchant,
+} from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -10,8 +15,8 @@ import {
   ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, IntlProvider, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message, Switch } from 'antd';
+import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { Button, Drawer, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -152,26 +157,31 @@ const MerchantList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.merchantTable.payin" defaultMessage="Max Payin" />,
-      render: (_, record) =>
+      render: (_, record) => (
         <span>
-        ₹
-        <FormattedNumber value={record.min_payin}
-                       currencySign='accounting'
-                       minimumFractionDigits={2}
-                       maximumFractionDigits={2}/>
-        &nbsp;-&nbsp;
-       ₹
-       <FormattedNumber value={record.max_payin}
-                      currencySign='accounting'
-                      minimumFractionDigits={2}
-                      maximumFractionDigits={2}/>
-      </span>
-      },
+          ₹
+          <FormattedNumber
+            value={record.min_payin}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+          &nbsp;-&nbsp; ₹
+          <FormattedNumber
+            value={record.max_payin}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+    },
     {
       title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
       dataIndex: 'is_test_mode',
-      renderText: (val: boolean) =>
-        <Switch checked={val} style={{backgroundColor: !val ? 'green' : 'grey'}}/>
+      renderText: (val: boolean) => (
+        <Switch checked={val} style={{ backgroundColor: !val ? 'green' : 'grey' }} />
+      ),
     },
     {
       title: (
@@ -182,7 +192,7 @@ const MerchantList: React.FC = () => {
       ),
       dataIndex: 'payin_commission',
       hideInForm: true,
-      renderText: (val: number) => `${val} %`
+      renderText: (val: number) => `${val} %`,
     },
   ];
 

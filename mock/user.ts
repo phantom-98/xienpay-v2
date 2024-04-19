@@ -105,7 +105,7 @@ export default {
         status: 'ok',
         type,
         currentAuthority: 'admin',
-        token: 'jaffa123'
+        token: 'jaffa123',
       });
       access = 'admin';
       return;

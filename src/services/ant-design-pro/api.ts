@@ -64,10 +64,10 @@ export async function rule(
 export async function updateRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -75,10 +75,10 @@ export async function updateRule(options?: { [key: string]: any }) {
 export async function addRule(options?: { [key: string]: any }) {
   return request<API.RuleListItem>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -86,10 +86,10 @@ export async function addRule(options?: { [key: string]: any }) {
 export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -117,10 +117,10 @@ export async function merchant(
 export async function updateMerchant(options?: { [key: string]: any }) {
   return request<API.MerchantListItem>('/api/merchants', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -128,10 +128,10 @@ export async function updateMerchant(options?: { [key: string]: any }) {
 export async function addMerchant(options?: { [key: string]: any }) {
   return request<API.MerchantListItem>('/api/merchants', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -139,13 +139,12 @@ export async function addMerchant(options?: { [key: string]: any }) {
 export async function removeMerchant(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/merchants', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }
-
 
 /** 获取规则列表 GET /api/agents */
 export async function agent(
@@ -171,10 +170,10 @@ export async function agent(
 export async function updateAgent(options?: { [key: string]: any }) {
   return request<API.AgentListItem>('/api/agents', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -182,10 +181,10 @@ export async function updateAgent(options?: { [key: string]: any }) {
 export async function addAgent(options?: { [key: string]: any }) {
   return request<API.AgentListItem>('/api/agents', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -193,14 +192,12 @@ export async function addAgent(options?: { [key: string]: any }) {
 export async function removeAgent(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/agents', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }
-
-
 
 /** 获取规则列表 GET /api/payins */
 export async function payin(
@@ -226,10 +223,10 @@ export async function payin(
 export async function updatePayin(options?: { [key: string]: any }) {
   return request<API.PayinListItem>('/api/payins', {
     method: 'POST',
-    data:{
+    data: {
       method: 'update',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -237,10 +234,10 @@ export async function updatePayin(options?: { [key: string]: any }) {
 export async function addPayin(options?: { [key: string]: any }) {
   return request<API.PayinListItem>('/api/payins', {
     method: 'POST',
-    data:{
+    data: {
       method: 'post',
       ...(options || {}),
-    }
+    },
   });
 }
 
@@ -248,9 +245,9 @@ export async function addPayin(options?: { [key: string]: any }) {
 export async function removePayin(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/payins', {
     method: 'POST',
-    data:{
+    data: {
       method: 'delete',
       ...(options || {}),
-    }
+    },
   });
 }
