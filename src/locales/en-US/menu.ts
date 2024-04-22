@@ -53,4 +53,5 @@ export default {
   'menu.list.merchant-list': 'Merchants',
   'menu.list.agent-list': 'Agents',
   'menu.list.payin-list': 'Payins',
+  'menu.list.bank-acct-list': 'Bank Accounts',
 };

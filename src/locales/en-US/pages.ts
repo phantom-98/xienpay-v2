@@ -91,4 +91,14 @@ export default {
 
   'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
   'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)',
+
+  'pages.bankAcctTable.searchTable.title': 'Bank Accounts',
+  'pages.bankAcctTable.searchTable.name': 'Account Name',
+  'pages.bankAcctTable.searchTable.details': 'Bank Details',
+  'pages.bankAcctTable.searchTable.payinLimits': 'Limits',
+  'pages.bankAcctTable.searchTable.upi-id': 'UPI ID',
+  'pages.bankAcctTable.searchTable.remit-intent?': 'Allow Intent?',
+  'pages.bankAcctTable.searchTable.remit-qr?': 'Allow QR?',
+  'pages.bankAcctTable.searchTable.remit-bank?': 'Show Bank?',
+  'pages.bankAcctTable.createform.newBankAcct': 'New Bank Account',
 };

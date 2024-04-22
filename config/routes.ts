@@ -25,7 +25,7 @@ export default [
   {
     path: '/welcome',
     name: 'welcome',
-    icon: 'smile',
+    icon: 'PieChartOutlined',
     component: './Welcome',
   },
   // {
@@ -53,7 +53,7 @@ export default [
   // },
   {
     name: 'list.merchant-list',
-    icon: 'GlobalOutlined',
+    icon: 'BookOutlined',
     path: '/merchant-list',
     component: './MerchantList',
   },
@@ -64,8 +64,14 @@ export default [
     component: './AgentList',
   },
   {
+    name: 'list.bank-acct-list',
+    icon: 'BankOutlined',
+    path: '/bank-acct-list',
+    component: './BankAcctsList',
+  },
+  {
     name: 'list.payin-list',
-    icon: 'MoneyCollectOutlined',
+    icon: 'DollarOutlined',
     path: '/payin-list',
     component: './PayinList',
   },

@@ -162,6 +162,7 @@ declare namespace API {
     agent: string;
     merchant: string;
     merchant_order_id: number;
+    bank_acct_name: string;
     user_submitted_utr: string;
     is_test_mode: boolean;
     uuid: string;
@@ -173,6 +174,30 @@ declare namespace API {
 
   type PayinList = {
     data?: PayinListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
+  type BankAcctListItem = {
+    id: number;
+    name: string;
+    balance: number;
+    ac_no: string;
+    ac_name: string;
+    ifsc: string;
+    upi_id: string;
+    max_payin?: number;
+    min_payin?: number;
+    is_enabled: boolean;
+    has_remit_qr: boolean;
+    has_remit_intent: boolean;
+    has_remit_bank: boolean;
+    updated_at: string;
+  };
+
+  type BankAcctList = {
+    data?: BankAcctListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;

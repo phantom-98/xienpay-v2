@@ -251,3 +251,56 @@ export async function removePayin(options?: { [key: string]: any }) {
     },
   });
 }
+
+/** 获取规则列表 GET /api/payins */
+export async function bankAcct(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.BankAcctListItem>('/api/bankAccts', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新规则 PUT /api/payins */
+export async function updateBankAcct(options?: { [key: string]: any }) {
+  return request<API.BankAcctListItem>('/api/bankAccts', {
+    method: 'POST',
+    data: {
+      method: 'update',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 新建规则 POST /api/payins */
+export async function addBankAcct(options?: { [key: string]: any }) {
+  return request<API.BankAcctListItem>('/api/bankAccts', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 删除规则 DELETE /api/payins */
+export async function removeBankAcct(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/bankAccts', {
+    method: 'POST',
+    data: {
+      method: 'delete',
+      ...(options || {}),
+    },
+  });
+}

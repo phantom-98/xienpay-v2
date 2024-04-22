@@ -1,4 +1,9 @@
-import { addRule, removeRule, rule, updateRule } from '@/services/ant-design-pro/api';
+import {
+  addBankAcct,
+  bankAcct,
+  removeBankAcct,
+  updateBankAcct,
+} from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -6,12 +11,13 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProFormMoney,
+  ProFormSwitch,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, message } from 'antd';
+import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { Button, Col, Drawer, Input, Row, Space, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -21,10 +27,10 @@ import UpdateForm from './components/UpdateForm';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.RuleListItem) => {
+const handleAdd = async (fields: API.BankAcctListItem) => {
   const hide = message.loading('Adding');
   try {
-    await addRule({ ...fields });
+    await addBankAcct({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -44,10 +50,17 @@ const handleAdd = async (fields: API.RuleListItem) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    await updateRule({
+    await updateBankAcct({
       name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
+      acName: fields.ac_name,
+      acNo: fields.ac_no,
+      ifsc: fields.ifsc,
+      upiId: fields.upi_id,
+      hasRemitQR: fields.has_remit_qr,
+      hasRemitIntent: fields.has_remit_intent,
+      hasRemitBank: fields.has_remit_bank,
+      minPayin: fields.min_payin,
+      maxPayin: fields.max_payin,
     });
     hide();
 
@@ -66,12 +79,12 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
+const handleRemove = async (selectedRows: API.BankAcctListItem[]) => {
   const hide = message.loading('Deleting');
   if (!selectedRows) return true;
   try {
-    await removeRule({
-      key: selectedRows.map((row) => row.key),
+    await removeBankAcct({
+      key: selectedRows.map((row) => row.id),
     });
     hide();
     message.success('Deleted successfully and will refresh soon');
@@ -98,8 +111,8 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.BankAcctListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.BankAcctListItem[]>([]);
 
   /**
    * @en-US International configuration
@@ -107,16 +120,13 @@ const TableList: React.FC = () => {
    * */
   const intl = useIntl();
 
-  const columns: ProColumns<API.RuleListItem>[] = [
+  const columns: ProColumns<API.BankAcctListItem>[] = [
     {
       title: (
-        <FormattedMessage
-          id="pages.searchTable.updateForm.ruleName.nameLabel"
-          defaultMessage="Rule name"
-        />
+        <FormattedMessage id="pages.bankAcctTable.searchTable.name" defaultMessage="Rule name" />
       ),
       dataIndex: 'name',
-      tip: 'The rule name is the unique key',
+      tip: 'The bank name is the unique key',
       render: (dom, entity) => {
         return (
           <a
@@ -131,30 +141,96 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleDesc" defaultMessage="Description" />,
-      dataIndex: 'desc',
+      title: (
+        <FormattedMessage id="pages.bankAcctTable.searchTable.details" defaultMessage="Details" />
+      ),
+      dataIndex: 'ac_name',
       valueType: 'textarea',
+      render: (_, record) => (
+        <span>
+          {record.ac_name}
+          <br />
+          {record.ac_no}
+          <br />
+          {record.ifsc}
+        </span>
+      ),
     },
     {
       title: (
         <FormattedMessage
-          id="pages.searchTable.titleCallNo"
+          id="pages.bankAcctTable.searchTable.payinLimits"
+          defaultMessage="Payin Limits"
+        />
+      ),
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.min_payin}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+          &nbsp;-&nbsp; ₹
+          <FormattedNumber
+            value={record.max_payin}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.bankAcctTable.searchTable.upi-id"
           defaultMessage="Number of service calls"
         />
       ),
-      dataIndex: 'callNo',
-      sorter: true,
-      hideInForm: true,
-      renderText: (val: string) =>
-        `${val}${intl.formatMessage({
-          id: 'pages.searchTable.tenThousand',
-          defaultMessage: ' 万 ',
-        })}`,
+      dataIndex: 'upi_id',
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.bankAcctTable.searchTable.remit-intent?"
+          defaultMessage="Allow Intent?"
+        />
+      ),
+      dataIndex: 'has_remit_intent',
+      renderText: (val: boolean) => <Switch checked={val} />,
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.bankAcctTable.searchTable.remit-qr?"
+          defaultMessage="Show QR?"
+        />
+      ),
+      dataIndex: 'has_remit_qr',
+      renderText: (val: boolean) => <Switch checked={val} />,
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.bankAcctTable.searchTable.remit-bank?"
+          defaultMessage="Show Bank?"
+        />
+      ),
+      dataIndex: 'has_remit_bank',
+      renderText: (val: boolean) => <Switch checked={val} />,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
-      dataIndex: 'status',
+      dataIndex: 'is_enabled',
+      renderText: (val: boolean) => <Switch checked={val} />,
+    },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
+      dataIndex: 'is_enabled',
       hideInForm: true,
+      hideInTable: true,
       valueEnum: {
         0: {
           text: (
@@ -196,7 +272,7 @@ const TableList: React.FC = () => {
         />
       ),
       sorter: true,
-      dataIndex: 'updatedAt',
+      dataIndex: 'updated_at',
       valueType: 'dateTime',
       renderFormItem: (item, { defaultRender, ...rest }, form) => {
         const status = form.getFieldValue('status');
@@ -221,6 +297,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
+      hideInTable: true,
       render: (_, record) => [
         <a
           key="config"
@@ -243,7 +320,7 @@ const TableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.RuleListItem, API.PageParams>
+      <ProTable<API.BankAcctListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.searchTable.title',
           defaultMessage: 'Enquiry form',
@@ -264,7 +341,7 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
           </Button>,
         ]}
-        request={rule}
+        request={bankAcct}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -285,7 +362,7 @@ const TableList: React.FC = () => {
                   id="pages.searchTable.totalServiceCalls"
                   defaultMessage="Total number of service calls"
                 />{' '}
-                {selectedRowsState.reduce((pre, item) => pre + item.callNo!, 0)}{' '}
+                {selectedRowsState.reduce((pre, item) => pre + item.id!, 0)}{' '}
                 <FormattedMessage id="pages.searchTable.tenThousand" defaultMessage="万" />
               </span>
             </div>
@@ -313,14 +390,26 @@ const TableList: React.FC = () => {
       )}
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newRule',
-          defaultMessage: 'New rule',
+          id: 'pages.bankAcctTable.createform.newBankAcct',
+          defaultMessage: 'New bank account',
         })}
-        width="400px"
+        layout="horizontal"
+        grid={true}
+        submitter={{
+          render: (props, doms) => {
+            return (
+              <Row>
+                <Col span={14} offset={4}>
+                  <Space>{doms}</Space>
+                </Col>
+              </Row>
+            );
+          },
+        }}
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.RuleListItem);
+          const success = await handleAdd(value as API.BankAcctListItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -335,20 +424,131 @@ const TableList: React.FC = () => {
               required: true,
               message: (
                 <FormattedMessage
-                  id="pages.searchTable.ruleName"
-                  defaultMessage="Rule name is required"
+                  id="pages.bankAcctTable.searchTable.name"
+                  defaultMessage="Bank acct name is required"
                 />
               ),
             },
           ]}
-          width="md"
+          label="Bank Account Nick Name"
           name="name"
+          colProps={{
+            span: 18,
+          }}
+          placeholder="Enter a nickname for this bank account"
         />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormSwitch
+          colProps={{
+            span: 6,
+          }}
+          initialValue={false}
+          label="Enabled?"
+          name="is_enabled"
+        />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.bankAcctTable.searchTable.ac_name"
+                  defaultMessage="Bank acct holder name is required"
+                />
+              ),
+            },
+          ]}
+          label="Bank Account Holders Name"
+          name="ac_name"
+          placeholder="Enter the bank account holders name"
+        />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.bankAcctTable.searchTable.ac_name"
+                  defaultMessage="Bank acct no is required"
+                />
+              ),
+            },
+          ]}
+          label="Account No."
+          width="md"
+          name="ac_no"
+          colProps={{ md: 12, xl: 12 }}
+          placeholder="Enter the 16 digit account number"
+        />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.bankAcctTable.searchTable.ac_name"
+                  defaultMessage="Bank IFSC is required"
+                />
+              ),
+            },
+          ]}
+          label="IFSC Code"
+          name="ifsc"
+          colProps={{ md: 12, xl: 12 }}
+          placeholder="Enter 16 digit IFSC code"
+        />
+        <ProFormText name="upi_id" label="UPI ID" placeholder="UPI ID for this bank account" />
+        <ProFormSwitch
+          colProps={{
+            span: 8,
+          }}
+          initialValue={false}
+          label="QR?"
+          name="has_remit_qr"
+        />
+        <ProFormSwitch
+          colProps={{
+            span: 8,
+          }}
+          initialValue={false}
+          label="Intent?"
+          name="has_remit_intent"
+        />
+        <ProFormSwitch
+          colProps={{
+            span: 8,
+          }}
+          initialValue={false}
+          label="Bank?"
+          name="has_remit_bank"
+        />
+        <ProFormMoney
+          label="Min Payin"
+          name="min_payin"
+          colProps={{ span: 12 }}
+          fieldProps={{
+            moneySymbol: false,
+          }}
+          locale="en-US"
+          initialValue={50.0}
+          min={0}
+        />
+        <ProFormMoney
+          label="Max Payin"
+          name="max_payin"
+          colProps={{ span: 12 }}
+          fieldProps={{
+            moneySymbol: false,
+          }}
+          locale="en-US"
+          initialValue={100.0}
+          min={0}
+        />
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {
+          console.log('update', value);
           const success = await handleUpdate(value);
+          console.log('update1', success);
           if (success) {
             handleUpdateModalOpen(false);
             setCurrentRow(undefined);
@@ -377,7 +577,7 @@ const TableList: React.FC = () => {
         closable={false}
       >
         {currentRow?.name && (
-          <ProDescriptions<API.RuleListItem>
+          <ProDescriptions<API.BankAcctListItem>
             column={2}
             title={currentRow?.name}
             request={async () => ({
@@ -386,7 +586,7 @@ const TableList: React.FC = () => {
             params={{
               id: currentRow?.name,
             }}
-            columns={columns as ProDescriptionsItemProps<API.RuleListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.BankAcctListItem>[]}
           />
         )}
       </Drawer>
