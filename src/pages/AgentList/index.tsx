@@ -22,7 +22,7 @@ import UpdateForm from './components/UpdateForm';
  * @param fields
  */
 const handleAdd = async (fields: API.AgentListItem) => {
-  const hide = message.loading('正在添加');
+  const hide = message.loading('Adding');
   try {
     await addAgent({ ...fields });
     hide();
