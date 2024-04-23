@@ -1,5 +1,5 @@
 import { addPayin, payin, removePayin, updatePayin } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UserOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -148,11 +148,19 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
-      renderText: (val: number) => (
+      render: (_, record) => (
         <span>
           ₹
           <FormattedNumber
-            value={val}
+            value={record.amount}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+          <br />
+          <UserOutlined /> ₹
+          <FormattedNumber
+            value={record.agent_submitted_amount}
             currencySign="accounting"
             minimumFractionDigits={2}
             maximumFractionDigits={2}

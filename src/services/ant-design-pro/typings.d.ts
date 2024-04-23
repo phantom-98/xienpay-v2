@@ -182,6 +182,7 @@ declare namespace API {
     merchant_order_id: number;
     bank_acct_name: string;
     user_submitted_utr: string;
+    agent_submitted_amount: number;
     is_test_mode: boolean;
     uuid: string;
     currency: string;

@@ -53,7 +53,7 @@ export default [
   // },
   {
     name: 'list.merchant-list',
-    icon: 'BookOutlined',
+    icon: 'CreditCardOutlined',
     path: '/merchant-list',
     component: './MerchantList',
   },
