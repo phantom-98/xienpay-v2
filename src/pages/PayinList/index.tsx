@@ -6,12 +6,12 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProFormMoney,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
-import { Button, Drawer, Switch, message } from 'antd';
+import { Button, Drawer, Modal, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -21,12 +21,27 @@ import UpdateForm from './components/UpdateForm';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.PayinListItem) => {
+const handleAdd = async (fields: API.PaymentLinkResponse) => {
   const hide = message.loading('Adding');
   try {
-    await addPayin({ ...fields });
+    const response = await addPayin({ ...fields });
+    const { payinUrl } = response;
     hide();
-    message.success('Added successfully');
+    if (payinUrl !== null && payinUrl !== undefined) {
+      navigator.clipboard.writeText(payinUrl).then(
+        () => {
+          message.success('Payment link copied to clipboard!');
+        },
+        (err) => {
+          message.error('Failed to copy: ', err);
+        },
+      );
+      Modal.success({
+        content: payinUrl,
+        width: 1000,
+        title: 'Payment Link',
+      });
+    }
     return true;
   } catch (error) {
     hide();
@@ -256,7 +271,11 @@ const PayinList: React.FC = () => {
               handleModalOpen(true);
             }}
           >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            <PlusOutlined />{' '}
+            <FormattedMessage
+              id="pages.payinTable.new-payment-link"
+              defaultMessage="New Payment Link"
+            />
           </Button>,
         ]}
         request={payin}
@@ -311,11 +330,18 @@ const PayinList: React.FC = () => {
           id: 'pages.searchTable.createForm.newPayin',
           defaultMessage: 'New payin',
         })}
-        width="400px"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
+        layout="horizontal"
+        labelCol={{
+          span: 8,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        labelAlign="left"
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.PayinListItem);
+          const success = await handleAdd(value as API.PaymentLinkItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -336,10 +362,30 @@ const PayinList: React.FC = () => {
               ),
             },
           ]}
+          label="Merchant Order ID"
           width="md"
-          name="name"
+          name="merchant_order_id"
         />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormText width="md" name="merchant_code" label="Merchant Code" />
+        <ProFormText width="md" name="user_id" label="User ID" />
+        <ProFormText colProps={{ span: 12 }} width="md" name="user_email" label="Email" />
+        <ProFormText
+          colProps={{ span: 12 }}
+          width="md"
+          name="user_phone_number"
+          label="User Phone #"
+        />
+        <ProFormMoney
+          label="Amount"
+          name="amount"
+          colProps={{ span: 12 }}
+          fieldProps={{
+            moneySymbol: false,
+          }}
+          locale="en-US"
+          initialValue={50.0}
+          min={0}
+        />
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {

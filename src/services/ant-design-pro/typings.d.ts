@@ -155,6 +155,24 @@ declare namespace API {
     | 'pending'
     | 'submitted';
 
+  type PaymentLinkItem = {
+    merchant_code: string;
+    merchant_order_id: string;
+    user_id: string;
+    user_phone_number?: string;
+    user_email?: string;
+    amount: number;
+  };
+
+  type PaymentLinkResponse = {
+    amount: number;
+    currency: string;
+    at: number;
+    merchantOrderId: string;
+    payinId: string;
+    payinUrl: string;
+  };
+
   type PayinListItem = {
     id: number;
     amount: number;
@@ -170,6 +188,8 @@ declare namespace API {
     status: PayinStatus;
     updated_at?: string;
     created_at?: string;
+
+    payinUrl?: string;
   };
 
   type PayinList = {

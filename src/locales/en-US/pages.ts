@@ -89,6 +89,8 @@ export default {
   'pages.payinTable.payinStatus.dropped': 'dropped',
   'pages.payinTable.payinStatus.dispute': 'dispute',
 
+  'pages.payinTable.new-payment-link': 'New Payment Link',
+
   'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
   'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)',
 
