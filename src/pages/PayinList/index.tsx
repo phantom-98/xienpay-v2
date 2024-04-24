@@ -146,6 +146,11 @@ const PayinList: React.FC = () => {
       },
     },
     {
+      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
+      dataIndex: 'short_code',
+      valueType: 'textarea',
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
       render: (_, record) => (
@@ -190,6 +195,11 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
       dataIndex: 'agent',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
+      dataIndex: 'user_id',
       valueType: 'textarea',
     },
     {
@@ -359,13 +369,13 @@ const PayinList: React.FC = () => {
         }}
       >
         <ProFormText
-          payins={[
+          rules={[
             {
               required: true,
               message: (
                 <FormattedMessage
                   id="pages.searchTable.payinName"
-                  defaultMessage="Payin name is required"
+                  defaultMessage="Merchant Order ID is required"
                 />
               ),
             },
@@ -374,8 +384,38 @@ const PayinList: React.FC = () => {
           width="md"
           name="merchant_order_id"
         />
-        <ProFormText width="md" name="merchant_code" label="Merchant Code" />
-        <ProFormText width="md" name="user_id" label="User ID" />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payinName"
+                  defaultMessage="Merchant Code is required"
+                />
+              ),
+            },
+          ]}
+          width="md"
+          name="merchant_code"
+          label="Merchant Code"
+        />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payinName"
+                  defaultMessage="User ID is required"
+                />
+              ),
+            },
+          ]}
+          width="md"
+          name="user_id"
+          label="User ID"
+        />
         <ProFormText colProps={{ span: 12 }} width="md" name="user_email" label="Email" />
         <ProFormText
           colProps={{ span: 12 }}
@@ -387,11 +427,8 @@ const PayinList: React.FC = () => {
           label="Amount"
           name="amount"
           colProps={{ span: 12 }}
-          fieldProps={{
-            moneySymbol: false,
-          }}
+          fieldProps={{ moneySymbol: false }}
           locale="en-US"
-          initialValue={50.0}
           min={0}
         />
       </ModalForm>
