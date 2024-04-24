@@ -11,8 +11,8 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProFormMoney,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
@@ -26,7 +26,7 @@ import UpdateForm from './components/UpdateForm';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.MerchantListItem) => {
+const handleAdd = async (fields: API.AddMerchantItem) => {
   const hide = message.loading('Adding');
   try {
     await addMerchant({ ...fields });
@@ -271,11 +271,13 @@ const MerchantList: React.FC = () => {
           id: 'pages.searchTable.createForm.newMerchant',
           defaultMessage: 'New merchant',
         })}
+        labelCol={{ span: 6 }}
         width="400px"
+        layout="horizontal"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.MerchantListItem);
+          const success = await handleAdd(value as API.AddMerchantItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -285,21 +287,60 @@ const MerchantList: React.FC = () => {
         }}
       >
         <ProFormText
-          merchants={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.merchantName"
-                  defaultMessage="Merchant name is required"
-                />
-              ),
-            },
-          ]}
+          label="Code"
           width="md"
-          name="name"
+          name="code"
+          required={true}
+          placeholder="Unique merchant code"
         />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormText
+          label="Url"
+          width="md"
+          name="site_url"
+          required={true}
+          placeholder="Site Url"
+        />
+        <ProFormText
+          label="Return"
+          width="md"
+          name="return_url"
+          required={true}
+          placeholder="Return Url"
+        />
+        <ProFormText
+          label="Callback"
+          width="md"
+          name="notify_url"
+          required={true}
+          placeholder="Callback Url"
+        />
+        <ProFormMoney
+          label="Min Payin"
+          width="md"
+          fieldProps={{ moneySymbol: false }}
+          locale="en-US"
+          initialValue={10.0}
+          name="min_payin"
+          placeholder="Min Payin"
+        />
+        <ProFormMoney
+          label="Max Payin"
+          width="md"
+          fieldProps={{ moneySymbol: false }}
+          locale="en-US"
+          initialValue={100.0}
+          name="max_payin"
+          placeholder="Max Payin "
+        />
+        <ProFormMoney
+          label="Commission"
+          width="md"
+          fieldProps={{ moneySymbol: false, precision: 2 }}
+          locale="en-US"
+          initialValue={5.0}
+          name="commission"
+          placeholder="Commission %"
+        />
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {
