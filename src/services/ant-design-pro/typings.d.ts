@@ -179,6 +179,8 @@ declare namespace API {
     utr_id: string;
     agent: string;
     merchant: string;
+    user_id: string;
+    short_code: string;
     merchant_order_id: number;
     bank_acct_name: string;
     user_submitted_utr: string;
