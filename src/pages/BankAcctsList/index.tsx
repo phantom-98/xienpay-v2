@@ -1,6 +1,7 @@
 import {
   addBankAcct,
   bankAcct,
+  changeStatusBankAcct,
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
@@ -52,15 +53,8 @@ const handleUpdate = async (fields: FormValueType) => {
   try {
     await updateBankAcct({
       name: fields.name,
-      acName: fields.ac_name,
-      acNo: fields.ac_no,
-      ifsc: fields.ifsc,
-      upiId: fields.upi_id,
-      hasRemitQR: fields.has_remit_qr,
-      hasRemitIntent: fields.has_remit_intent,
-      hasRemitBank: fields.has_remit_bank,
-      minPayin: fields.min_payin,
-      maxPayin: fields.max_payin,
+      desc: fields.desc,
+      key: fields.key,
     });
     hide();
 
@@ -224,7 +218,9 @@ const TableList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
       dataIndex: 'is_enabled',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      render: (_, record) => (
+        <Switch checked={record.is_enabled} onChange={changeStatusBankAcct(record.id)} />
+      ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
