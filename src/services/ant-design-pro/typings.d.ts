@@ -133,6 +133,11 @@ declare namespace API {
     success?: boolean;
   };
 
+  type AddAgentItem = {
+    name: string;
+    tg_handle: string;
+  };
+
   type AgentListItem = {
     id: number;
     name: string;

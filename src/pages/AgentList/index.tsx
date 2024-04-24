@@ -7,7 +7,6 @@ import {
   PageContainer,
   ProDescriptions,
   ProFormText,
-  ProFormTextArea,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
@@ -21,7 +20,7 @@ import UpdateForm from './components/UpdateForm';
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.AgentListItem) => {
+const handleAdd = async (fields: API.AddAgentItem) => {
   const hide = message.loading('Adding');
   try {
     await addAgent({ ...fields });
@@ -269,7 +268,7 @@ const AgentList: React.FC = () => {
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.AgentListItem);
+          const success = await handleAdd(value as API.AddAgentItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -278,22 +277,8 @@ const AgentList: React.FC = () => {
           }
         }}
       >
-        <ProFormText
-          agents={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.agentName"
-                  defaultMessage="Agent name is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="name"
-        />
-        <ProFormTextArea width="md" name="desc" />
+        <ProFormText width="md" name="name" required={true} placeholder="Agent Nickname" />
+        <ProFormText width="md" name="tg_id" required={true} placeholder="Telegram ID" />
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {
