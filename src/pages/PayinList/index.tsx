@@ -151,7 +151,7 @@ const PayinList: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
+      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Initiated" />,
       dataIndex: 'amount',
       render: (_, record) => (
         <span>
@@ -162,7 +162,14 @@ const PayinList: React.FC = () => {
             minimumFractionDigits={2}
             maximumFractionDigits={2}
           />
-          <br />
+        </span>
+      ),
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Confirmed" />,
+      dataIndex: 'amount',
+      render: (_, record) => (
+        <span>
           <UserOutlined /> ₹
           <FormattedNumber
             value={record.agent_submitted_amount}
@@ -179,13 +186,16 @@ const PayinList: React.FC = () => {
       ),
       dataIndex: 'merchant_order_id',
       valueType: 'textarea',
-      render: (_, record) => (
-        <span>
-          {record.merchant_order_id}
-          <br />
-          <i>{record.merchant}</i>
-        </span>
-      ),
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
+      dataIndex: 'merchant',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
+      dataIndex: 'user_id',
+      valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
@@ -198,13 +208,13 @@ const PayinList: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
-      dataIndex: 'user_id',
+      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
+      dataIndex: 'utr_id',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
-      dataIndex: 'utr_id',
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
+      dataIndex: 'user_submitted_utr',
       valueType: 'textarea',
     },
     {
@@ -276,6 +286,7 @@ const PayinList: React.FC = () => {
           id: 'pages.payinTable.title',
           defaultMessage: 'Payins List',
         })}
+        scroll={{ x: 'max-content' }}
         actionRef={actionRef}
         rowKey="key"
         search={{
@@ -383,6 +394,7 @@ const PayinList: React.FC = () => {
           label="Merchant Order ID"
           width="md"
           name="merchant_order_id"
+          placeholder="Unique order ID generated at the merchant for reference"
         />
         <ProFormText
           rules={[
@@ -399,6 +411,7 @@ const PayinList: React.FC = () => {
           width="md"
           name="merchant_code"
           label="Merchant Code"
+          placeholder="Merchant Code"
         />
         <ProFormText
           rules={[
@@ -415,13 +428,21 @@ const PayinList: React.FC = () => {
           width="md"
           name="user_id"
           label="User ID"
+          placeholder="Unique user ID for reference of the merchant"
         />
-        <ProFormText colProps={{ span: 12 }} width="md" name="user_email" label="Email" />
+        <ProFormText
+          colProps={{ span: 12 }}
+          width="md"
+          name="user_email"
+          label="Email"
+          placeholder="Optional user email"
+        />
         <ProFormText
           colProps={{ span: 12 }}
           width="md"
           name="user_phone_number"
           label="User Phone #"
+          placeholder="Optional user email"
         />
         <ProFormMoney
           label="Amount"
@@ -430,6 +451,7 @@ const PayinList: React.FC = () => {
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
           min={0}
+          placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
         />
       </ModalForm>
       <UpdateForm
