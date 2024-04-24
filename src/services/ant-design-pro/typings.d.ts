@@ -99,6 +99,16 @@ declare namespace API {
     type?: NoticeIconItemType;
   };
 
+  type AddMerchantItem = {
+    code: string;
+    site_url: string;
+    return_url: string;
+    notify_url: string;
+    min_payin: number;
+    max_payin: number;
+    commission: number;
+  };
+
   type MerchantListItem = {
     return_url?: string;
     max_payin?: number;
