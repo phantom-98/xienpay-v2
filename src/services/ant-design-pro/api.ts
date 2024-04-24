@@ -304,3 +304,21 @@ export async function removeBankAcct(options?: { [key: string]: any }) {
     },
   });
 }
+
+async function bankAcct_changeStatus(bank_id: number, checked: boolean) {
+  console.log('changeBankStatus', bank_id, checked);
+  return request('/api/bankAccts/changeStatus', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      id: bank_id,
+      is_enabled: checked ? true : false,
+    },
+  });
+}
+
+export function changeStatusBankAcct(bank_id: number) {
+  return (checked: boolean) => {
+    bankAcct_changeStatus(bank_id, checked);
+  };
+}

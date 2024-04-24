@@ -324,6 +324,7 @@ module.exports = {
   'GET /api/bankAccts': {
     data: [
       {
+        id: 1,
         ac_no: '1234567890',
         ac_name: 'John Doe',
         ifsc: 'ABCD1234567',
@@ -338,6 +339,7 @@ module.exports = {
         updated_at: '2022-12-06T05:00:57.040Z',
       },
       {
+        id: 2,
         ac_no: '1234567890',
         ac_name: 'John Doe',
         ifsc: 'ABCD1234567',
@@ -352,6 +354,7 @@ module.exports = {
         updated_at: '2022-12-06T05:00:57.040Z',
       },
       {
+        id: 3,
         ac_no: '1234567890',
         ac_name: 'John Doe',
         ifsc: 'ABCD1234567',
@@ -366,6 +369,7 @@ module.exports = {
         updated_at: '2022-12-06T05:00:57.040Z',
       },
       {
+        id: 4,
         ac_no: '1234567890',
         ac_name: 'John Doe',
         ifsc: 'ABCD1234567',
