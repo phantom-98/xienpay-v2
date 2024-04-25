@@ -318,6 +318,7 @@ async function bankAcct_changeStatus(bank_id: number, checked: boolean) {
 }
 
 export function changeStatusBankAcct(bank_id: number) {
+  console.log('changeStatusBankAcct', bank_id);
   return (checked: boolean) => {
     bankAcct_changeStatus(bank_id, checked);
   };
