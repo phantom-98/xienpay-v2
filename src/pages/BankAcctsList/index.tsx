@@ -230,7 +230,7 @@ const TableList: React.FC = () => {
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.has_remit_intent}
+          defaultChecked={record.has_remit_qr}
           onChange={toggleRemitFlag(record.id, 'qr')}
         />
       ),
@@ -242,11 +242,12 @@ const TableList: React.FC = () => {
           defaultMessage="Show Bank?"
         />
       ),
+      hideInTable: true,
       dataIndex: 'has_remit_bank',
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.has_remit_intent}
+          defaultChecked={record.has_remit_bank}
           onChange={toggleRemitFlag(record.id, 'bank')}
         />
       ),
