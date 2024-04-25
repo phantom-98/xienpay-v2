@@ -1,4 +1,10 @@
-import { addAgent, agent, removeAgent, updateAgent } from '@/services/ant-design-pro/api';
+import {
+  addAgent,
+  agent,
+  changeEnableAgent,
+  removeAgent,
+  updateAgent,
+} from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -14,6 +20,16 @@ import { Button, Drawer, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+/******************
+ * Switch handlers
+ *****************/
+function toggleEnable(agent_id: number) {
+  console.log('toggleStatus', agent_id);
+  return (checked: boolean) => {
+    changeEnableAgent(agent_id, checked);
+  };
+}
 
 /**
  * @en-US Add node
@@ -169,17 +185,23 @@ const AgentList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.agentTable.online?" defaultMessage="Online?" />,
       dataIndex: 'is_logged_in',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
+    },
+    {
+      title: <FormattedMessage id="pages.agentTable.apprpved" defaultMessage="Approved?" />,
+      dataIndex: 'is_approved',
+      render: (_, record) => <Switch defaultChecked={record.is_enabled} disabled size="small" />,
     },
     {
       title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Enabled?" />,
       dataIndex: 'is_enabled',
-      renderText: (val: boolean) => <Switch checked={val} />,
-    },
-    {
-      title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Approved?" />,
-      dataIndex: 'is_approved',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      render: (_, record) => (
+        <Switch
+          defaultChecked={record.is_enabled}
+          size="small"
+          onChange={toggleEnable(record.id)}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
