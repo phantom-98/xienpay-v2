@@ -1,5 +1,5 @@
 import { addPayin, payin, removePayin, updatePayin } from '@/services/ant-design-pro/api';
-import { PlusOutlined, UserOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -124,26 +124,9 @@ const PayinList: React.FC = () => {
 
   const columns: ProColumns<API.PayinListItem>[] = [
     {
-      title: (
-        <FormattedMessage
-          id="pages.payinTable.updateForm.payinName.nameLabel"
-          defaultMessage="Payin UUID"
-        />
-      ),
-      dataIndex: 'uuid',
-      tip: 'The payin uuid is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
+      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="ID" />,
+      dataIndex: 'id',
+      valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
@@ -151,26 +134,11 @@ const PayinList: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Initiated" />,
-      dataIndex: 'amount',
-      render: (_, record) => (
-        <span>
-          ₹
-          <FormattedNumber
-            value={record.amount}
-            currencySign="accounting"
-            minimumFractionDigits={2}
-            maximumFractionDigits={2}
-          />
-        </span>
-      ),
-    },
-    {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Confirmed" />,
       dataIndex: 'amount',
       render: (_, record) => (
         <span>
-          <UserOutlined /> ₹
+          ₹
           <FormattedNumber
             value={record.agent_submitted_amount}
             currencySign="accounting"
@@ -195,26 +163,6 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
       dataIndex: 'user_id',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
-      dataIndex: 'is_test_mode',
-      renderText: (val: boolean) => <Switch checked={val} />,
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
-      dataIndex: 'agent',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
-      dataIndex: 'utr_id',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
-      dataIndex: 'user_submitted_utr',
       valueType: 'textarea',
     },
     {
@@ -270,6 +218,63 @@ const PayinList: React.FC = () => {
           status: 'Warning',
         },
       },
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.payinTable.updateForm.payinName.nameLabel"
+          defaultMessage="Payin UUID"
+        />
+      ),
+      dataIndex: 'uuid',
+      tip: 'The payin uuid is the unique key',
+      render: (dom, entity) => {
+        return (
+          <a
+            onClick={() => {
+              setCurrentRow(entity);
+              setShowDetail(true);
+            }}
+          >
+            {dom}
+          </a>
+        );
+      },
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
+      dataIndex: 'amount',
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.amount}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+    },
+    {
+      title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
+      dataIndex: 'is_test_mode',
+      renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
+      dataIndex: 'agent',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
+      dataIndex: 'utr_id',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
+      dataIndex: 'user_submitted_utr',
+      valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated" />,
@@ -391,6 +396,7 @@ const PayinList: React.FC = () => {
               ),
             },
           ]}
+          initialValue={crypto.randomUUID().toString()}
           label="Merchant Order ID"
           width="md"
           name="merchant_order_id"

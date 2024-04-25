@@ -110,6 +110,7 @@ declare namespace API {
   };
 
   type MerchantListItem = {
+    id: number;
     return_url?: string;
     max_payin?: number;
     min_payin?: number;

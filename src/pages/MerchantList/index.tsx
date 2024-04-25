@@ -1,5 +1,6 @@
 import {
   addMerchant,
+  changeStatusMerchant,
   merchant,
   removeMerchant,
   updateMerchant,
@@ -20,6 +21,16 @@ import { Button, Drawer, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+/******************
+ * Switch handlers
+ *****************/
+function toggleStatus(merchant_id: number) {
+  console.log('toggleStatus', merchant_id);
+  return (checked: boolean) => {
+    changeStatusMerchant(merchant_id, checked);
+  };
+}
 
 /**
  * @en-US Add node
@@ -179,8 +190,12 @@ const MerchantList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
       dataIndex: 'is_test_mode',
-      renderText: (val: boolean) => (
-        <Switch checked={val} style={{ backgroundColor: !val ? 'green' : 'grey' }} />
+      render: (_, record) => (
+        <Switch
+          defaultChecked={!record.is_test_mode}
+          size="small"
+          onChange={toggleStatus(record.id)}
+        />
       ),
     },
     {

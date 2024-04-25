@@ -199,6 +199,18 @@ export async function removeAgent(options?: { [key: string]: any }) {
   });
 }
 
+export async function changeEnableAgent(agent_id: number, checked: boolean) {
+  console.log('changeEnableAgent', agent_id, checked);
+  return request('/api/agents/changeEnable', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      id: agent_id,
+      is_enabled: checked ? true : false,
+    },
+  });
+}
+
 /** 获取规则列表 GET /api/payins */
 export async function payin(
   params: {
@@ -305,7 +317,7 @@ export async function removeBankAcct(options?: { [key: string]: any }) {
   });
 }
 
-async function bankAcct_changeStatus(bank_id: number, checked: boolean) {
+export async function changeStatusBankAcct(bank_id: number, checked: boolean) {
   console.log('changeBankStatus', bank_id, checked);
   return request('/api/bankAccts/changeStatus', {
     method: 'POST',
@@ -317,9 +329,27 @@ async function bankAcct_changeStatus(bank_id: number, checked: boolean) {
   });
 }
 
-export function changeStatusBankAcct(bank_id: number) {
-  console.log('changeStatusBankAcct', bank_id);
-  return (checked: boolean) => {
-    bankAcct_changeStatus(bank_id, checked);
-  };
+export async function changeRemitFlagBankAcct(bank_id: number, flag: string, checked: boolean) {
+  console.log('changeRemitFlagBankAcct', bank_id, checked);
+  return request('/api/bankAccts/changeRemitFlag', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      id: bank_id,
+      flag: flag,
+      is_enabled: checked ? true : false,
+    },
+  });
+}
+
+export async function changeStatusMerchant(merchant_id: number, checked: boolean) {
+  console.log('changeStatusMerchant', merchant_id, checked);
+  return request('/api/merchants/changeStatus', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      id: merchant_id,
+      is_enabled: checked ? true : false,
+    },
+  });
 }

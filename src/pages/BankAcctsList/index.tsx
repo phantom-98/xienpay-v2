@@ -1,6 +1,7 @@
 import {
   addBankAcct,
   bankAcct,
+  changeRemitFlagBankAcct,
   changeStatusBankAcct,
   removeBankAcct,
   updateBankAcct,
@@ -22,6 +23,23 @@ import { Button, Col, Drawer, Input, Row, Space, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+/******************
+ * Switch handlers
+ *****************/
+function toggleStatus(bank_id: number) {
+  console.log('toggleStatus', bank_id);
+  return (checked: boolean) => {
+    changeStatusBankAcct(bank_id, checked);
+  };
+}
+
+function toggleRemitFlag(bank_id: number, flag: string) {
+  console.log('toggleRemitFlag', bank_id);
+  return (checked: boolean) => {
+    changeRemitFlagBankAcct(bank_id, flag, checked);
+  };
+}
 
 /**
  * @en-US Add node
@@ -193,7 +211,13 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_intent',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      render: (_, record) => (
+        <Switch
+          size="small"
+          defaultChecked={record.has_remit_intent}
+          onChange={toggleRemitFlag(record.id, 'intent')}
+        />
+      ),
     },
     {
       title: (
@@ -203,7 +227,13 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_qr',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      render: (_, record) => (
+        <Switch
+          size="small"
+          defaultChecked={record.has_remit_intent}
+          onChange={toggleRemitFlag(record.id, 'qr')}
+        />
+      ),
     },
     {
       title: (
@@ -213,13 +243,23 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_bank',
-      renderText: (val: boolean) => <Switch checked={val} />,
+      render: (_, record) => (
+        <Switch
+          size="small"
+          defaultChecked={record.has_remit_intent}
+          onChange={toggleRemitFlag(record.id, 'bank')}
+        />
+      ),
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
       dataIndex: 'is_enabled',
       render: (_, record) => (
-        <Switch defaultChecked={record.is_enabled} onChange={changeStatusBankAcct(record.id)} />
+        <Switch
+          size="small"
+          defaultChecked={record.is_enabled}
+          onChange={toggleStatus(record.id)}
+        />
       ),
     },
     {
