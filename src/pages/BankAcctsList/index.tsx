@@ -219,7 +219,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
       dataIndex: 'is_enabled',
       render: (_, record) => (
-        <Switch checked={record.is_enabled} onChange={changeStatusBankAcct(record.id)} />
+        <Switch defaultChecked={record.is_enabled} onChange={changeStatusBankAcct(record.id)} />
       ),
     },
     {
