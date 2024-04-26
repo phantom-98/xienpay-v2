@@ -6,7 +6,7 @@ import {
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -19,7 +19,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
-import { Button, Col, Drawer, Input, Row, Space, Switch, message } from 'antd';
+import { Button, Col, Drawer, Form, Input, List, Modal, Row, Space, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -120,11 +120,26 @@ const TableList: React.FC = () => {
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
+  const [updateMerchantsModalOpen, handleUpdateMerchantsModalOpen] = useState<boolean>(false);
+  const [items, setItems] = useState(['Item 1', 'Item 2', 'Item 3']); // Initial items
+  const [newItem, setNewItem] = useState('');
+
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.BankAcctListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.BankAcctListItem[]>([]);
+
+  const handleMerchantsDelete = (itemToDelete: string) => {
+    setItems(items.filter((item) => item !== itemToDelete));
+  };
+
+  const handleMerchantsAdd = () => {
+    if (newItem) {
+      setItems([...items, newItem]);
+      setNewItem('');
+    }
+  };
 
   /**
    * @en-US International configuration
@@ -334,22 +349,16 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      hideInTable: true,
+      hideInTable: false,
       render: (_, record) => [
         <a
           key="config"
           onClick={() => {
-            handleUpdateModalOpen(true);
+            handleUpdateMerchantsModalOpen(true);
             setCurrentRow(record);
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
+          <FormattedMessage id="pages.merchantTable.title" defaultMessage="Configuration" />
         </a>,
       ],
     },
@@ -581,6 +590,7 @@ const TableList: React.FC = () => {
           min={0}
         />
       </ModalForm>
+
       <UpdateForm
         onSubmit={async (value) => {
           console.log('update', value);
@@ -603,6 +613,36 @@ const TableList: React.FC = () => {
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
       />
+
+      <Modal
+        title="Items List"
+        open={updateMerchantsModalOpen}
+        onOk={() => handleUpdateMerchantsModalOpen(false)}
+        onCancel={() => handleUpdateMerchantsModalOpen(false)}
+      >
+        <List
+          dataSource={items}
+          renderItem={(item) => (
+            <List.Item
+              actions={[
+                <DeleteOutlined key="delete" onClick={() => handleMerchantsDelete(item)} />,
+              ]}
+            >
+              {item}
+            </List.Item>
+          )}
+        />
+        <Form layout="inline">
+          <Form.Item>
+            <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} />
+          </Form.Item>
+          <Form.Item>
+            <Button type="dashed" onClick={handleMerchantsAdd} icon={<PlusOutlined />}>
+              Add Item
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Drawer
         width={600}

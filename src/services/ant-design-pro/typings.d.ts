@@ -218,6 +218,11 @@ declare namespace API {
     success?: boolean;
   };
 
+  type LinkedMerchantListItem = {
+    id: number;
+    name: string;
+  };
+
   type BankAcctListItem = {
     id: number;
     name: string;
@@ -226,13 +231,15 @@ declare namespace API {
     ac_name: string;
     ifsc: string;
     upi_id: string;
-    max_payin?: number;
-    min_payin?: number;
+    max_payin: number;
+    min_payin: number;
     is_enabled: boolean;
     has_remit_qr: boolean;
     has_remit_intent: boolean;
     has_remit_bank: boolean;
     updated_at: string;
+
+    merchants?: LinkedMerchantListItem[];
   };
 
   type BankAcctList = {
