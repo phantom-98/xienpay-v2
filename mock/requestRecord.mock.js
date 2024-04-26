@@ -384,5 +384,18 @@ module.exports = {
         updated_at: '2022-12-06T05:00:57.040Z',
       },
     ],
+    total: 4,
+    success: true,
+    pageSize: 20,
+    current: 1,
+  },
+  'POST /api/bankAccts/assignedMerchants': {
+    data: [
+      { id: 1, name: 'Merchant 1' },
+      { id: 2, name: 'Merchant 2' },
+      { id: 3, name: 'Merchant 3' },
+    ],
+    success: true,
+    total: 3,
   },
 };

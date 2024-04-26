@@ -353,3 +353,12 @@ export async function changeStatusMerchant(merchant_id: number, checked: boolean
     },
   });
 }
+
+export async function fetchAssignedMerchants(bank_id: number) {
+  return request('/api/bankAccts/assignedMerchants', {
+    method: 'POST',
+    params: {
+      bank_id: bank_id,
+    },
+  });
+}

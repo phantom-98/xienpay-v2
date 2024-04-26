@@ -3,6 +3,7 @@ import {
   bankAcct,
   changeRemitFlagBankAcct,
   changeStatusBankAcct,
+  fetchAssignedMerchants,
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
@@ -40,6 +41,10 @@ function toggleRemitFlag(bank_id: number, flag: string) {
     changeRemitFlagBankAcct(bank_id, flag, checked);
   };
 }
+
+const loadAssignedMerchants = async (bank_id: number) => {
+  return fetchAssignedMerchants(bank_id);
+};
 
 /**
  * @en-US Add node
@@ -120,9 +125,12 @@ const TableList: React.FC = () => {
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
+  /**
+   * Merchant assignment modal
+   */
   const [updateMerchantsModalOpen, handleUpdateMerchantsModalOpen] = useState<boolean>(false);
-  const [items, setItems] = useState(['Item 1', 'Item 2', 'Item 3']); // Initial items
-  const [newItem, setNewItem] = useState('');
+  const [merchants, setMerchants] = useState<API.LinkedMerchantListItem[]>([]); // Initial items
+  const [newMerchant, setNewMerchant] = useState<API.LinkedMerchantListItem>();
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -130,14 +138,14 @@ const TableList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.BankAcctListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.BankAcctListItem[]>([]);
 
-  const handleMerchantsDelete = (itemToDelete: string) => {
-    setItems(items.filter((item) => item !== itemToDelete));
+  const handleMerchantsDelete = (itemToDelete: API.LinkedMerchantListItem) => {
+    setMerchants(merchants.filter((item) => item.id !== itemToDelete.id));
   };
 
   const handleMerchantsAdd = () => {
-    if (newItem) {
-      setItems([...items, newItem]);
-      setNewItem('');
+    if (newMerchant) {
+      setMerchants([...merchants, newMerchant]);
+      setNewMerchant(undefined);
     }
   };
 
@@ -352,10 +360,15 @@ const TableList: React.FC = () => {
       hideInTable: false,
       render: (_, record) => [
         <a
-          key="config"
+          key="id"
           onClick={() => {
-            handleUpdateMerchantsModalOpen(true);
             setCurrentRow(record);
+            handleUpdateMerchantsModalOpen(true);
+
+            loadAssignedMerchants(record.id).then((response) => {
+              console.log('loadAssignedMerchants', response);
+              setMerchants(response.data);
+            });
           }}
         >
           <FormattedMessage id="pages.merchantTable.title" defaultMessage="Configuration" />
@@ -615,26 +628,30 @@ const TableList: React.FC = () => {
       />
 
       <Modal
-        title="Items List"
+        title="Marchants List"
         open={updateMerchantsModalOpen}
+        okText="Update"
         onOk={() => handleUpdateMerchantsModalOpen(false)}
         onCancel={() => handleUpdateMerchantsModalOpen(false)}
       >
         <List
-          dataSource={items}
-          renderItem={(item) => (
+          dataSource={merchants}
+          renderItem={(item: API.LinkedMerchantListItem) => (
             <List.Item
               actions={[
                 <DeleteOutlined key="delete" onClick={() => handleMerchantsDelete(item)} />,
               ]}
             >
-              {item}
+              {item.name}
             </List.Item>
           )}
         />
         <Form layout="inline">
           <Form.Item>
-            <Input value={newItem} onChange={(e) => setNewItem(e.target.value)} />
+            <Input
+              value={{ id: 0, name: '' } as API.LinkedMerchantListItem}
+              onChange={(e) => setNewMerchant(e.target.value)}
+            />
           </Form.Item>
           <Form.Item>
             <Button type="dashed" onClick={handleMerchantsAdd} icon={<PlusOutlined />}>
