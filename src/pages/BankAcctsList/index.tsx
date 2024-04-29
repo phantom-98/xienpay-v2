@@ -1,12 +1,15 @@
 import {
   addBankAcct,
+  assignMerchants,
   bankAcct,
   changeRemitFlagBankAcct,
   changeStatusBankAcct,
+  fetchAssignedMerchants,
+  fetchMerchantsList,
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -19,10 +22,103 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
-import { Button, Col, Drawer, Input, Row, Space, Switch, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import type { SelectProps } from 'antd';
+import {
+  Button,
+  Col,
+  Drawer,
+  Form,
+  Input,
+  List,
+  Modal,
+  Row,
+  Select,
+  Space,
+  Spin,
+  Switch,
+  message,
+} from 'antd';
+import debounce from 'lodash/debounce';
+import React, { useMemo, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+export interface DebounceSelectProps<ValueType = any>
+  extends Omit<SelectProps<ValueType | ValueType[]>, 'options' | 'children'> {
+  fetchOptions: (search: string) => Promise<ValueType[]>;
+  debounceTimeout?: number;
+}
+
+function DebounceSelect<
+  ValueType extends { key?: string; label: React.ReactNode; value: string | number } = any,
+>({ fetchOptions, debounceTimeout = 800, ...props }: DebounceSelectProps<ValueType>) {
+  const [fetching, setFetching] = useState(false);
+  const [options, setOptions] = useState<ValueType[]>([]);
+  const fetchRef = useRef(0);
+
+  const debounceFetcher = useMemo(() => {
+    const loadOptions = (value: string) => {
+      fetchRef.current += 1;
+      const fetchId = fetchRef.current;
+      setOptions([]);
+      setFetching(true);
+
+      fetchOptions(value).then((newOptions) => {
+        if (fetchId !== fetchRef.current) {
+          // for fetch callback order
+          return;
+        }
+
+        setOptions(newOptions);
+        setFetching(false);
+      });
+    };
+
+    return debounce(loadOptions, debounceTimeout);
+  }, [fetchOptions, debounceTimeout]);
+
+  return (
+    <Select
+      labelInValue
+      filterOption={false}
+      onSearch={debounceFetcher}
+      notFoundContent={fetching ? <Spin size="small" /> : null}
+      {...props}
+      options={options}
+    />
+  );
+}
+
+// Usage of DebounceSelect
+interface UserValue {
+  label: string;
+  value: number;
+}
+
+function toLinkedMerchanListItem(user: UserValue): API.LinkedMerchantListItem {
+  let item: API.LinkedMerchantListItem = {
+    id: 0,
+    name: '',
+  };
+  item.id = user.value;
+  item.name = user.label;
+  return item;
+}
+
+// async function fetchUserList(username: string): Promise<UserValue[]> {
+//   console.log('fetching user', username);
+
+//   return fetch('https://randomuser.me/api/?results=5')
+//     .then((response) => response.json())
+//     .then((body) =>
+//       body.results.map(
+//         (user: { name: { first: string; last: string }; login: { username: string } }) => ({
+//           label: `${user.name.first} ${user.name.last}`,
+//           value: user.login.username,
+//         }),
+//       ),
+//     );
+// }
 
 /******************
  * Switch handlers
@@ -40,6 +136,10 @@ function toggleRemitFlag(bank_id: number, flag: string) {
     changeRemitFlagBankAcct(bank_id, flag, checked);
   };
 }
+
+const loadAssignedMerchants = async (bank_id: number) => {
+  return fetchAssignedMerchants(bank_id);
+};
 
 /**
  * @en-US Add node
@@ -120,11 +220,33 @@ const TableList: React.FC = () => {
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
 
+  /**
+   * Merchant assignment modal
+   */
+  const [updateMerchantsModalOpen, handleUpdateMerchantsModalOpen] = useState<boolean>(false);
+  const [merchants, setMerchants] = useState<API.LinkedMerchantListItem[]>([]); // Initial items
+  const [newMerchant, setNewMerchant] = useState<API.LinkedMerchantListItem[]>();
+
+  const [value, setValue] = useState<UserValue[]>([]);
+
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.BankAcctListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.BankAcctListItem[]>([]);
+
+  const handleMerchantsDelete = (itemToDelete: API.LinkedMerchantListItem) => {
+    setMerchants(merchants.filter((item) => item.id !== itemToDelete.id));
+  };
+
+  const handleMerchantsAdd = () => {
+    console.log(newMerchant);
+    if (value) {
+      const new_merchants = value.map(toLinkedMerchanListItem);
+      setMerchants([...merchants, ...new_merchants]);
+      setNewMerchant(undefined);
+    }
+  };
 
   /**
    * @en-US International configuration
@@ -334,22 +456,21 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
       dataIndex: 'option',
       valueType: 'option',
-      hideInTable: true,
+      hideInTable: false,
       render: (_, record) => [
         <a
-          key="config"
+          key="id"
           onClick={() => {
-            handleUpdateModalOpen(true);
             setCurrentRow(record);
+            handleUpdateMerchantsModalOpen(true);
+
+            loadAssignedMerchants(record.id).then((response) => {
+              console.log('loadAssignedMerchants', response);
+              setMerchants(response.data);
+            });
           }}
         >
-          <FormattedMessage id="pages.searchTable.config" defaultMessage="Configuration" />
-        </a>,
-        <a key="subscribeAlert" href="https://procomponents.ant.design/">
-          <FormattedMessage
-            id="pages.searchTable.subscribeAlert"
-            defaultMessage="Subscribe to alerts"
-          />
+          <FormattedMessage id="pages.merchantTable.title" defaultMessage="Configuration" />
         </a>,
       ],
     },
@@ -581,6 +702,7 @@ const TableList: React.FC = () => {
           min={0}
         />
       </ModalForm>
+
       <UpdateForm
         onSubmit={async (value) => {
           console.log('update', value);
@@ -603,6 +725,54 @@ const TableList: React.FC = () => {
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
       />
+
+      <Modal
+        title="Marchants List"
+        open={updateMerchantsModalOpen}
+        okText="Update"
+        onOk={() => {
+          if (currentRow?.id && merchants) {
+            assignMerchants(
+              currentRow?.id,
+              merchants?.map((m) => m.id),
+            );
+            handleUpdateMerchantsModalOpen(false);
+          }
+        }}
+        onCancel={() => handleUpdateMerchantsModalOpen(false)}
+      >
+        <List
+          dataSource={merchants}
+          renderItem={(item: API.LinkedMerchantListItem) => (
+            <List.Item
+              actions={[
+                <DeleteOutlined key="delete" onClick={() => handleMerchantsDelete(item)} />,
+              ]}
+            >
+              {item.name}
+            </List.Item>
+          )}
+        />
+        <Form layout="inline">
+          <Form.Item>
+            <DebounceSelect
+              mode="multiple"
+              value={value}
+              placeholder="Select users"
+              fetchOptions={fetchMerchantsList}
+              onChange={(newValue) => {
+                setValue(newValue as UserValue[]);
+              }}
+              style={{ width: '200px' }}
+            />
+          </Form.Item>
+          <Form.Item>
+            <Button type="dashed" onClick={handleMerchantsAdd} icon={<PlusOutlined />}>
+              Add Item
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Drawer
         width={600}
