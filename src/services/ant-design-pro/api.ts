@@ -322,7 +322,6 @@ export async function changeStatusBankAcct(bank_id: number, checked: boolean) {
   return request('/api/bankAccts/changeStatus', {
     method: 'POST',
     data: {
-      method: 'post',
       id: bank_id,
       is_enabled: checked ? true : false,
     },
@@ -334,7 +333,6 @@ export async function changeRemitFlagBankAcct(bank_id: number, flag: string, che
   return request('/api/bankAccts/changeRemitFlag', {
     method: 'POST',
     data: {
-      method: 'post',
       id: bank_id,
       flag: flag,
       is_enabled: checked ? true : false,
@@ -347,7 +345,6 @@ export async function changeStatusMerchant(merchant_id: number, checked: boolean
   return request('/api/merchants/changeStatus', {
     method: 'POST',
     data: {
-      method: 'post',
       id: merchant_id,
       is_enabled: checked ? true : false,
     },
@@ -357,8 +354,37 @@ export async function changeStatusMerchant(merchant_id: number, checked: boolean
 export async function fetchAssignedMerchants(bank_id: number) {
   return request('/api/bankAccts/assignedMerchants', {
     method: 'POST',
-    params: {
+    data: {
       bank_id: bank_id,
     },
   });
+}
+
+export async function assignMerchants(bank_id: number, merchant_ids: number[]) {
+  return request('/api/bankAccts/assignMerchants', {
+    method: 'POST',
+    data: {
+      bank_id: bank_id,
+      merchant_ids: merchant_ids,
+    },
+  });
+}
+
+export async function fetchMerchantsList(
+  merchant_name: string,
+): Promise<API.LinkedMerchantListItem[]> {
+  console.log('fetching user', merchant_name);
+
+  return request('/api/merchants/lookup', {
+    method: 'POST',
+    data: {
+      merchant_name: merchant_name,
+      limit: 5,
+    },
+  }).then((response) =>
+    response.data.map((merchant: { id: number; name: string; code: string }) => ({
+      label: `${merchant.name || ''} ${merchant.code}`,
+      value: merchant.id,
+    })),
+  );
 }
