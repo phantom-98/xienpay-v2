@@ -17,7 +17,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
-import { Button, Drawer, Switch, message } from 'antd';
+import { Button, Drawer, Select, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -98,6 +98,14 @@ const handleRemove = async (selectedRows: API.MerchantListItem[]) => {
     return false;
   }
 };
+
+const { Option } = Select;
+const selectBefore = (
+  <Select defaultValue="http://">
+    <Option value="http://">http://</Option>
+    <Option value="https://">https://</Option>
+  </Select>
+);
 
 const MerchantList: React.FC = () => {
   /**
@@ -287,7 +295,6 @@ const MerchantList: React.FC = () => {
           defaultMessage: 'New merchant',
         })}
         labelCol={{ span: 6 }}
-        width="400px"
         layout="horizontal"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
@@ -301,37 +308,30 @@ const MerchantList: React.FC = () => {
           }
         }}
       >
-        <ProFormText
-          label="Code"
-          width="md"
-          name="code"
-          required={true}
-          placeholder="Unique merchant code"
-        />
+        <ProFormText label="Code" name="code" required={true} placeholder="Unique merchant code" />
         <ProFormText
           label="Url"
-          width="md"
           name="site_url"
           required={true}
           placeholder="Site Url"
+          addonBefore={selectBefore}
         />
         <ProFormText
           label="Return"
-          width="md"
           name="return_url"
           required={true}
           placeholder="Return Url"
+          addonBefore={selectBefore}
         />
         <ProFormText
           label="Callback"
-          width="md"
           name="notify_url"
           required={true}
           placeholder="Callback Url"
+          addonBefore={selectBefore}
         />
         <ProFormMoney
           label="Min Payin"
-          width="md"
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
           initialValue={10.0}
@@ -340,7 +340,6 @@ const MerchantList: React.FC = () => {
         />
         <ProFormMoney
           label="Max Payin"
-          width="md"
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
           initialValue={100.0}
@@ -349,7 +348,6 @@ const MerchantList: React.FC = () => {
         />
         <ProFormMoney
           label="Commission"
-          width="md"
           fieldProps={{ moneySymbol: false, precision: 2 }}
           locale="en-US"
           initialValue={5.0}
