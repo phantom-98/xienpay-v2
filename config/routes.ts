@@ -56,24 +56,28 @@ export default [
     icon: 'CreditCardOutlined',
     path: '/merchant-list',
     component: './MerchantList',
+    access: 'canMerchantList',
   },
   {
     name: 'list.agent-list',
     icon: 'team',
     path: '/agent-list',
     component: './AgentList',
+    access: 'canAgentList',
   },
   {
     name: 'list.bank-acct-list',
     icon: 'BankOutlined',
     path: '/bank-acct-list',
     component: './BankAcctsList',
+    access: 'canBankAcctList',
   },
   {
     name: 'list.payin-list',
     icon: 'DollarOutlined',
     path: '/payin-list',
     component: './PayinList',
+    access: 'canPayinList',
   },
   {
     path: '/',

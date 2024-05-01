@@ -10,7 +10,7 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import { Button, Drawer, Modal, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
@@ -121,6 +121,7 @@ const PayinList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+  const access = useAccess();
 
   const columns: ProColumns<API.PayinListItem>[] = [
     {
@@ -297,21 +298,25 @@ const PayinList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined />{' '}
-            <FormattedMessage
-              id="pages.payinTable.new-payment-link"
-              defaultMessage="New Payment Link"
-            />
-          </Button>,
-        ]}
+        toolBarRender={() =>
+          access.canPayinLinkCreate
+            ? [
+                <Button
+                  type="primary"
+                  key="primary"
+                  onClick={() => {
+                    handleModalOpen(true);
+                  }}
+                >
+                  <PlusOutlined />{' '}
+                  <FormattedMessage
+                    id="pages.payinTable.new-payment-link"
+                    defaultMessage="New Payment Link"
+                  />
+                </Button>,
+              ]
+            : null
+        }
         request={payin}
         columns={columns}
         rowSelection={{

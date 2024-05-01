@@ -16,7 +16,7 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import { Button, Drawer, Select, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
@@ -130,6 +130,7 @@ const MerchantList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+  const access = useAccess();
 
   const columns: ProColumns<API.MerchantListItem>[] = [
     {
@@ -231,17 +232,22 @@ const MerchantList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
+        toolBarRender={() =>
+          access.canMerchantCreate
+            ? [
+                <Button
+                  type="primary"
+                  key="primary"
+                  onClick={() => {
+                    handleModalOpen(true);
+                  }}
+                >
+                  <PlusOutlined />{' '}
+                  <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>,
+              ]
+            : null
+        }
         request={merchant}
         columns={columns}
         rowSelection={{
