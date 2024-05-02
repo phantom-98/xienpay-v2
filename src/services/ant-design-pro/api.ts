@@ -477,7 +477,7 @@ export async function fetchPlayerList(
 ): Promise<API.MerchantUserItem[]> {
   console.log('fetching player', merchant_code, player_name);
 
-  return request('/api/merchants/users/lookup', {
+  return request('/api/merchants/players/lookup', {
     method: 'POST',
     data: {
       merchant_code: merchant_code,
@@ -485,9 +485,9 @@ export async function fetchPlayerList(
       limit: 5,
     },
   }).then((response) =>
-    response.data.map((player: { id: string; mid: string }) => ({
-      label: player.mid,
-      value: player.mid,
+    response.data.map((player: { id: string; name: string }) => ({
+      label: player.name,
+      value: player.name,
     })),
   );
 }

@@ -56,7 +56,7 @@ export default [
     icon: 'TrophyOutlined',
     path: '/admin-user-list',
     component: './AdminUserList',
-    access: 'canSuperAdmin',
+    access: 'canAdmin',
   },
   {
     name: 'list.merchant-list',

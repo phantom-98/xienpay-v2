@@ -101,7 +101,7 @@ const handleRemove = async (selectedRows: API.AdminUserListItem[]) => {
   }
 };
 
-const SearchInput: React.FC<{
+const SearchRoleInput: React.FC<{
   placeholder: string;
   style: React.CSSProperties;
   onChange?: (value: string) => void;
@@ -333,8 +333,15 @@ const AdminUserList: React.FC = () => {
           label="Password"
           placeholder="Password"
         />
+        <ProFormText
+          width="md"
+          name="tg_handle"
+          required={true}
+          label="Telegram username"
+          placeholder="Telegram username"
+        />
         <ProForm.Item name="role" label="Role" valuePropName="value">
-          <SearchInput placeholder="Search role" style={{ width: 'md' }} />
+          <SearchRoleInput placeholder="Search role" style={{ width: 'md' }} />
         </ProForm.Item>
       </ModalForm>
 
