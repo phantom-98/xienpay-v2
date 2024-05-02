@@ -103,4 +103,6 @@ export default {
   'pages.bankAcctTable.searchTable.remit-qr?': 'Allow QR?',
   'pages.bankAcctTable.searchTable.remit-bank?': 'Show Bank?',
   'pages.bankAcctTable.createform.newBankAcct': 'New Bank Account',
+
+  'pages.admin-user-list': 'Users',
 };

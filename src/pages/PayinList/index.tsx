@@ -1,4 +1,10 @@
-import { addPayin, payin, removePayin, updatePayin } from '@/services/ant-design-pro/api';
+import {
+  addPayin,
+  fetchPlayerList,
+  payin,
+  removePayin,
+  updatePayin,
+} from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -6,15 +12,58 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProForm,
   ProFormMoney,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
-import { Button, Drawer, Modal, Switch, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
+import type { SelectProps } from 'antd';
+import { Button, Drawer, Modal, Select, Switch, message } from 'antd';
+import debounce from 'lodash.debounce';
+import React, { useCallback, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+const SearchUserInput: React.FC<{
+  merchantCode: string;
+  placeholder: string;
+  style: React.CSSProperties;
+  onChange?: (value: string) => void;
+}> = (props) => {
+  const [data, setData] = useState<SelectProps['options']>([]);
+  const [value, setValue] = useState<string>();
+
+  const handleSearch = (newValue: string) => {
+    return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
+      setData(data);
+    });
+  };
+
+  const handleChange = (newValue: string) => {
+    setValue(newValue);
+    props.onChange?.(newValue);
+  };
+
+  return (
+    <Select
+      showSearch
+      value={value}
+      placeholder={props.placeholder}
+      style={props.style}
+      defaultActiveFirstOption={false}
+      suffixIcon={null}
+      filterOption={false}
+      onSearch={handleSearch}
+      onChange={handleChange}
+      notFoundContent={null}
+      options={(data || []).map((d) => ({
+        value: d.value,
+        label: d.label,
+      }))}
+    />
+  );
+};
 
 /**
  * @en-US Add node
@@ -116,11 +165,16 @@ const PayinList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.PayinListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.PayinListItem[]>([]);
 
+  const [merchantCode, setMerchantCode] = useState('');
+
+  const debouncedSetMerchantCode = useCallback(debounce(setMerchantCode, 300), []);
+
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+  const access = useAccess();
 
   const columns: ProColumns<API.PayinListItem>[] = [
     {
@@ -297,21 +351,25 @@ const PayinList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined />{' '}
-            <FormattedMessage
-              id="pages.payinTable.new-payment-link"
-              defaultMessage="New Payment Link"
-            />
-          </Button>,
-        ]}
+        toolBarRender={() =>
+          access.canPayinLinkCreate
+            ? [
+                <Button
+                  type="primary"
+                  key="primary"
+                  onClick={() => {
+                    handleModalOpen(true);
+                  }}
+                >
+                  <PlusOutlined />{' '}
+                  <FormattedMessage
+                    id="pages.payinTable.new-payment-link"
+                    defaultMessage="New Payment Link"
+                  />
+                </Button>,
+              ]
+            : null
+        }
         request={payin}
         columns={columns}
         rowSelection={{
@@ -418,24 +476,17 @@ const PayinList: React.FC = () => {
           name="merchant_code"
           label="Merchant Code"
           placeholder="Merchant Code"
+          fieldProps={{
+            onChange: (e) => debouncedSetMerchantCode(e.target.value),
+          }}
         />
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.payinName"
-                  defaultMessage="User ID is required"
-                />
-              ),
-            },
-          ]}
-          width="md"
-          name="user_id"
-          label="User ID"
-          placeholder="Unique user ID for reference of the merchant"
-        />
+        <ProForm.Item name="user_id" label="User ID" valuePropName="value">
+          <SearchUserInput
+            merchantCode={merchantCode}
+            placeholder="Search user id"
+            style={{ width: 'md' }}
+          />
+        </ProForm.Item>
         <ProFormText
           colProps={{ span: 12 }}
           width="md"

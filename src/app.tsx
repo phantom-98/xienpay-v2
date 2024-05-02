@@ -1,4 +1,4 @@
-import { AvatarDropdown, AvatarName, Footer, Question, SelectLang } from '@/components';
+import { AvatarDropdown, AvatarName, Question, SelectLang } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
 import { LinkOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
@@ -60,7 +60,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     waterMarkProps: {
       content: initialState?.currentUser?.name,
     },
-    footerRender: () => <Footer />,
+    footerRender: () => <></>, // <Footer />,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
@@ -149,6 +149,8 @@ const loginTokenInterceptor = (response: Response) => {
     if (token !== null) {
       localStorage.setItem('xien.auth.0', token);
     }
+  } else if (response.config.url === '/api/login/outLogin') {
+    localStorage.removeItem('xien.auth.0');
   }
 
   return response;

@@ -1,9 +1,10 @@
 import {
-  addMerchant,
-  changeStatusMerchant,
-  merchant,
-  removeMerchant,
-  updateMerchant,
+  addAdminUser,
+  adminUser,
+  changeEnableAdminUser,
+  fetchRolesList,
+  removeAdminUser,
+  updateAdminUser,
 } from '@/services/ant-design-pro/api';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -12,11 +13,12 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
-  ProFormMoney,
+  ProForm,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
+import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
+import type { SelectProps } from 'antd';
 import { Button, Drawer, Select, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
@@ -25,10 +27,10 @@ import UpdateForm from './components/UpdateForm';
 /******************
  * Switch handlers
  *****************/
-function toggleStatus(merchant_id: number) {
-  console.log('toggleStatus', merchant_id);
+function toggleEnable(adminUser_id: number) {
+  console.log('toggleStatus', adminUser_id);
   return (checked: boolean) => {
-    changeStatusMerchant(merchant_id, checked);
+    changeEnableAdminUser(adminUser_id, checked);
   };
 }
 
@@ -37,10 +39,10 @@ function toggleStatus(merchant_id: number) {
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.AddMerchantItem) => {
+const handleAdd = async (fields: API.AddAdminUserItem) => {
   const hide = message.loading('Adding');
   try {
-    await addMerchant({ ...fields });
+    await addAdminUser({ ...fields });
     hide();
     message.success('Added successfully');
     return true;
@@ -60,7 +62,7 @@ const handleAdd = async (fields: API.AddMerchantItem) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    await updateMerchant({
+    await updateAdminUser({
       name: fields.name,
       desc: fields.desc,
       key: fields.key,
@@ -82,12 +84,12 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.MerchantListItem[]) => {
+const handleRemove = async (selectedRows: API.AdminUserListItem[]) => {
   const hide = message.loading('Deleting...');
   if (!selectedRows) return true;
   try {
-    await removeMerchant({
-      key: selectedRows.map((row) => row.code),
+    await removeAdminUser({
+      key: selectedRows.map((row) => row.id),
     });
     hide();
     message.success('Deleted successfully and will refresh soon');
@@ -99,15 +101,46 @@ const handleRemove = async (selectedRows: API.MerchantListItem[]) => {
   }
 };
 
-const { Option } = Select;
-const selectBefore = (
-  <Select defaultValue="http://">
-    <Option value="http://">http://</Option>
-    <Option value="https://">https://</Option>
-  </Select>
-);
+const SearchRoleInput: React.FC<{
+  placeholder: string;
+  style: React.CSSProperties;
+  onChange?: (value: string) => void;
+}> = (props) => {
+  const [data, setData] = useState<SelectProps['options']>([]);
+  const [value, setValue] = useState<string>();
 
-const MerchantList: React.FC = () => {
+  const handleSearch = (newValue: string) => {
+    return fetchRolesList(newValue).then((data: any) => {
+      setData(data);
+    });
+  };
+
+  const handleChange = (newValue: string) => {
+    setValue(newValue);
+    props.onChange?.(newValue);
+  };
+
+  return (
+    <Select
+      showSearch
+      value={value}
+      placeholder={props.placeholder}
+      style={props.style}
+      defaultActiveFirstOption={false}
+      suffixIcon={null}
+      filterOption={false}
+      onSearch={handleSearch}
+      onChange={handleChange}
+      notFoundContent={null}
+      options={(data || []).map((d) => ({
+        value: d.value,
+        label: d.label,
+      }))}
+    />
+  );
+};
+
+const AdminUserList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -122,8 +155,8 @@ const MerchantList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.MerchantListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.MerchantListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.AdminUserListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.AdminUserListItem[]>([]);
 
   /**
    * @en-US International configuration
@@ -132,16 +165,16 @@ const MerchantList: React.FC = () => {
   const intl = useIntl();
   const access = useAccess();
 
-  const columns: ProColumns<API.MerchantListItem>[] = [
+  const columns: ProColumns<API.AdminUserListItem>[] = [
     {
       title: (
         <FormattedMessage
-          id="pages.merchantTable.updateForm.merchantName.nameLabel"
-          defaultMessage="Merchant name"
+          id="pages.adminUserTable.updateForm.adminUserName.nameLabel"
+          defaultMessage="AdminUser name"
         />
       ),
-      dataIndex: 'code',
-      tip: 'The merchant code is the unique key',
+      dataIndex: 'name',
+      tip: 'The adminUser code is the unique key',
       render: (dom, entity) => {
         return (
           <a
@@ -156,76 +189,40 @@ const MerchantList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.merchantTable.siteUrl" defaultMessage="Site" />,
-      dataIndex: 'site_url',
+      title: <FormattedMessage id="pages.adminUserTable.tg_handle" defaultMessage="Username" />,
+      dataIndex: 'username',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.merchantTable.apiKey" defaultMessage="API Key" />,
-      dataIndex: 'api_key',
+      title: <FormattedMessage id="pages.adminUserTable.tg_handle" defaultMessage="Role" />,
+      dataIndex: 'role',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.merchantTable.notifyUrl" defaultMessage="Notify Url" />,
-      dataIndex: 'notify_url',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.merchantTable.returnUrl" defaultMessage="Return Url" />,
-      dataIndex: 'return_url',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.merchantTable.payin" defaultMessage="Max Payin" />,
-      render: (_, record) => (
-        <span>
-          ₹
-          <FormattedNumber
-            value={record.min_payin}
-            currencySign="accounting"
-            minimumFractionDigits={2}
-            maximumFractionDigits={2}
-          />
-          &nbsp;-&nbsp; ₹
-          <FormattedNumber
-            value={record.max_payin}
-            currencySign="accounting"
-            minimumFractionDigits={2}
-            maximumFractionDigits={2}
-          />
-        </span>
-      ),
-    },
-    {
-      title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
-      dataIndex: 'is_test_mode',
+      title: <FormattedMessage id="pages.adminUserTable.enabled" defaultMessage="Enabled?" />,
+      dataIndex: 'is_enabled',
       render: (_, record) => (
         <Switch
-          defaultChecked={!record.is_test_mode}
+          defaultChecked={record.is_enabled}
           size="small"
-          onChange={toggleStatus(record.id)}
+          onChange={toggleEnable(record.id)}
         />
       ),
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.merchantTable.payinCommission"
-          defaultMessage="Payin Commission"
-        />
-      ),
-      dataIndex: 'payin_commission',
-      hideInForm: true,
-      renderText: (val: number) => `${val} %`,
+      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
+      dataIndex: 'last_login',
+      valueType: 'dateTime',
+      render: (_, record) => (record.is_logged_in ? record.last_login : record.last_logout),
     },
   ];
 
   return (
     <PageContainer>
-      <ProTable<API.MerchantListItem, API.PageParams>
+      <ProTable<API.AdminUserListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.merchantTable.title',
-          defaultMessage: 'Merchants List',
+          id: 'pages.adminUserTable.title',
+          defaultMessage: 'AdminUsers List',
         })}
         actionRef={actionRef}
         rowKey="key"
@@ -233,7 +230,7 @@ const MerchantList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canMerchantCreate
+          access.canAdmin
             ? [
                 <Button
                   type="primary"
@@ -248,7 +245,7 @@ const MerchantList: React.FC = () => {
               ]
             : null
         }
-        request={merchant}
+        request={adminUser}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -297,15 +294,16 @@ const MerchantList: React.FC = () => {
       )}
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newMerchant',
-          defaultMessage: 'New merchant',
+          id: 'pages.searchTable.createForm.newAdminUser',
+          defaultMessage: 'New Admin User',
         })}
-        labelCol={{ span: 6 }}
         layout="horizontal"
         open={createModalOpen}
+        labelCol={{ span: 8 }}
+        width="480px"
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.AddMerchantItem);
+          const success = await handleAdd(value as API.AddAdminUserItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -314,53 +312,39 @@ const MerchantList: React.FC = () => {
           }
         }}
       >
-        <ProFormText label="Code" name="code" required={true} placeholder="Unique merchant code" />
         <ProFormText
-          label="Url"
-          name="site_url"
+          width="md"
+          name="name"
           required={true}
-          placeholder="Site Url"
-          addonBefore={selectBefore}
-        />
-        <ProFormText
-          label="Return"
-          name="return_url"
-          required={true}
-          placeholder="Return Url"
-          addonBefore={selectBefore}
+          label="Fullname"
+          placeholder="Full name"
         />
         <ProFormText
-          label="Callback"
-          name="notify_url"
+          width="md"
+          name="username"
           required={true}
-          placeholder="Callback Url"
-          addonBefore={selectBefore}
+          label="Username"
+          placeholder="Login name"
         />
-        <ProFormMoney
-          label="Min Payin"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={10.0}
-          name="min_payin"
-          placeholder="Min Payin"
+        <ProFormText.Password
+          width="md"
+          name="password"
+          required={true}
+          label="Password"
+          placeholder="Password"
         />
-        <ProFormMoney
-          label="Max Payin"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={100.0}
-          name="max_payin"
-          placeholder="Max Payin "
+        <ProFormText
+          width="md"
+          name="tg_handle"
+          required={true}
+          label="Telegram username"
+          placeholder="Telegram username"
         />
-        <ProFormMoney
-          label="Commission"
-          fieldProps={{ moneySymbol: false, precision: 2 }}
-          locale="en-US"
-          initialValue={5.0}
-          name="commission"
-          placeholder="Commission %"
-        />
+        <ProForm.Item name="role" label="Role" valuePropName="value">
+          <SearchRoleInput placeholder="Search role" style={{ width: 'md' }} />
+        </ProForm.Item>
       </ModalForm>
+
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
@@ -391,17 +375,17 @@ const MerchantList: React.FC = () => {
         }}
         closable={false}
       >
-        {currentRow?.code && (
-          <ProDescriptions<API.MerchantListItem>
+        {currentRow?.id && (
+          <ProDescriptions<API.AdminUserListItem>
             column={1}
-            title={currentRow?.code}
+            title={<span>AdminUser No. {currentRow?.id}</span>}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
-              id: currentRow?.code,
+              id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<API.MerchantListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.AdminUserListItem>[]}
           />
         )}
       </Drawer>
@@ -409,4 +393,4 @@ const MerchantList: React.FC = () => {
   );
 };
 
-export default MerchantList;
+export default AdminUserList;

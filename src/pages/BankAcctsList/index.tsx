@@ -21,7 +21,7 @@ import {
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
-import { FormattedMessage, FormattedNumber, useIntl } from '@umijs/max';
+import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
 import {
   Button,
@@ -253,6 +253,7 @@ const TableList: React.FC = () => {
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
+  const access = useAccess();
 
   const columns: ProColumns<API.BankAcctListItem>[] = [
     {
@@ -488,17 +489,22 @@ const TableList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() => [
-          <Button
-            type="primary"
-            key="primary"
-            onClick={() => {
-              handleModalOpen(true);
-            }}
-          >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-          </Button>,
-        ]}
+        toolBarRender={() =>
+          access.canBankAcctCreate
+            ? [
+                <Button
+                  type="primary"
+                  key="primary"
+                  onClick={() => {
+                    handleModalOpen(true);
+                  }}
+                >
+                  <PlusOutlined />{' '}
+                  <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>,
+              ]
+            : null
+        }
         request={bankAcct}
         columns={columns}
         rowSelection={{
