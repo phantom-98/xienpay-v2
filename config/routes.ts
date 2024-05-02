@@ -52,6 +52,13 @@ export default [
   //   component: './TableList',
   // },
   {
+    name: 'list.admin-user-list',
+    icon: 'TrophyOutlined',
+    path: '/admin-user-list',
+    component: './AdminUserList',
+    access: 'canSuperAdmin',
+  },
+  {
     name: 'list.merchant-list',
     icon: 'CreditCardOutlined',
     path: '/merchant-list',

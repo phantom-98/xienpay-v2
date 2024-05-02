@@ -224,6 +224,16 @@ declare namespace API {
     name: string;
   };
 
+  type RoleListItem = {
+    name: string;
+    description: string;
+  };
+
+  type MerchantUserItem = {
+    id: number;
+    mid: string;
+  };
+
   type BankAcctListItem = {
     id: number;
     name: string;
@@ -245,6 +255,32 @@ declare namespace API {
 
   type BankAcctList = {
     data?: BankAcctListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
+  type AdminUserListItem = {
+    id: number;
+    fullname: string;
+    username: number;
+    role: string;
+    is_enabled: boolean;
+    last_login?: string;
+    last_logout?: string;
+    updated_at: string;
+  };
+
+  type AddAdminUserItem = {
+    fullname: string;
+    username: string;
+    password: string;
+    role: string;
+    tg_handle: string;
+  };
+
+  type AdminUserList = {
+    data?: AgentListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;

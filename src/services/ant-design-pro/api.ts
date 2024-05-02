@@ -388,3 +388,106 @@ export async function fetchMerchantsList(
     })),
   );
 }
+
+/** 获取规则列表 GET /api/adminUsers */
+export async function adminUser(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.AdminUserList>('/api/adminUsers', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新规则 PUT /api/adminUsers */
+export async function updateAdminUser(options?: { [key: string]: any }) {
+  return request<API.AdminUserListItem>('/api/adminUsers', {
+    method: 'POST',
+    data: {
+      method: 'update',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 新建规则 POST /api/adminUsers */
+export async function addAdminUser(options?: { [key: string]: any }) {
+  return request<API.AdminUserListItem>('/api/adminUsers', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 删除规则 DELETE /api/adminUsers */
+export async function removeAdminUser(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/adminUsers', {
+    method: 'POST',
+    data: {
+      method: 'delete',
+      ...(options || {}),
+    },
+  });
+}
+
+export async function changeEnableAdminUser(adminUser_id: number, checked: boolean) {
+  console.log('changeEnableAdminUser', adminUser_id, checked);
+  return request('/api/adminUsers/changeEnable', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      id: adminUser_id,
+      is_enabled: checked ? true : false,
+    },
+  });
+}
+
+export async function fetchRolesList(name: string): Promise<API.RoleListItem[]> {
+  console.log('fetching role', name);
+
+  return request('/api/roles', {
+    method: 'POST',
+    data: {
+      name: name,
+      limit: 5,
+    },
+  }).then((response) =>
+    response.data.map((role: { name: string; description: string }) => ({
+      label: role.description,
+      value: role.name,
+    })),
+  );
+}
+
+export async function fetchPlayerList(
+  merchant_code: string,
+  player_name: string,
+): Promise<API.MerchantUserItem[]> {
+  console.log('fetching player', merchant_code, player_name);
+
+  return request('/api/merchants/users/lookup', {
+    method: 'POST',
+    data: {
+      merchant_code: merchant_code,
+      player_name: player_name,
+      limit: 5,
+    },
+  }).then((response) =>
+    response.data.map((player: { id: string; mid: string }) => ({
+      label: player.mid,
+      value: player.mid,
+    })),
+  );
+}
