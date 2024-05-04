@@ -13,14 +13,13 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
-  ProForm,
+  ProFormSelect,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, useAccess, useIntl } from '@umijs/max';
-import type { SelectProps } from 'antd';
-import { Button, Drawer, Select, Switch, message } from 'antd';
-import React, { useRef, useState } from 'react';
+import { Button, Drawer, Switch, message } from 'antd';
+import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
@@ -101,45 +100,6 @@ const handleRemove = async (selectedRows: API.AdminUserListItem[]) => {
   }
 };
 
-const SearchRoleInput: React.FC<{
-  placeholder: string;
-  style: React.CSSProperties;
-  onChange?: (value: string) => void;
-}> = (props) => {
-  const [data, setData] = useState<SelectProps['options']>([]);
-  const [value, setValue] = useState<string>();
-
-  const handleSearch = (newValue: string) => {
-    return fetchRolesList(newValue).then((data: any) => {
-      setData(data);
-    });
-  };
-
-  const handleChange = (newValue: string) => {
-    setValue(newValue);
-    props.onChange?.(newValue);
-  };
-
-  return (
-    <Select
-      showSearch
-      value={value}
-      placeholder={props.placeholder}
-      style={props.style}
-      defaultActiveFirstOption={false}
-      suffixIcon={null}
-      filterOption={false}
-      onSearch={handleSearch}
-      onChange={handleChange}
-      notFoundContent={null}
-      options={(data || []).map((d) => ({
-        value: d.value,
-        label: d.label,
-      }))}
-    />
-  );
-};
-
 const AdminUserList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -157,6 +117,21 @@ const AdminUserList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.AdminUserListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.AdminUserListItem[]>([]);
+
+  /* Preload roles list */
+  const [rolesList, setRolesList] = useState<API.RoleListItem[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetchedRoles = await fetchRolesList('');
+        setRolesList(fetchedRoles);
+      } catch (error) {
+        // Handle error
+        console.error('Error fetching roles:', error);
+      }
+    })();
+  }, []);
 
   /**
    * @en-US International configuration
@@ -197,10 +172,12 @@ const AdminUserList: React.FC = () => {
       title: <FormattedMessage id="pages.adminUserTable.tg_handle" defaultMessage="Role" />,
       dataIndex: 'role',
       valueType: 'textarea',
+      valueEnum: Map.from(rolesList, (role) => [role.value, role.label]),
     },
     {
       title: <FormattedMessage id="pages.adminUserTable.enabled" defaultMessage="Enabled?" />,
       dataIndex: 'is_enabled',
+      hideInSearch: true,
       render: (_, record) => (
         <Switch
           defaultChecked={record.is_enabled}
@@ -213,6 +190,7 @@ const AdminUserList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
       dataIndex: 'last_login',
       valueType: 'dateTime',
+      hideInSearch: true,
       render: (_, record) => (record.is_logged_in ? record.last_login : record.last_logout),
     },
   ];
@@ -292,6 +270,7 @@ const AdminUserList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
+
       <ModalForm
         title={intl.formatMessage({
           id: 'pages.searchTable.createForm.newAdminUser',
@@ -340,9 +319,13 @@ const AdminUserList: React.FC = () => {
           label="Telegram username"
           placeholder="Telegram username"
         />
-        <ProForm.Item name="role" label="Role" valuePropName="value">
-          <SearchRoleInput placeholder="Search role" style={{ width: 'md' }} />
-        </ProForm.Item>
+        <ProFormSelect
+          width="md"
+          options={rolesList}
+          // request={fetchRolesList}
+          name="role"
+          label="Role"
+        />
       </ModalForm>
 
       <UpdateForm
