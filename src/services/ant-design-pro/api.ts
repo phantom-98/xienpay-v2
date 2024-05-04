@@ -383,7 +383,7 @@ export async function fetchMerchantsList(
     },
   }).then((response) =>
     response.data.map((merchant: { id: number; name: string; code: string }) => ({
-      label: `${merchant.name || ''} ${merchant.code}`,
+      label: merchant.code, // `${merchant.name || ''} ${merchant.code}`,
       value: merchant.id,
     })),
   );

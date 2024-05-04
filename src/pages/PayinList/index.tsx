@@ -1,5 +1,6 @@
 import {
   addPayin,
+  fetchMerchantsList,
   fetchPlayerList,
   payin,
   removePayin,
@@ -14,14 +15,14 @@ import {
   ProDescriptions,
   ProForm,
   ProFormMoney,
+  ProFormSelect,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
 import { Button, Drawer, Modal, Select, Switch, message } from 'antd';
-import debounce from 'lodash.debounce';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
@@ -167,14 +168,27 @@ const PayinList: React.FC = () => {
 
   const [merchantCode, setMerchantCode] = useState('');
 
-  const debouncedSetMerchantCode = useCallback(debounce(setMerchantCode, 300), []);
-
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
    * */
   const intl = useIntl();
   const access = useAccess();
+
+  /* Preload merchants list */
+  const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetchedMerchants = await fetchMerchantsList('');
+        setMerchantsList(fetchedMerchants);
+      } catch (error) {
+        // Handle error
+        console.error('Error fetching merchants:', error);
+      }
+    })();
+  }, []);
 
   const columns: ProColumns<API.PayinListItem>[] = [
     {
@@ -189,7 +203,8 @@ const PayinList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Confirmed" />,
-      dataIndex: 'amount',
+      dataIndex: 'agent_submitted_amount',
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -213,6 +228,7 @@ const PayinList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
       dataIndex: 'merchant',
       valueType: 'textarea',
+      valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
     },
     {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
@@ -313,6 +329,7 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
       dataIndex: 'is_test_mode',
+      hideInSearch: true,
       renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
     },
     {
@@ -329,12 +346,14 @@ const PayinList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
       dataIndex: 'user_submitted_utr',
       valueType: 'textarea',
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated" />,
       dataIndex: 'updated_at',
       hideInForm: true,
       valueType: 'dateTime',
+      hideInSearch: true,
     },
   ];
 
@@ -433,7 +452,7 @@ const PayinList: React.FC = () => {
         }}
         labelAlign="left"
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.PaymentLinkItem);
+          const success = await handleAdd(value as API.PaymentLinkResponse);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -460,25 +479,14 @@ const PayinList: React.FC = () => {
           name="merchant_order_id"
           placeholder="Unique order ID generated at the merchant for reference"
         />
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.payinName"
-                  defaultMessage="Merchant Code is required"
-                />
-              ),
-            },
-          ]}
+        <ProFormSelect
           width="md"
+          options={merchantsList.map((merchant) => merchant.label)}
+          //options={merchantsList}
+          // request={fetchRolesList}
           name="merchant_code"
           label="Merchant Code"
-          placeholder="Merchant Code"
-          fieldProps={{
-            onChange: (e) => debouncedSetMerchantCode(e.target.value),
-          }}
+          onChange={setMerchantCode}
         />
         <ProForm.Item name="user_id" label="User ID" valuePropName="value">
           <SearchUserInput
