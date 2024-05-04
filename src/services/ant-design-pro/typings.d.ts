@@ -277,6 +277,7 @@ declare namespace API {
     password: string;
     role: string;
     tg_handle: string;
+    merchant_code: string;
   };
 
   type AdminUserList = {

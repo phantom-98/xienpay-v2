@@ -2,6 +2,7 @@ import {
   addAdminUser,
   adminUser,
   changeEnableAdminUser,
+  fetchMerchantsList,
   fetchRolesList,
   removeAdminUser,
   updateAdminUser,
@@ -13,6 +14,7 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProFormDependency,
   ProFormSelect,
   ProFormText,
   ProTable,
@@ -129,6 +131,21 @@ const AdminUserList: React.FC = () => {
       } catch (error) {
         // Handle error
         console.error('Error fetching roles:', error);
+      }
+    })();
+  }, []);
+
+  /* Preload merchants list */
+  const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetchedMerchants = await fetchMerchantsList('');
+        setMerchantsList(fetchedMerchants);
+      } catch (error) {
+        // Handle error
+        console.error('Error fetching merchants:', error);
       }
     })();
   }, []);
@@ -312,20 +329,38 @@ const AdminUserList: React.FC = () => {
           label="Password"
           placeholder="Password"
         />
-        <ProFormText
-          width="md"
-          name="tg_handle"
-          required={true}
-          label="Telegram username"
-          placeholder="Telegram username"
-        />
         <ProFormSelect
           width="md"
+          required={true}
           options={rolesList}
           // request={fetchRolesList}
           name="role"
           label="Role"
         />
+        <ProFormDependency name={['role']}>
+          {({ role }) => {
+            return role === 'cs' || role === 'agent' || role === 'transactions' ? (
+              <ProFormText
+                width="md"
+                name="tg_handle"
+                label="Telegram username"
+                placeholder="Telegram username"
+              />
+            ) : null;
+          }}
+        </ProFormDependency>
+        <ProFormDependency name={['role']}>
+          {({ role }) => {
+            return role === 'merchant' ? (
+              <ProFormSelect
+                width="md"
+                options={merchantsList.map((merchant) => merchant.label)}
+                name="merchant_code"
+                label="Merchant Code"
+              />
+            ) : null;
+          }}
+        </ProFormDependency>
       </ModalForm>
 
       <UpdateForm
