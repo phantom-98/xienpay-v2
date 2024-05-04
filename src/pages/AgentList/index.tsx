@@ -155,6 +155,7 @@ const AgentList: React.FC = () => {
       title: <FormattedMessage id="pages.agentTable.balance" defaultMessage="Balance" />,
       dataIndex: 'balance',
       valueType: 'textarea',
+      hideInSearch: true,
       renderText: (val: boolean) => (
         <FormattedNumber
           value={val}
@@ -167,6 +168,7 @@ const AgentList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.agentTable.remitType" defaultMessage="Type" />,
       dataIndex: 'remit_acct_type',
+      hideInSearch: true,
       valueEnum: {
         'upi-mc': {
           text: <FormattedMessage id="pages.payinTable.remit.upi-mc" defaultMessage="Intent" />,
@@ -181,21 +183,25 @@ const AgentList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.agentTable.upi" defaultMessage="UPI" />,
       dataIndex: 'upi_id',
+      hideInSearch: true,
       valueType: 'textarea',
     },
     {
       title: <FormattedMessage id="pages.agentTable.online?" defaultMessage="Online?" />,
       dataIndex: 'is_logged_in',
+      valueType: 'switch',
       renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
     },
     {
       title: <FormattedMessage id="pages.agentTable.apprpved" defaultMessage="Approved?" />,
       dataIndex: 'is_approved',
+      hideInSearch: true,
       render: (_, record) => <Switch defaultChecked={record.is_enabled} disabled size="small" />,
     },
     {
       title: <FormattedMessage id="pages.agentTable.enabled" defaultMessage="Enabled?" />,
       dataIndex: 'is_enabled',
+      valueType: 'switch',
       render: (_, record) => (
         <Switch
           defaultChecked={record.is_enabled}
@@ -207,6 +213,7 @@ const AgentList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
       dataIndex: 'last_login',
+      hideInSearch: true,
       valueType: 'dateTime',
       render: (_, record) => (record.is_logged_in ? record.last_login : record.last_logout),
     },
@@ -221,9 +228,6 @@ const AgentList: React.FC = () => {
         })}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
         toolBarRender={() =>
           access.canAgentCreate
             ? [
@@ -242,6 +246,9 @@ const AgentList: React.FC = () => {
         }
         request={agent}
         columns={columns}
+        search={{
+          labelWidth: 'auto',
+        }}
         rowSelection={{
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);

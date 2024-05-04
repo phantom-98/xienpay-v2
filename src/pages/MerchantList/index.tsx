@@ -141,6 +141,7 @@ const MerchantList: React.FC = () => {
         />
       ),
       dataIndex: 'code',
+      hideInSearch: true,
       tip: 'The merchant code is the unique key',
       render: (dom, entity) => {
         return (
@@ -159,24 +160,29 @@ const MerchantList: React.FC = () => {
       title: <FormattedMessage id="pages.merchantTable.siteUrl" defaultMessage="Site" />,
       dataIndex: 'site_url',
       valueType: 'textarea',
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.apiKey" defaultMessage="API Key" />,
       dataIndex: 'api_key',
       valueType: 'textarea',
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.notifyUrl" defaultMessage="Notify Url" />,
       dataIndex: 'notify_url',
       valueType: 'textarea',
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.returnUrl" defaultMessage="Return Url" />,
       dataIndex: 'return_url',
       valueType: 'textarea',
+      hideInSearch: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.payin" defaultMessage="Max Payin" />,
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -198,6 +204,7 @@ const MerchantList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
+      hideInSearch: true,
       dataIndex: 'is_test_mode',
       render: (_, record) => (
         <Switch
@@ -215,7 +222,7 @@ const MerchantList: React.FC = () => {
         />
       ),
       dataIndex: 'payin_commission',
-      hideInForm: true,
+      hideInSearch: true,
       renderText: (val: number) => `${val} %`,
     },
   ];
@@ -229,9 +236,10 @@ const MerchantList: React.FC = () => {
         })}
         actionRef={actionRef}
         rowKey="key"
-        search={{
-          labelWidth: 120,
-        }}
+        search={false}
+        // search={{
+        //   labelWidth: 120,
+        // }}
         toolBarRender={() =>
           access.canMerchantCreate
             ? [
