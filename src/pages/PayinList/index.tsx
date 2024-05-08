@@ -21,7 +21,7 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Modal, Select, Switch, message } from 'antd';
+import { Button, Drawer, Modal, Select, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -326,12 +326,13 @@ const PayinList: React.FC = () => {
         </span>
       ),
     },
-    {
-      title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
-      dataIndex: 'is_test_mode',
-      hideInSearch: true,
-      renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
-    },
+    // {
+    //   title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
+    //   dataIndex: 'is_test_mode',
+    //   hideInSearch: true,
+    //   hideInTable: false,
+    //   renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
+    // },
     {
       title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
       dataIndex: 'agent',
