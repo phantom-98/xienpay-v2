@@ -1,6 +1,6 @@
 import {
   addMerchant,
-  changeStatusMerchant,
+  // changeStatusMerchant,
   merchant,
   removeMerchant,
   updateMerchant,
@@ -25,12 +25,12 @@ import UpdateForm from './components/UpdateForm';
 /******************
  * Switch handlers
  *****************/
-function toggleStatus(merchant_id: number) {
-  console.log('toggleStatus', merchant_id);
-  return (checked: boolean) => {
-    changeStatusMerchant(merchant_id, checked);
-  };
-}
+// function toggleStatus(merchant_id: number) {
+//   console.log('toggleStatus', merchant_id);
+//   return (checked: boolean) => {
+//     changeStatusMerchant(merchant_id, checked);
+//   };
+// }
 
 /**
  * @en-US Add node
@@ -203,14 +203,16 @@ const MerchantList: React.FC = () => {
       ),
     },
     {
-      title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Live?" />,
+      title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Test mode?" />,
       hideInSearch: true,
       dataIndex: 'is_test_mode',
       render: (_, record) => (
         <Switch
-          defaultChecked={!record.is_test_mode}
+          checked={record.is_test_mode}
           size="small"
-          onChange={toggleStatus(record.id)}
+          style={{ backgroundColor: record.is_test_mode ? 'red' : 'grey' }}
+          disabled
+          // onChange={toggleStatus(record.id)}
         />
       ),
     },

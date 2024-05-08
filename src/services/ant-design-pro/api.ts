@@ -340,16 +340,16 @@ export async function changeRemitFlagBankAcct(bank_id: number, flag: string, che
   });
 }
 
-export async function changeStatusMerchant(merchant_id: number, checked: boolean) {
-  console.log('changeStatusMerchant', merchant_id, checked);
-  return request('/api/merchants/changeStatus', {
-    method: 'POST',
-    data: {
-      id: merchant_id,
-      is_enabled: checked ? true : false,
-    },
-  });
-}
+// export async function changeStatusMerchant(merchant_id: number, checked: boolean) {
+//   console.log('changeStatusMerchant', merchant_id, checked);
+//   return request('/api/merchants/changeStatus', {
+//     method: 'POST',
+//     data: {
+//       id: merchant_id,
+//       is_enabled: checked ? true : false,
+//     },
+//   });
+// }
 
 export async function fetchAssignedMerchants(bank_id: number) {
   return request('/api/bankAccts/assignedMerchants', {
