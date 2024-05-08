@@ -1,6 +1,5 @@
 import {
   addMerchant,
-  // changeStatusMerchant,
   merchant,
   removeMerchant,
   updateMerchant,
@@ -21,16 +20,6 @@ import { Button, Drawer, Select, Switch, message } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-
-/******************
- * Switch handlers
- *****************/
-// function toggleStatus(merchant_id: number) {
-//   console.log('toggleStatus', merchant_id);
-//   return (checked: boolean) => {
-//     changeStatusMerchant(merchant_id, checked);
-//   };
-// }
 
 /**
  * @en-US Add node
@@ -212,7 +201,6 @@ const MerchantList: React.FC = () => {
           size="small"
           style={{ backgroundColor: record.is_test_mode ? 'red' : 'grey' }}
           disabled
-          // onChange={toggleStatus(record.id)}
         />
       ),
     },
