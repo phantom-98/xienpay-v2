@@ -35,9 +35,15 @@ const SearchUserInput: React.FC<{
   const [data, setData] = useState<SelectProps['options']>([]);
   const [value, setValue] = useState<string>();
 
+  // Ensure that new user ids should also be allowed to be entered here
+  // if they were not present in lookup
   const handleSearch = (newValue: string) => {
     return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
-      setData(data);
+      if (data.length > 0) {
+        setData(data);
+      } else {
+        setData([{ label: newValue, value: newValue }]);
+      }
     });
   };
 
@@ -74,7 +80,10 @@ const SearchUserInput: React.FC<{
 const handleAdd = async (fields: API.PaymentLinkResponse) => {
   const hide = message.loading('Adding');
   try {
-    const response = await addPayin({ ...fields });
+    const response = await addPayin({
+      ...fields,
+      merchant_order_id: crypto.randomUUID().toString(),
+    });
     const { payinUrl } = response;
     hide();
     if (payinUrl !== null && payinUrl !== undefined) {
@@ -462,24 +471,6 @@ const PayinList: React.FC = () => {
           }
         }}
       >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.payinName"
-                  defaultMessage="Merchant Order ID is required"
-                />
-              ),
-            },
-          ]}
-          initialValue={crypto.randomUUID().toString()}
-          label="Merchant Order ID"
-          width="md"
-          name="merchant_order_id"
-          placeholder="Unique order ID generated at the merchant for reference"
-        />
         <ProFormSelect
           width="md"
           options={merchantsList.map((merchant) => merchant.label)}
