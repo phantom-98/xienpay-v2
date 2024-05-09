@@ -87,6 +87,13 @@ export default [
     access: 'canPayinList',
   },
   {
+    name: 'list.payout-list',
+    icon: 'SendOutlined',
+    path: '/payout-list',
+    component: './PayoutList',
+    access: 'canPayoutList',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },
