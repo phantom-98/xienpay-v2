@@ -1,13 +1,12 @@
 import {
+  addPayout,
   fetchMerchantsList,
   fetchPlayerList,
-  generatePaymentLink,
-  generatePermaPaymentLink,
-  payin,
-  removePayin,
-  updatePayin,
+  payout,
+  removePayout,
+  updatePayout,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -15,10 +14,8 @@ import {
   PageContainer,
   ProDescriptions,
   ProForm,
-  ProFormDependency,
   ProFormMoney,
   ProFormSelect,
-  ProFormSwitch,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
@@ -38,15 +35,9 @@ const SearchUserInput: React.FC<{
   const [data, setData] = useState<SelectProps['options']>([]);
   const [value, setValue] = useState<string>();
 
-  // Ensure that new user ids should also be allowed to be entered here
-  // if they were not present in lookup
   const handleSearch = (newValue: string) => {
     return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
-      if (data.length > 0) {
-        setData(data);
-      } else {
-        setData([{ label: newValue, value: newValue }]);
-      }
+      setData(data);
     });
   };
 
@@ -80,26 +71,14 @@ const SearchUserInput: React.FC<{
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.PaymentLinkItem) => {
+const handleAdd = async (fields: API.PaymentLinkResponse) => {
   const hide = message.loading('Adding');
   try {
-    let payinUrl = '';
-    if (fields.one_time_paylink === true) {
-      const response = await generatePaymentLink({
-        ...fields,
-        merchant_order_id: crypto.randomUUID().toString(),
-      });
-      payinUrl = response.payinUrl;
-    } else {
-      const response = await generatePermaPaymentLink({
-        ...fields,
-      });
-      payinUrl = response.permalink;
-    }
-
+    const response = await addPayout({ ...fields });
+    const { payoutUrl } = response;
     hide();
-    if (payinUrl !== null && payinUrl !== undefined) {
-      navigator.clipboard.writeText(payinUrl).then(
+    if (payoutUrl !== null && payoutUrl !== undefined) {
+      navigator.clipboard.writeText(payoutUrl).then(
         () => {
           message.success('Payment link copied to clipboard!');
         },
@@ -108,7 +87,7 @@ const handleAdd = async (fields: API.PaymentLinkItem) => {
         },
       );
       Modal.success({
-        content: payinUrl,
+        content: payoutUrl,
         width: 1000,
         title: 'Payment Link',
       });
@@ -130,7 +109,7 @@ const handleAdd = async (fields: API.PaymentLinkItem) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    await updatePayin({
+    await updatePayout({
       name: fields.name,
       desc: fields.desc,
       key: fields.key,
@@ -152,11 +131,11 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.PayinListItem[]) => {
+const handleRemove = async (selectedRows: API.PayoutListItem[]) => {
   const hide = message.loading('Deleting...');
   if (!selectedRows) return true;
   try {
-    await removePayin({
+    await removePayout({
       key: selectedRows.map((row) => row.id),
     });
     hide();
@@ -169,7 +148,7 @@ const handleRemove = async (selectedRows: API.PayinListItem[]) => {
   }
 };
 
-const PayinList: React.FC = () => {
+const PayoutList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -184,8 +163,8 @@ const PayinList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.PayinListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.PayinListItem[]>([]);
+  const [currentRow, setCurrentRow] = useState<API.PayoutListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.PayoutListItem[]>([]);
 
   const [merchantCode, setMerchantCode] = useState('');
 
@@ -211,26 +190,68 @@ const PayinList: React.FC = () => {
     })();
   }, []);
 
-  const columns: ProColumns<API.PayinListItem>[] = [
+  const columns: ProColumns<API.PayoutListItem>[] = [
     {
-      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="ID" />,
+      title: <FormattedMessage id="pages.payoutTable.short_code" defaultMessage="ID" />,
       dataIndex: 'id',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
-      dataIndex: 'short_code',
+      title: (
+        <FormattedMessage id="pages.payoutTable.mcOrderId" defaultMessage="Merchant Order ID" />
+      ),
+      dataIndex: 'merchant_order_id',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Confirmed" />,
-      dataIndex: 'agent_submitted_amount',
-      hideInSearch: true,
+      title: <FormattedMessage id="pages.payoutTable.mcOrderId" defaultMessage="Merchant" />,
+      dataIndex: 'merchant',
+      valueType: 'textarea',
+      valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
+    },
+    {
+      title: <FormattedMessage id="pages.payoutTable.agent" defaultMessage="User" />,
+      dataIndex: 'user_id',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payoutTable.status" defaultMessage="Status" />,
+      dataIndex: 'status',
+      valueEnum: {
+        initiated: {
+          text: (
+            <FormattedMessage
+              id="pages.payoutTable.payoutStatus.default"
+              defaultMessage="Initiated"
+            />
+          ),
+          status: 'Default',
+        },
+        success: {
+          text: (
+            <FormattedMessage
+              id="pages.payoutTable.payoutStatus.success"
+              defaultMessage="Success"
+            />
+          ),
+          status: 'Success',
+        },
+        failed: {
+          text: (
+            <FormattedMessage id="pages.payoutTable.payoutStatus.failed" defaultMessage="Failed" />
+          ),
+          status: 'Error',
+        },
+      },
+    },
+    {
+      title: <FormattedMessage id="pages.payoutTable.amount" defaultMessage="Amount" />,
+      dataIndex: 'amount',
       render: (_, record) => (
         <span>
           ₹
           <FormattedNumber
-            value={record.agent_submitted_amount}
+            value={record.amount}
             currencySign="accounting"
             minimumFractionDigits={2}
             maximumFractionDigits={2}
@@ -240,85 +261,31 @@ const PayinList: React.FC = () => {
     },
     {
       title: (
-        <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
+        <FormattedMessage id="pages.bankAcctTable.searchTable.details" defaultMessage="Details" />
       ),
-      dataIndex: 'merchant_order_id',
+      dataIndex: 'ac_name',
       valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
-      dataIndex: 'merchant',
-      valueType: 'textarea',
-      valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
-      dataIndex: 'user_id',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
-      dataIndex: 'status',
-      valueEnum: {
-        initiated: {
-          text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.default"
-              defaultMessage="Initiated"
-            />
-          ),
-          status: 'Default',
-        },
-        assigned: {
-          text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.assigned"
-              defaultMessage="Assigned"
-            />
-          ),
-          status: 'Processing',
-        },
-        pending: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.pending" defaultMessage="Pending" />
-          ),
-          status: 'Processing',
-        },
-        success: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.success" defaultMessage="Success" />
-          ),
-          status: 'Success',
-        },
-        failed: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.failed" defaultMessage="Failed" />
-          ),
-          status: 'Error',
-        },
-        dropped: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
-          ),
-          status: 'Error',
-        },
-        dispute: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.dispute" defaultMessage="Dispute" />
-          ),
-          status: 'Warning',
-        },
-      },
+      render: (_, record) => (
+        <span>
+          {record.account_number}
+          <br />
+          {record.account_holder_name}
+          <br />
+          {record.ifsc_code}
+          <br />
+          {record.bank_name}
+        </span>
+      ),
     },
     {
       title: (
         <FormattedMessage
-          id="pages.payinTable.updateForm.payinName.nameLabel"
-          defaultMessage="Payin UUID"
+          id="pages.payoutTable.updateForm.payoutName.nameLabel"
+          defaultMessage="Payout UUID"
         />
       ),
       dataIndex: 'uuid',
-      tip: 'The payin uuid is the unique key',
+      tip: 'The payout uuid is the unique key',
       render: (dom, entity) => {
         return (
           <a
@@ -333,58 +300,45 @@ const PayinList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
-      dataIndex: 'amount',
-      render: (_, record) => (
-        <span>
-          ₹
-          <FormattedNumber
-            value={record.amount}
-            currencySign="accounting"
-            minimumFractionDigits={2}
-            maximumFractionDigits={2}
-          />
-        </span>
-      ),
-    },
-    // {
-    //   title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
-    //   dataIndex: 'is_test_mode',
-    //   hideInSearch: true,
-    //   hideInTable: false,
-    //   renderText: (val: boolean) => <Switch size="small" disabled checked={val} />,
-    // },
-    {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
-      dataIndex: 'agent',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
+      title: <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR" />,
       dataIndex: 'utr_id',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
-      dataIndex: 'user_submitted_utr',
-      valueType: 'textarea',
-      hideInSearch: true,
-    },
-    {
-      title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated" />,
+      title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated" />,
       dataIndex: 'updated_at',
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
     },
+    {
+      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
+      dataIndex: 'option',
+      valueType: 'option',
+      render: (_, record) =>
+        record.status === 'initiated' && [
+          <a
+            key="config"
+            onClick={() => {
+              handleUpdateModalOpen(true);
+              setCurrentRow(record);
+            }}
+          >
+            <CheckCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#00ff00'} />
+          </a>,
+          <a key="subscribeAlert" href="https://procomponents.ant.design/">
+            <CloseCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#ff0000'} />
+          </a>,
+        ],
+    },
   ];
 
   return (
     <PageContainer>
-      <ProTable<API.PayinListItem, API.PageParams>
+      <ProTable<API.PayoutListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.payinTable.title',
-          defaultMessage: 'Payins List',
+          id: 'pages.payoutTable.title',
+          defaultMessage: 'Payouts List',
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
@@ -393,7 +347,7 @@ const PayinList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayinLinkCreate
+          access.canPayoutLinkCreate
             ? [
                 <Button
                   type="primary"
@@ -404,14 +358,14 @@ const PayinList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage
-                    id="pages.payinTable.new-payment-link"
+                    id="pages.payoutTable.new-payment-link"
                     defaultMessage="New Payment Link"
                   />
                 </Button>,
               ]
             : null
         }
-        request={payin}
+        request={payout}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -460,8 +414,8 @@ const PayinList: React.FC = () => {
       )}
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newPayin',
-          defaultMessage: 'New payment link',
+          id: 'pages.searchTable.createForm.newPayout',
+          defaultMessage: 'New payout',
         })}
         open={createModalOpen}
         onOpenChange={handleModalOpen}
@@ -474,7 +428,7 @@ const PayinList: React.FC = () => {
         }}
         labelAlign="left"
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.PaymentLinkItem);
+          const success = await handleAdd(value as API.PaymentLinkResponse);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -483,6 +437,24 @@ const PayinList: React.FC = () => {
           }
         }}
       >
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutName"
+                  defaultMessage="Merchant Order ID is required"
+                />
+              ),
+            },
+          ]}
+          initialValue={crypto.randomUUID().toString()}
+          label="Merchant Order ID"
+          width="md"
+          name="merchant_order_id"
+          placeholder="Unique order ID generated at the merchant for reference"
+        />
         <ProFormSelect
           width="md"
           options={merchantsList.map((merchant) => merchant.label)}
@@ -499,45 +471,29 @@ const PayinList: React.FC = () => {
             style={{ width: 'md' }}
           />
         </ProForm.Item>
-        <ProFormSwitch
-          colProps={{
-            span: 8,
-          }}
-          initialValue={false}
-          label="One time payment link?"
-          name="one_time_paylink"
+        <ProFormText
+          colProps={{ span: 12 }}
+          width="md"
+          name="user_email"
+          label="Email"
+          placeholder="Optional user email"
         />
-        <ProFormDependency name={['one_time_paylink']}>
-          {({ one_time_paylink }) => {
-            return one_time_paylink === true ? (
-              <>
-                <ProFormText
-                  colProps={{ span: 12 }}
-                  width="md"
-                  name="user_email"
-                  label="Email"
-                  placeholder="Optional user email"
-                />
-                <ProFormText
-                  colProps={{ span: 12 }}
-                  width="md"
-                  name="user_phone_number"
-                  label="User Phone #"
-                  placeholder="Optional user email"
-                />
-                <ProFormMoney
-                  label="Amount"
-                  name="amount"
-                  colProps={{ span: 12 }}
-                  fieldProps={{ moneySymbol: false }}
-                  locale="en-US"
-                  min={0}
-                  placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
-                />
-              </>
-            ) : null;
-          }}
-        </ProFormDependency>
+        <ProFormText
+          colProps={{ span: 12 }}
+          width="md"
+          name="user_phone_number"
+          label="User Phone #"
+          placeholder="Optional user email"
+        />
+        <ProFormMoney
+          label="Amount"
+          name="amount"
+          colProps={{ span: 12 }}
+          fieldProps={{ moneySymbol: false }}
+          locale="en-US"
+          min={0}
+          placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
+        />
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {
@@ -570,16 +526,16 @@ const PayinList: React.FC = () => {
         closable={false}
       >
         {currentRow?.id && (
-          <ProDescriptions<API.PayinListItem>
+          <ProDescriptions<API.PayoutListItem>
             column={1}
-            title={<p>Payin ID. {currentRow?.id}</p>}
+            title={<p>Payout ID. {currentRow?.id}</p>}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
               id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<API.PayinListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.PayoutListItem>[]}
           />
         )}
       </Drawer>
@@ -587,4 +543,4 @@ const PayinList: React.FC = () => {
   );
 };
 
-export default PayinList;
+export default PayoutList;

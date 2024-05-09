@@ -179,6 +179,7 @@ declare namespace API {
     user_phone_number?: string;
     user_email?: string;
     amount: number;
+    one_time_paylink: boolean;
   };
 
   type PaymentLinkResponse = {
@@ -187,7 +188,8 @@ declare namespace API {
     at: number;
     merchantOrderId: string;
     payinId: string;
-    payinUrl: string;
+    payinUrl?: string;
+    permalink?: string;
   };
 
   type PayinListItem = {
@@ -214,6 +216,31 @@ declare namespace API {
 
   type PayinList = {
     data?: PayinListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
+  };
+
+  type PayoutListItem = {
+    id: number;
+    amount: number;
+    utr_id: string;
+    merchant: string;
+    user_id: string;
+    merchant_order_id: number;
+    account_number: string;
+    account_holder_name: string;
+    ifsc_code: string;
+    bank_name: string;
+    uuid: string;
+    currency: string;
+    status: PayinStatus;
+    updated_at?: string;
+    created_at?: string;
+  };
+
+  type PayoutList = {
+    data?: PayoutListItem[];
     /** 列表的内容总数 */
     total?: number;
     success?: boolean;

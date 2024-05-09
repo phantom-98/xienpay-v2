@@ -253,6 +253,26 @@ export async function addPayin(options?: { [key: string]: any }) {
   });
 }
 
+export async function generatePaymentLink(options?: { [key: string]: any }) {
+  return request<API.PayinListItem>('/api/payins/paylink', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+export async function generatePermaPaymentLink(options?: { [key: string]: any }) {
+  return request<API.PayinListItem>('/api/payins/permalink', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
 /** 删除规则 DELETE /api/payins */
 export async function removePayin(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/payins', {
@@ -264,7 +284,60 @@ export async function removePayin(options?: { [key: string]: any }) {
   });
 }
 
-/** 获取规则列表 GET /api/payins */
+/** 获取规则列表 GET /api/payouts */
+export async function payout(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.PayoutList>('/api/payouts', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新规则 PUT /api/payouts */
+export async function updatePayout(options?: { [key: string]: any }) {
+  return request<API.PayoutListItem>('/api/payouts', {
+    method: 'POST',
+    data: {
+      method: 'update',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 新建规则 POST /api/payouts */
+export async function addPayout(options?: { [key: string]: any }) {
+  return request<API.PayoutListItem>('/api/payouts', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 删除规则 DELETE /api/payouts */
+export async function removePayout(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/payouts', {
+    method: 'POST',
+    data: {
+      method: 'delete',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 获取规则列表 GET /api/bankAccts */
 export async function bankAcct(
   params: {
     // query

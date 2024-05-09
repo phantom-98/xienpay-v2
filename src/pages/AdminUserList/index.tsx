@@ -339,7 +339,27 @@ const AdminUserList: React.FC = () => {
         />
         <ProFormDependency name={['role']}>
           {({ role }) => {
-            return role === 'cs' || role === 'agent' || role === 'transactions' ? (
+            return role === 'cs' ? (
+              <>
+                <ProFormText
+                  width="md"
+                  name="tg_handle"
+                  label="Telegram username"
+                  placeholder="Telegram username"
+                />
+                <ProFormSelect
+                  width="md"
+                  options={merchantsList.map((merchant) => merchant.label)}
+                  name="merchant_code"
+                  label="Merchant Code"
+                />
+              </>
+            ) : null;
+          }}
+        </ProFormDependency>
+        <ProFormDependency name={['role']}>
+          {({ role }) => {
+            return role === 'agent' || role === 'transactions' ? (
               <ProFormText
                 width="md"
                 name="tg_handle"

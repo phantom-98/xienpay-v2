@@ -94,6 +94,14 @@ export default {
   'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
   'pages.payinTable.remit.upi-p2p': 'UPI-P2P (Collect)',
 
+  'pages.payoutTable.payoutStatus.default': 'initiated',
+  'pages.payoutTable.payoutStatus.assigned': 'assigned',
+  'pages.payoutTable.payoutStatus.pending': 'pending',
+  'pages.payoutTable.payoutStatus.success': 'success',
+  'pages.payoutTable.payoutStatus.failed': 'failed',
+  'pages.payoutTable.payoutStatus.dropped': 'dropped',
+  'pages.payoutTable.payoutStatus.dispute': 'dispute',
+
   'pages.bankAcctTable.searchTable.title': 'Bank Accounts',
   'pages.bankAcctTable.searchTable.name': 'Account Name',
   'pages.bankAcctTable.searchTable.details': 'Bank Details',
