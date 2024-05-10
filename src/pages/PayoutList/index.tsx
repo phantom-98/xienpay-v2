@@ -1,8 +1,10 @@
 import {
+  acceptPayout,
   addPayout,
   fetchMerchantsList,
   fetchPlayerList,
   payout,
+  rejectPayout,
   removePayout,
   updatePayout,
 } from '@/services/ant-design-pro/api';
@@ -21,10 +23,66 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Modal, Select, message } from 'antd';
+import { Button, Drawer, Input, Modal, Popconfirm, Select, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+const ApprovalModal: React.FC<{
+  placeholder: string;
+  style: React.CSSProperties;
+  onConfirm?: (value: string) => void;
+}> = (props) => {
+  const [visible, setVisible] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+
+  const showModal = () => {
+    setVisible(true);
+  };
+
+  const handleOk = () => {
+    if (inputValue && inputValue.length > 0) {
+      props.onConfirm?.(inputValue);
+      setVisible(false);
+      setInputValue(''); // Reset input value
+    }
+  };
+
+  const handleCancel = () => {
+    setVisible(false);
+    setInputValue(''); // Reset input value
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  return (
+    <>
+      <CheckCircleTwoTone
+        style={{ fontSize: '20px' }}
+        twoToneColor={'#00ff00'}
+        onClick={showModal}
+      />
+      <Modal
+        title={`Confirm Approval for ID. ${props.payoutId}`}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="OK"
+        cancelText="Cancel"
+        visible={visible}
+        width="sm"
+      >
+        <Input
+          placeholder="Enter UTR ID"
+          width="sm"
+          value={inputValue}
+          onChange={handleInputChange}
+        />
+      </Modal>
+    </>
+  );
+};
 
 const SearchUserInput: React.FC<{
   merchantCode: string;
@@ -65,6 +123,10 @@ const SearchUserInput: React.FC<{
     />
   );
 };
+
+// const handleReject = async (fields: API.PayoutListItem) => {
+//   rejectPayout({id: fields.id, action: 'reject'}).then(() => { message.success('Payout rejected!'); });
+// };
 
 /**
  * @en-US Add node
@@ -317,18 +379,34 @@ const PayoutList: React.FC = () => {
       valueType: 'option',
       render: (_, record) =>
         record.status === 'initiated' && [
-          <a
-            key="config"
-            onClick={() => {
-              handleUpdateModalOpen(true);
-              setCurrentRow(record);
+          <ApprovalModal
+            key={record.id}
+            onConfirm={async (value) => {
+              await acceptPayout({ id: record.id, action: 'approve', utr_id: value });
+              message.success(`Payout No ${record.id} approved!`);
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
             }}
-          >
-            <CheckCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#00ff00'} />
-          </a>,
-          <a key="subscribeAlert" href="https://procomponents.ant.design/">
-            <CloseCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#ff0000'} />
-          </a>,
+            placeholder={'Input UTR ID'}
+            style={{ width: 'md' }}
+          />,
+          <>
+            <Popconfirm
+              title="Confirm"
+              description="Reject Payout?"
+              onConfirm={async () => {
+                await rejectPayout({ id: record.id, action: 'reject' });
+                message.success(`Payout No ${record.id} rejected!`);
+                if (actionRef.current) {
+                  actionRef.current.reload();
+                }
+              }}
+              onOpenChange={() => console.log('open change')}
+            >
+              <CloseCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#ff0000'} />
+            </Popconfirm>
+          </>,
         ],
     },
   ];
