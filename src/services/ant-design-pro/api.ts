@@ -337,6 +337,26 @@ export async function removePayout(options?: { [key: string]: any }) {
   });
 }
 
+export async function acceptPayout(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/payouts/authorize', {
+    method: 'POST',
+    data: {
+      method: 'rejectPayout',
+      ...(options || {}),
+    },
+  });
+}
+
+export async function rejectPayout(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/payouts/authorize', {
+    method: 'POST',
+    data: {
+      method: 'rejectPayout',
+      ...(options || {}),
+    },
+  });
+}
+
 /** 获取规则列表 GET /api/bankAccts */
 export async function bankAcct(
   params: {
