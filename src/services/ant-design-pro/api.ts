@@ -242,6 +242,16 @@ export async function updatePayin(options?: { [key: string]: any }) {
   });
 }
 
+export async function confirmNotified(options?: { [key: string]: any }) {
+  return request<API.PayinListItem>('/api/payins//confirmNotify', {
+    method: 'POST',
+    data: {
+      method: 'confirmNotified',
+      ...(options || {}),
+    },
+  });
+}
+
 /** 新建规则 POST /api/payins */
 export async function addPayin(options?: { [key: string]: any }) {
   return request<API.PayinListItem>('/api/payins', {
