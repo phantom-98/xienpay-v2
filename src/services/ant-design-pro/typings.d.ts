@@ -210,6 +210,8 @@ declare namespace API {
     status: PayinStatus;
     updated_at?: string;
     created_at?: string;
+    is_notified?: boolean;
+    api?: string;
 
     payinUrl?: string;
   };

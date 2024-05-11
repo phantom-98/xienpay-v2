@@ -1,4 +1,5 @@
 import {
+  confirmNotified,
   fetchMerchantsList,
   fetchPlayerList,
   generatePaymentLink,
@@ -7,7 +8,13 @@ import {
   removePayin,
   updatePayin,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import {
+  BellOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  PlusOutlined,
+  SyncOutlined,
+} from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -24,7 +31,7 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Modal, Select, message } from 'antd';
+import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -259,55 +266,103 @@ const PayinList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
+      hideInTable: true,
       valueEnum: {
-        initiated: {
-          text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.default"
-              defaultMessage="Initiated"
-            />
+        initiated: { text: 'Initiated', status: 'Default' },
+        assigned: { text: 'Assigned', status: 'Processing' },
+        pending: { text: 'Pending', status: 'Warning' },
+        success: { text: 'Success', status: 'Success' },
+        failed: { text: 'Failed', status: 'Error' },
+        dropped: { text: 'Dropped', status: 'Error' },
+        dispute: { text: 'Dispute', status: 'Error' },
+      },
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
+      dataIndex: 'status',
+      hideInSearch: true,
+      render: (status, record) => {
+        const statusMap = {
+          initiated: (
+            <Tag color="default">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.default"
+                defaultMessage="Initiated"
+              />
+            </Tag>
           ),
-          status: 'Default',
-        },
-        assigned: {
-          text: (
-            <FormattedMessage
-              id="pages.payinTable.payinStatus.assigned"
-              defaultMessage="Assigned"
-            />
+          assigned: (
+            <Tag icon={<SyncOutlined spin />} color="processing">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.assigned"
+                defaultMessage="Assigned"
+              />
+            </Tag>
           ),
-          status: 'Processing',
-        },
-        pending: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.pending" defaultMessage="Pending" />
+          pending: (
+            <Tag color="orange">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.pending"
+                defaultMessage="Pending"
+              />
+            </Tag>
           ),
-          status: 'Processing',
-        },
-        success: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.success" defaultMessage="Success" />
+          success: (
+            <>
+              {status === 'success' && !record.is_notified ? (
+                <>
+                  <Tag color="success">
+                    <FormattedMessage
+                      id="pages.payinTable.payinStatus.success"
+                      defaultMessage="Success"
+                    />
+                  </Tag>
+                  <Button
+                    type="primary"
+                    size="small"
+                    onClick={async () => {
+                      await confirmNotified(record);
+                      actionRef.current?.reloadAndRest?.();
+                    }}
+                  >
+                    <BellOutlined />
+                  </Button>
+                </>
+              ) : (
+                <Tag icon={<CheckCircleOutlined />} color="success">
+                  <FormattedMessage
+                    id="pages.payinTable.payinStatus.success"
+                    defaultMessage="Success"
+                  />
+                </Tag>
+              )}
+            </>
           ),
-          status: 'Success',
-        },
-        failed: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.failed" defaultMessage="Failed" />
+          failed: (
+            <Tag icon={<ExclamationCircleOutlined />} color="warning">
+              <FormattedMessage id="pages.payinTable.payinStatus.failed" defaultMessage="Failed" />
+            </Tag>
           ),
-          status: 'Error',
-        },
-        dropped: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.dropped" defaultMessage="Dropped" />
+          dropped: (
+            <Tag color="red">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.dropped"
+                defaultMessage="Dropped"
+              />
+            </Tag>
           ),
-          status: 'Error',
-        },
-        dispute: {
-          text: (
-            <FormattedMessage id="pages.payinTable.payinStatus.dispute" defaultMessage="Dispute" />
+          dispute: (
+            <Tag icon={<ExclamationCircleOutlined />} color="#f50">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.dispute"
+                defaultMessage="Dispute"
+              />
+            </Tag>
           ),
-          status: 'Warning',
-        },
+        };
+
+        // Return the component corresponding to the status
+        return statusMap[status] || null;
       },
     },
     {
