@@ -37,14 +37,15 @@ const Welcome: React.FC = () => {
     //   value: 'https://assets.antv.antgroup.com/g2/aapl.json',
     // },
     data: lastDay.histogram,
-    xField: (d) => new Date(d.hour),
-    yField: 'value',
+    //xField: (d) => new Date(d.hour),
+    xField: 'hour',
+    yField: 'amount',
   };
 
   const config = {
     data: lastWeek.histogram,
     xField: 'day',
-    yField: 'value',
+    yField: 'amount',
     point: {
       size: 5,
       shape: 'diamond',
