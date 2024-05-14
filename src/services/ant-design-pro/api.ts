@@ -481,6 +481,15 @@ export async function fetchMerchantsList(
   );
 }
 
+export async function fetchMerchantAnalytics(merchant_code: string): Promise<API.AnalyticsData> {
+  return request('/api/merchants/analytics', {
+    method: 'POST',
+    data: {
+      merchant_code: merchant_code,
+    },
+  }).then((response) => response.data);
+}
+
 /** 获取规则列表 GET /api/adminUsers */
 export async function adminUser(
   params: {

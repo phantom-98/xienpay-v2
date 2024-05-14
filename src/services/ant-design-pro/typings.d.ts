@@ -315,4 +315,21 @@ declare namespace API {
     total?: number;
     success?: boolean;
   };
+
+  type AnalyticsData = {
+    lastHour: {
+      deposit_count: number;
+      deposit_amount: number;
+    };
+    lastDay: {
+      deposit_count: number;
+      deposit_amount: number;
+      histogram: { hour: number; value: number }[];
+    };
+    lastWeek: {
+      deposit_count: number;
+      deposit_amount: number;
+      histogram: { day: number; value: number }[];
+    };
+  };
 }
