@@ -212,6 +212,7 @@ declare namespace API {
     created_at?: string;
     is_notified?: boolean;
     api?: string;
+    time_taken?: string;
 
     payinUrl?: string;
   };

@@ -366,6 +366,11 @@ const PayinList: React.FC = () => {
       },
     },
     {
+      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
+      dataIndex: 'time_taken',
+      valueType: 'textarea',
+    },
+    {
       title: (
         <FormattedMessage
           id="pages.payinTable.updateForm.payinName.nameLabel"
