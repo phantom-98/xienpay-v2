@@ -443,6 +443,17 @@ export async function changeRemitFlagBankAcct(bank_id: number, flag: string, che
   });
 }
 
+export async function changeUpiIdBankAcct(bank_id: number, upi_id: string) {
+  console.log('changeUpiIDBankAcct', bank_id, upi_id);
+  return request('/api/bankAccts/changeUpiId', {
+    method: 'POST',
+    data: {
+      id: bank_id,
+      upi_id: upi_id,
+    },
+  });
+}
+
 export async function fetchAssignedMerchants(bank_id: number) {
   return request('/api/bankAccts/assignedMerchants', {
     method: 'POST',
