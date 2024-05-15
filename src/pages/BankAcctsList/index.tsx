@@ -4,12 +4,13 @@ import {
   bankAcct,
   changeRemitFlagBankAcct,
   changeStatusBankAcct,
+  changeUpiIdBankAcct,
   fetchAssignedMerchants,
   fetchMerchantsList,
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
-import { DeleteOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -42,6 +43,44 @@ import debounce from 'lodash/debounce';
 import React, { useMemo, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+
+const EditableCell = ({ text, onEdit }) => {
+  const [editing, setEditing] = useState(false);
+  const [inputValue, setInputValue] = useState(text);
+
+  const toggleEdit = () => {
+    setEditing(!editing);
+    setInputValue(text); // Reset on cancel
+  };
+
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
+  const save = async () => {
+    toggleEdit();
+    try {
+      await onEdit(inputValue);
+      message.success('Updated successfully');
+    } catch (error) {
+      message.error('Update failed');
+    }
+  };
+
+  return editing ? (
+    <Input
+      value={inputValue}
+      onChange={handleInputChange}
+      onPressEnter={save}
+      onBlur={save}
+      style={{ margin: '-5px 0' }}
+    />
+  ) : (
+    <div>
+      {text} <EditOutlined type="edit" onClick={toggleEdit} />
+    </div>
+  );
+};
 
 export interface DebounceSelectProps<ValueType = any>
   extends Omit<SelectProps<ValueType | ValueType[]>, 'options' | 'children'> {
@@ -104,21 +143,6 @@ function toLinkedMerchanListItem(user: UserValue): API.LinkedMerchantListItem {
   item.name = user.label;
   return item;
 }
-
-// async function fetchUserList(username: string): Promise<UserValue[]> {
-//   console.log('fetching user', username);
-
-//   return fetch('https://randomuser.me/api/?results=5')
-//     .then((response) => response.json())
-//     .then((body) =>
-//       body.results.map(
-//         (user: { name: { first: string; last: string }; login: { username: string } }) => ({
-//           label: `${user.name.first} ${user.name.last}`,
-//           value: user.login.username,
-//         }),
-//       ),
-//     );
-// }
 
 /******************
  * Switch handlers
@@ -325,6 +349,16 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'upi_id',
+      render: (text, record) => (
+        <EditableCell
+          text={record.upi_id}
+          onEdit={async (newText) => {
+            setCurrentRow(record);
+            await changeUpiIdBankAcct(record.id, newText);
+            actionRef.current?.reloadAndRest?.();
+          }}
+        />
+      ),
     },
     {
       title: (
