@@ -1,26 +1,26 @@
-import { fetchMerchantAnalytics, fetchMerchantsList } from '@/services/ant-design-pro/api';
+import { fetchMerchantAnalytics, fetchMerchantsList, downloadMerchantAnalytics } from '@/services/ant-design-pro/api';
 import { Column } from '@ant-design/charts';
+import {DownloadOutlined} from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
   ProFormDateRangePicker,
   ProFormSelect,
-  QueryFilter,
-  ProFormSwitch,
+  ProForm,
+  StatisticCard
 } from '@ant-design/pro-components';
-import { Divider, Space, Statistic, Badge } from 'antd';
+import { Button } from 'antd';
 import React, { useEffect, useState } from 'react';
-import { message } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Row, Col, message } from 'antd';
 
+
+const { Statistic, Divider } = StatisticCard;
 
 function daysBetween(date1:string, date2:string) : number {
-  const date1Obj:Date = new Date(date1);
-  const date2Obj:Date = new Date(date2);
+  const d1:Date = new Date(date1);
+  const d2:Date = new Date(date2);
 
-  const timeDifference:number = date2Obj - date1Obj;
-
-  const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+  const daysDifference = (d2 - d1) / (1000 * 60 * 60 * 24);
 
   return Math.abs(daysDifference);
 }
@@ -29,9 +29,15 @@ function dateFromMs(ms:number) : string {
   return new Date(ms).toISOString().substring(0, 10);
 }
 
-const Welcome: React.FC = () => {
+
+const Welcome = () => {
   /* Preload merchants list */
   const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
+  const [analytics, setAnalytics] = useState<API.AnalyticsData>();
+  const [formValues, setFormValues] = useState({
+    merchant_code: '',
+    time_period: [Date.now(), Date.now() - 1000 * 60 * 60 * 24 * 6],
+  });
 
   useEffect(() => {
     (async () => {
@@ -44,7 +50,41 @@ const Welcome: React.FC = () => {
     })();
   }, []);
 
-  const [analytics, setAnalytics] = useState<API.AnalyticsData>();
+  const handleFormSubmit = async (action) => {
+    console.log('Form values:', formValues);
+    const { merchant_code, time_period } = formValues;
+    const [from_date, to_date] = time_period;
+
+    if (daysBetween(from_date, to_date) >= 15) {
+      message.error('Please select a date range within 15 days');
+      return;
+    }
+
+    try {
+      if (action === 'download') {
+        await downloadMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+      } else if (action === 'submit') {
+        const data = await fetchMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+        setAnalytics(data);
+      }
+    } catch (error) {
+      message.error(`Failed to ${action}`);
+    }
+  };
+
+  const handleMerchantChange = (value) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      merchant_code: value,
+    }));
+  };
+
+  const handleDateChange = (value) => {
+    setFormValues((prevValues) => ({
+      ...prevValues,
+      time_period: value,
+    }));
+  };
 
   const { lastHour, lastDay, lastWeek } = analytics || {
     lastHour: {},
@@ -53,12 +93,10 @@ const Welcome: React.FC = () => {
   };
 
   const hourlyDataConfig = {
-    data: lastDay.histogram.map((value) => {
-      return {
-        hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00', // Extract HH from YYYY-mm-dd HH:MM:SS
-        amount: value.amount,
-      };
-    }),
+    data: lastDay.histogram.map((value) => ({
+      hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00',
+      amount: value.amount,
+    })),
     xField: 'hour_ist',
     yField: 'amount',
     colorField: 'hour_ist',
@@ -71,104 +109,139 @@ const Welcome: React.FC = () => {
     colorField: 'day_ist',
   };
 
+  const lh_dc = `${lastHour.deposit_count} #`;
+  const ld_dc = `${lastDay.deposit_count} #`;
+
   return (
     <PageContainer>
+      <Row gutter={[16, 16]}>
+        <ProForm layout="horizontal" submitter={false}>
+          <ProFormSelect
+            width="lg"
+            labelCol={{ span: 6 }}
+            options={merchantsList.map((merchant) => merchant.label)}
+            name="merchant_code"
+            label="Merchant Code"
+            required
+            onChange={handleMerchantChange}
+          />
+        </ProForm>
+      </Row>
 
-      <QueryFilter
-        layout="horizontal"
-        initialValues={{time_period: [Date.now(), Date.now() - 1000 * 60 * 60 * 24 * 6]}}
-        onFinish={async (values) => {
-          const { merchant_code, time_period } = values;
-          const [from_date, to_date] = time_period;
-
-          if(daysBetween(from_date, to_date) >= 15) {
-            message.error('Please select a date range within 15 days');
-            return;
-          }
-
-          const data = await fetchMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
-          setAnalytics(data);
-        }}
-      >
-        <ProFormSelect
-          width="md"
-          labelCol={{
-            span: 8,
-          }}
-          options={merchantsList.map((merchant) => merchant.label)}
-          name="merchant_code"
-          label="Merchant Code"
-          required
-        />
-        <ProFormDateRangePicker
-          labelCol={{
-            span: 8,
-          }}
-          width="md"
-          name='time_period'
-          label="Select Duration"
-          fieldProps={{
-            format: (value) => value.format('YYYY-MM-DD'),
-          }}
-          required
-        />
-      </QueryFilter>
-
-      {/* <Divider /> */}
-
-      <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-        <ProCard.Group direction="row">
-          <ProCard boxShadow>
-            <Statistic title="This hour deposit count" value={lastHour.deposit_count} />
-          </ProCard>
-          <Divider type="vertical" />
-          <ProCard boxShadow>
-            <Statistic
-              title="This hour deposit amount"
-              value={lastHour.deposit_amount}
-              prefix="₹"
+      <Row gutter={[16, 16]}>
+        {/* Left Half */}
+        <Col span={12}>
+          <StatisticCard.Group direction="row" boxShadow>
+            <StatisticCard
+              statistic={{
+                title: 'This Hour Deposits',
+                value: `₹ ${lastHour.deposit_amount}`,
+                description: <Statistic title="Count" value={lh_dc} />,
+              }}
+              chart={
+                <img
+                  src="https://gw.alipayobjects.com/zos/alicdn/ShNDpDTik/huan.svg"
+                  alt="百分比"
+                  width="100%"
+                />
+              }
+              chartPlacement="left"
             />
-          </ProCard>
-          <Divider type="vertical" />
-          <ProCard boxShadow>
-            <Statistic title="Today deposit count" value={lastDay.deposit_count} />
-          </ProCard>
-          <Divider type="vertical" />
-          <ProCard boxShadow>
-            <Statistic title="Today deposit amount" value={lastDay.deposit_amount} prefix="₹" />
-          </ProCard>
-        </ProCard.Group>
-      </Space>
-
-      <Divider size="sm" />
-
-      <ProCard.Group direction="row">
-        <ProCard boxShadow>
-          <Statistic
-            title="Today's Deposits"
-            value={lastDay.deposit_amount}
-            precision={2}
-            prefix="₹"
+            <Divider type="vertical" />
+            <StatisticCard
+              statistic={{
+                title: "Today's Deposits",
+                value: `₹ ${lastDay.deposit_amount}`,
+                description: <Statistic title="Count" value={ld_dc} />,
+              }}
+              chart={
+                <img
+                  src="https://gw.alipayobjects.com/zos/alicdn/6YR18tCxJ/huanlv.svg"
+                  alt="百分比"
+                  width="100%"
+                />
+              }
+              chartPlacement="left"
+            />
+          </StatisticCard.Group>
+          <Divider type="horizontal" />
+          <StatisticCard
+            boxShadow
+            statistic={{
+              title: "Today's Deposits",
+              value: `₹ ${lastDay.deposit_amount}`,
+            }}
+            chart={<Column height={400} {...hourlyDataConfig} />}
           />
-          <Column height={400} {...hourlyDataConfig} />
-        </ProCard>
+        </Col>
 
-        <Divider type="vertical" />
-
-        <ProCard boxShadow>
-          <Statistic
-            title="7 day's deposits"
-            value={lastWeek.deposit_amount}
-            precision={2}
-            prefix="₹"
+        {/* Right Half */}
+        <Col span={12}>
+          <ProCard boxShadow>
+            <ProForm
+              layout="horizontal"
+              initialValues={formValues}
+              onValuesChange={(_, values) => handleDateChange(values.time_period)}
+              submitter={{
+                render: (props, _) => (
+                  <Row gutter={8} align="middle">
+                    <Col>
+                      <Button
+                        key="submit"
+                        type="primary"
+                        onClick={async () => {
+                          const values = await props.form?.validateFields();
+			  console.log(values);
+                          handleFormSubmit('submit');
+                        }}
+                      >
+                        Submit
+                      </Button>
+                    </Col>
+                    <Col>
+                      <Button
+                        key="download"
+                        icon={<DownloadOutlined />}
+                        style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
+                        onClick={async () => {
+                          const values = await props.form?.validateFields();
+			  console.log(values);
+                          handleFormSubmit('download');
+                        }}
+                      >
+                        Download
+                      </Button>
+                    </Col>
+                  </Row>
+                ),
+                searchConfig: {
+                  submitText: 'Search',
+                },
+              }}
+            >
+              <ProFormDateRangePicker
+                labelCol={{ span: 4 }}
+                width="sm"
+                name="time_period"
+                label="Select Duration"
+                fieldProps={{
+                  format: (value) => value.format('YYYY-MM-DD'),
+                }}
+                required
+              />
+            </ProForm>
+          </ProCard>
+          <Divider />
+          <StatisticCard
+            boxShadow
+            statistic={{
+              title: "Duration's Deposits",
+              value: `₹ ${lastWeek.deposit_amount}`,
+            }}
+            chart={<Column height={400} {...dailyDataConfig} />}
           />
-
-          <Badge count={<DownloadOutlined style={{ float: 'left', fontSize: '20px', color: '#1890ff' }} onClick={() => {}}/>}>
-          <Column height={400} {...dailyDataConfig} />
-          </Badge>
-        </ProCard>
-
-      </ProCard.Group>
+        </Col>
+      </Row>
     </PageContainer>
   );
 };
