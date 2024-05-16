@@ -6,9 +6,28 @@ import {
   ProFormDateRangePicker,
   ProFormSelect,
   QueryFilter,
+  ProFormSwitch,
 } from '@ant-design/pro-components';
-import { Divider, Space, Statistic } from 'antd';
+import { Divider, Space, Statistic, Badge } from 'antd';
 import React, { useEffect, useState } from 'react';
+import { message } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
+
+
+function daysBetween(date1:string, date2:string) : number {
+  const date1Obj:Date = new Date(date1);
+  const date2Obj:Date = new Date(date2);
+
+  const timeDifference:number = date2Obj - date1Obj;
+
+  const daysDifference = timeDifference / (1000 * 60 * 60 * 24);
+
+  return Math.abs(daysDifference);
+}
+
+function dateFromMs(ms:number) : string {
+  return new Date(ms).toISOString().substring(0, 10);
+}
 
 const Welcome: React.FC = () => {
   /* Preload merchants list */
@@ -54,17 +73,25 @@ const Welcome: React.FC = () => {
 
   return (
     <PageContainer>
+
       <QueryFilter
         layout="horizontal"
+        initialValues={{time_period: [Date.now(), Date.now() - 1000 * 60 * 60 * 24 * 6]}}
         onFinish={async (values) => {
           const { merchant_code, time_period } = values;
           const [from_date, to_date] = time_period;
-          const data = await fetchMerchantAnalytics(merchant_code, from_date, to_date);
+
+          if(daysBetween(from_date, to_date) >= 15) {
+            message.error('Please select a date range within 15 days');
+            return;
+          }
+
+          const data = await fetchMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
           setAnalytics(data);
         }}
       >
         <ProFormSelect
-          width="lg"
+          width="md"
           labelCol={{
             span: 8,
           }}
@@ -72,18 +99,22 @@ const Welcome: React.FC = () => {
           name="merchant_code"
           label="Merchant Code"
           required
-          autoFocusFirstInput
         />
         <ProFormDateRangePicker
           labelCol={{
             span: 8,
           }}
-          width="lg"
-          name={['time_period']}
+          width="md"
+          name='time_period'
           label="Select Duration"
+          fieldProps={{
+            format: (value) => value.format('YYYY-MM-DD'),
+          }}
           required
         />
       </QueryFilter>
+
+      {/* <Divider /> */}
 
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         <ProCard.Group direction="row">
@@ -109,7 +140,7 @@ const Welcome: React.FC = () => {
         </ProCard.Group>
       </Space>
 
-      <Divider />
+      <Divider size="sm" />
 
       <ProCard.Group direction="row">
         <ProCard boxShadow>
@@ -121,7 +152,9 @@ const Welcome: React.FC = () => {
           />
           <Column height={400} {...hourlyDataConfig} />
         </ProCard>
+
         <Divider type="vertical" />
+
         <ProCard boxShadow>
           <Statistic
             title="7 day's deposits"
@@ -129,8 +162,12 @@ const Welcome: React.FC = () => {
             precision={2}
             prefix="₹"
           />
+
+          <Badge count={<DownloadOutlined style={{ float: 'left', fontSize: '20px', color: '#1890ff' }} onClick={() => {}}/>}>
           <Column height={400} {...dailyDataConfig} />
+          </Badge>
         </ProCard>
+
       </ProCard.Group>
     </PageContainer>
   );
