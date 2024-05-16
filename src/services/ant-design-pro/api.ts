@@ -492,13 +492,44 @@ export async function fetchMerchantsList(
   );
 }
 
-export async function fetchMerchantAnalytics(merchant_code: string): Promise<API.AnalyticsData> {
+export async function fetchMerchantAnalytics(
+  merchant_code: string,
+  from_date: string,
+  to_date: string,
+): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics', {
     method: 'POST',
     data: {
-      merchant_code: merchant_code,
+      merchant_code,
+      from_date,
+      to_date,
     },
   }).then((response) => response.data);
+}
+
+export async function downloadMerchantAnalytics(
+  merchant_code: string,
+  from_date: string,
+  to_date: string,
+) {
+  return request('/api/merchants/downloadAnalytics', {
+    method: 'POST',
+    data: {
+      merchant_code,
+      from_date,
+      to_date,
+    },
+    getResponse: true, // This will return the full response object
+  }).then((response) => {
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'data.csv'); // Specify the file name
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
 }
 
 /** 获取规则列表 GET /api/adminUsers */

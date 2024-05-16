@@ -325,7 +325,7 @@ declare namespace API {
     lastDay: {
       deposit_count: number;
       deposit_amount: number;
-      histogram: { hour_ist: number; amount: number }[];
+      histogram: { hour_ist: string; amount: number }[];
     };
     lastWeek: {
       deposit_count: number;
