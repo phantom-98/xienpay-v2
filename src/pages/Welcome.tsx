@@ -94,7 +94,7 @@ const Welcome: React.FC = () => {
         <ProCard boxShadow>
           <Statistic
             title="Today's Deposits"
-            value={lastHour.deposit_amount}
+            value={lastDay.deposit_amount}
             precision={2}
             prefix="₹"
           />
@@ -104,7 +104,7 @@ const Welcome: React.FC = () => {
         <ProCard boxShadow>
           <Statistic
             title="7 day's deposits"
-            value={lastDay.deposit_amount}
+            value={lastWeek.deposit_amount}
             precision={2}
             prefix="₹"
           />
