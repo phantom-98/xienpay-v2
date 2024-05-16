@@ -1,6 +1,12 @@
 import { fetchMerchantAnalytics, fetchMerchantsList } from '@/services/ant-design-pro/api';
 import { Column } from '@ant-design/charts';
-import { PageContainer, ProCard, ProFormSelect } from '@ant-design/pro-components';
+import {
+  PageContainer,
+  ProCard,
+  ProFormDateRangePicker,
+  ProFormSelect,
+  QueryFilter,
+} from '@ant-design/pro-components';
 import { Divider, Space, Statistic } from 'antd';
 import React, { useEffect, useState } from 'react';
 
@@ -14,7 +20,6 @@ const Welcome: React.FC = () => {
         const fetchedMerchants = await fetchMerchantsList('');
         setMerchantsList(fetchedMerchants);
       } catch (error) {
-        // Handle error
         console.error('Error fetching merchants:', error);
       }
     })();
@@ -22,19 +27,16 @@ const Welcome: React.FC = () => {
 
   const [analytics, setAnalytics] = useState<API.AnalyticsData>();
 
-  console.log(analytics);
   const { lastHour, lastDay, lastWeek } = analytics || {
     lastHour: {},
     lastDay: { histogram: [] },
     lastWeek: { histogram: [] },
   };
-  console.log(lastHour, lastDay, lastWeek);
 
   const hourlyDataConfig = {
     data: lastDay.histogram.map((value) => {
-      console.log(value);
       return {
-        hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00',
+        hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00', // Extract HH from YYYY-mm-dd HH:MM:SS
         amount: value.amount,
       };
     }),
@@ -52,17 +54,36 @@ const Welcome: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProFormSelect
-        width="md"
-        options={merchantsList.map((merchant) => merchant.label)}
-        name="merchant_code"
-        label="Merchant Code"
-        onChange={async (merchant_code) => {
-          const data = await fetchMerchantAnalytics(merchant_code);
-          console.log(data);
+      <QueryFilter
+        layout="horizontal"
+        onFinish={async (values) => {
+          const { merchant_code, time_period } = values;
+          const [from_date, to_date] = time_period;
+          const data = await fetchMerchantAnalytics(merchant_code, from_date, to_date);
           setAnalytics(data);
         }}
-      />
+      >
+        <ProFormSelect
+          width="lg"
+          labelCol={{
+            span: 8,
+          }}
+          options={merchantsList.map((merchant) => merchant.label)}
+          name="merchant_code"
+          label="Merchant Code"
+          required
+          autoFocusFirstInput
+        />
+        <ProFormDateRangePicker
+          labelCol={{
+            span: 8,
+          }}
+          width="lg"
+          name={['time_period']}
+          label="Select Duration"
+          required
+        />
+      </QueryFilter>
 
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         <ProCard.Group direction="row">

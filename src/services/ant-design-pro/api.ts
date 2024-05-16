@@ -492,11 +492,17 @@ export async function fetchMerchantsList(
   );
 }
 
-export async function fetchMerchantAnalytics(merchant_code: string): Promise<API.AnalyticsData> {
+export async function fetchMerchantAnalytics(
+  merchant_code: string,
+  from_date: string,
+  to_date: string,
+): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics', {
     method: 'POST',
     data: {
-      merchant_code: merchant_code,
+      merchant_code,
+      from_date,
+      to_date,
     },
   }).then((response) => response.data);
 }
