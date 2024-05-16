@@ -191,7 +191,7 @@ const Welcome = () => {
                         type="primary"
                         onClick={async () => {
                           const values = await props.form?.validateFields();
-			  console.log(values);
+			                    console.log(values);
                           handleFormSubmit('submit');
                         }}
                       >
@@ -205,7 +205,7 @@ const Welcome = () => {
                         style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
                         onClick={async () => {
                           const values = await props.form?.validateFields();
-			  console.log(values);
+			                    console.log(values);
                           handleFormSubmit('download');
                         }}
                       >
@@ -231,7 +231,7 @@ const Welcome = () => {
               />
             </ProForm>
           </ProCard>
-          <Divider />
+          <Divider type="horizontal" />
           <StatisticCard
             boxShadow
             statistic={{
