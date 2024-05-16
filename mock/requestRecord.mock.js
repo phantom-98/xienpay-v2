@@ -1,4 +1,11 @@
 module.exports = {
+  'POST /api/login/account': {
+    status: 'ok',
+    type: 'account',
+    token:
+      'eyJhbGciOiJIUzI1NiJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJhZG1pbjEiLCJmdWxsbmFtZSI6IkFkbWluIDEifQ.D6swbqYdn_LlDmIt3OqFUAtZckyGwS5y93rNBWhkzNE',
+    currentAuthority: 'admin',
+  },
   'GET /api/currentUser': {
     data: {
       name: 'Serati Ma',
@@ -397,5 +404,201 @@ module.exports = {
     ],
     success: true,
     total: 3,
+  },
+  'POST /api/merchants/lookup': {
+    success: true,
+    data: [
+      {
+        id: 1,
+        code: 'mc-sandbox',
+        name: null,
+      },
+      {
+        id: 2,
+        code: 'zetto-test',
+        name: null,
+      },
+      {
+        id: 3,
+        code: 'wolf-tes',
+        name: null,
+      },
+    ],
+  },
+  'POST /api/merchants/analytics': {
+    success: true,
+    data: {
+      lastHour: {
+        deposit_count: 8,
+        deposit_amount: 24900,
+      },
+      lastDay: {
+        deposit_count: 97,
+        deposit_amount: 194340,
+        histogram: [
+          {
+            hour_ist: '2024-05-16 00:00:00',
+            n: 8,
+            amount: 27200,
+          },
+          {
+            hour_ist: '2024-05-16 01:00:00',
+            n: 6,
+            amount: 11900,
+          },
+          {
+            hour_ist: '2024-05-16 02:00:00',
+            n: 2,
+            amount: 1500,
+          },
+          {
+            hour_ist: '2024-05-16 03:00:00',
+            n: 3,
+            amount: 3000,
+          },
+          {
+            hour_ist: '2024-05-16 04:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 05:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 06:00:00',
+            n: 1,
+            amount: 1000,
+          },
+          {
+            hour_ist: '2024-05-16 07:00:00',
+            n: 1,
+            amount: 500,
+          },
+          {
+            hour_ist: '2024-05-16 08:00:00',
+            n: 2,
+            amount: 19000,
+          },
+          {
+            hour_ist: '2024-05-16 09:00:00',
+            n: 1,
+            amount: 500,
+          },
+          {
+            hour_ist: '2024-05-16 10:00:00',
+            n: 3,
+            amount: 2700,
+          },
+          {
+            hour_ist: '2024-05-16 11:00:00',
+            n: 7,
+            amount: 11500,
+          },
+          {
+            hour_ist: '2024-05-16 12:00:00',
+            n: 1,
+            amount: 500,
+          },
+          {
+            hour_ist: '2024-05-16 13:00:00',
+            n: 6,
+            amount: 5500,
+          },
+          {
+            hour_ist: '2024-05-16 14:00:00',
+            n: 12,
+            amount: 20030,
+          },
+          {
+            hour_ist: '2024-05-16 15:00:00',
+            n: 18,
+            amount: 39810,
+          },
+          {
+            hour_ist: '2024-05-16 16:00:00',
+            n: 18,
+            amount: 24800,
+          },
+          {
+            hour_ist: '2024-05-16 17:00:00',
+            n: 8,
+            amount: 24900,
+          },
+          {
+            hour_ist: '2024-05-16 18:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 19:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 20:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 21:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 22:00:00',
+            n: 1,
+            amount: 0,
+          },
+          {
+            hour_ist: '2024-05-16 23:00:00',
+            n: 1,
+            amount: 0,
+          },
+        ],
+      },
+      lastWeek: {
+        deposit_count: 610,
+        deposit_amount: 1267920,
+        histogram: [
+          {
+            day_ist: '2024-05-10',
+            n: 73,
+            amount: 157459,
+          },
+          {
+            day_ist: '2024-05-11',
+            n: 5,
+            amount: 7000,
+          },
+          {
+            day_ist: '2024-05-12',
+            n: 94,
+            amount: 211899,
+          },
+          {
+            day_ist: '2024-05-13',
+            n: 128,
+            amount: 284881,
+          },
+          {
+            day_ist: '2024-05-14',
+            n: 118,
+            amount: 226420,
+          },
+          {
+            day_ist: '2024-05-15',
+            n: 95,
+            amount: 185921,
+          },
+          {
+            day_ist: '2024-05-16',
+            n: 97,
+            amount: 194340,
+          },
+        ],
+      },
+    },
   },
 };
