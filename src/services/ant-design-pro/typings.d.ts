@@ -212,6 +212,7 @@ declare namespace API {
     created_at?: string;
     is_notified?: boolean;
     api?: string;
+    time_taken?: string;
 
     payinUrl?: string;
   };
@@ -324,12 +325,12 @@ declare namespace API {
     lastDay: {
       deposit_count: number;
       deposit_amount: number;
-      histogram: { hour: number; value: number }[];
+      histogram: { hour_ist: number; amount: number }[];
     };
     lastWeek: {
       deposit_count: number;
       deposit_amount: number;
-      histogram: { day: number; value: number }[];
+      histogram: { day_ist: string; amount: number }[];
     };
   };
 }

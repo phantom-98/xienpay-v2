@@ -1,5 +1,5 @@
 import { fetchMerchantAnalytics, fetchMerchantsList } from '@/services/ant-design-pro/api';
-import { Area, Line } from '@ant-design/charts';
+import { Column } from '@ant-design/charts';
 import { PageContainer, ProCard, ProFormSelect } from '@ant-design/pro-components';
 import { Divider, Space, Statistic } from 'antd';
 import React, { useEffect, useState } from 'react';
@@ -24,51 +24,30 @@ const Welcome: React.FC = () => {
 
   console.log(analytics);
   const { lastHour, lastDay, lastWeek } = analytics || {
-    lastHour: 0,
-    lastDay: 0,
-    lastWeek: 0,
-    lastMonth: 0,
+    lastHour: {},
+    lastDay: { histogram: [] },
+    lastWeek: { histogram: [] },
   };
   console.log(lastHour, lastDay, lastWeek);
 
-  const areaConfig = {
-    // data: {
-    //   type: 'fetch',
-    //   value: 'https://assets.antv.antgroup.com/g2/aapl.json',
-    // },
-    data: lastDay.histogram,
-    //xField: (d) => new Date(d.hour),
-    xField: 'hour',
+  const hourlyDataConfig = {
+    data: lastDay.histogram.map((value) => {
+      console.log(value);
+      return {
+        hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00',
+        amount: value.amount,
+      };
+    }),
+    xField: 'hour_ist',
     yField: 'amount',
+    colorField: 'hour_ist',
   };
 
-  const config = {
+  const dailyDataConfig = {
     data: lastWeek.histogram,
-    xField: 'day',
+    xField: 'day_ist',
     yField: 'amount',
-    point: {
-      size: 5,
-      shape: 'diamond',
-    },
-    tooltip: {
-      // formatter: (data) => {
-      //   return {
-      //     name: '',
-      //     value: 75,
-      //   };
-      // },
-      // customContent: (name, data) =>
-      //   `<div>${data?.map((item) => {
-      //     return `<div class="tooltip-chart" >
-      //         <span class="tooltip-item-name">${item?.day}</span>
-      //         <span class="tooltip-item-value">${item?.value}</span>
-      //       </div>`;
-      //   })}</div>`,
-      showMarkers: false,
-      showContent: false,
-      position: 'left',
-      showCrosshairs: true,
-    },
+    colorField: 'day_ist',
   };
 
   return (
@@ -88,44 +67,48 @@ const Welcome: React.FC = () => {
       <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
         <ProCard.Group direction="row">
           <ProCard boxShadow>
-            <Statistic title="Hourly deposit count" value={lastHour.deposit_count} />
+            <Statistic title="This hour deposit count" value={lastHour.deposit_count} />
           </ProCard>
           <Divider type="vertical" />
           <ProCard boxShadow>
-            <Statistic title="Deposits in last 1 hour" value={lastHour.deposit_amount} prefix="₹" />
+            <Statistic
+              title="This hour deposit amount"
+              value={lastHour.deposit_amount}
+              prefix="₹"
+            />
           </ProCard>
           <Divider type="vertical" />
           <ProCard boxShadow>
-            <Statistic title="Daily deposit count" value={lastDay.deposit_count} />
+            <Statistic title="Today deposit count" value={lastDay.deposit_count} />
           </ProCard>
           <Divider type="vertical" />
           <ProCard boxShadow>
-            <Statistic title="Deposit in last 1 day" value={lastDay.deposit_amount} prefix="₹" />
+            <Statistic title="Today deposit amount" value={lastDay.deposit_amount} prefix="₹" />
           </ProCard>
         </ProCard.Group>
       </Space>
 
       <Divider />
 
-      <ProCard.Group direction="column">
+      <ProCard.Group direction="row">
         <ProCard boxShadow>
           <Statistic
-            title="Deposits in last 1 hour"
+            title="Today's Deposits"
             value={lastHour.deposit_amount}
             precision={2}
             prefix="₹"
           />
-          <Area height={150} {...areaConfig} />
+          <Column height={400} {...hourlyDataConfig} />
         </ProCard>
-        <Divider type="horizontal" />
+        <Divider type="vertical" />
         <ProCard boxShadow>
           <Statistic
-            title="Deposits in last 1 day"
+            title="7 day's deposits"
             value={lastDay.deposit_amount}
             precision={2}
             prefix="₹"
           />
-          <Line height={150} {...config} />
+          <Column height={400} {...dailyDataConfig} />
         </ProCard>
       </ProCard.Group>
     </PageContainer>
