@@ -29,6 +29,10 @@ function dateFromMs(ms:number) : string {
   return new Date(ms).toISOString().substring(0, 10);
 }
 
+function asINR (n:number): string {
+  if (!n) return '₹ --';
+  return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'INR',}).format(n);
+}
 
 const Welcome = () => {
   /* Preload merchants list */
@@ -87,9 +91,9 @@ const Welcome = () => {
   };
 
   const { lastHour, lastDay, lastWeek } = analytics || {
-    lastHour: {},
-    lastDay: { histogram: [] },
-    lastWeek: { histogram: [] },
+    lastHour: { deposit_count: '--'},
+    lastDay: { deposit_count: '--', histogram: [] },
+    lastWeek: { deposit_count: '--', histogram: [] },
   };
 
   const hourlyDataConfig = {
@@ -135,7 +139,7 @@ const Welcome = () => {
             <StatisticCard
               statistic={{
                 title: 'This Hour Deposits',
-                value: `₹ ${lastHour.deposit_amount}`,
+                value: `${ asINR(lastHour.deposit_amount) }`,
                 description: <Statistic title="Count" value={lh_dc} />,
               }}
               chart={
@@ -151,7 +155,7 @@ const Welcome = () => {
             <StatisticCard
               statistic={{
                 title: "Today's Deposits",
-                value: `₹ ${lastDay.deposit_amount}`,
+                value: `${ asINR(lastDay.deposit_amount) }`,
                 description: <Statistic title="Count" value={ld_dc} />,
               }}
               chart={
@@ -169,7 +173,7 @@ const Welcome = () => {
             boxShadow
             statistic={{
               title: "Today's Deposits",
-              value: `₹ ${lastDay.deposit_amount}`,
+              value: `${ asINR(lastDay.deposit_amount)}`,
             }}
             chart={<Column height={400} {...hourlyDataConfig} />}
           />
@@ -236,7 +240,7 @@ const Welcome = () => {
             boxShadow
             statistic={{
               title: "Duration's Deposits",
-              value: `₹ ${lastWeek.deposit_amount}`,
+              value: `${ asINR(lastWeek.deposit_amount) }`,
             }}
             chart={<Column height={400} {...dailyDataConfig} />}
           />
