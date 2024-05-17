@@ -482,7 +482,7 @@ export async function fetchMerchantsList(
     method: 'POST',
     data: {
       merchant_name: merchant_name,
-      limit: 5,
+      limit: 20,
     },
   }).then((response) =>
     response.data.map((merchant: { id: number; name: string; code: string }) => ({
