@@ -507,12 +507,8 @@ export async function fetchMerchantAnalytics(
   }).then((response) => response.data);
 }
 
-export async function downloadMerchantAnalytics(
-  merchant_code: string,
-  from_date: string,
-  to_date: string,
-) {
-  return request('/api/merchants/downloadAnalytics', {
+export async function downloadPayins(merchant_code: string, from_date: string, to_date: string) {
+  return request('/api/merchants/payins/download', {
     method: 'POST',
     data: {
       merchant_code,
@@ -525,7 +521,7 @@ export async function downloadMerchantAnalytics(
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', 'data.csv'); // Specify the file name
+    link.setAttribute('download', `payins-${from_date}-${to_date}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();

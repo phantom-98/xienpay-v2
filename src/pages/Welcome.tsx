@@ -1,37 +1,39 @@
-import { fetchMerchantAnalytics, fetchMerchantsList, downloadMerchantAnalytics } from '@/services/ant-design-pro/api';
+import {
+  downloadPayins,
+  fetchMerchantAnalytics,
+  fetchMerchantsList,
+} from '@/services/ant-design-pro/api';
 import { Column } from '@ant-design/charts';
-import {DownloadOutlined} from '@ant-design/icons';
+import { DownloadOutlined } from '@ant-design/icons';
 import {
   PageContainer,
   ProCard,
+  ProForm,
   ProFormDateRangePicker,
   ProFormSelect,
-  ProForm,
-  StatisticCard
+  StatisticCard,
 } from '@ant-design/pro-components';
-import { Button } from 'antd';
-import React, { useEffect, useState } from 'react';
-import { Row, Col, message } from 'antd';
-
+import { Button, Col, Row, message } from 'antd';
+import { useEffect, useState } from 'react';
 
 const { Statistic, Divider } = StatisticCard;
 
-function daysBetween(date1:string, date2:string) : number {
-  const d1:Date = new Date(date1);
-  const d2:Date = new Date(date2);
+function daysBetween(date1: string, date2: string): number {
+  const d1: Date = new Date(date1);
+  const d2: Date = new Date(date2);
 
   const daysDifference = (d2 - d1) / (1000 * 60 * 60 * 24);
 
   return Math.abs(daysDifference);
 }
 
-function dateFromMs(ms:number) : string {
+function dateFromMs(ms: number): string {
   return new Date(ms).toISOString().substring(0, 10);
 }
 
-function asINR (n:number): string {
+function asINR(n: number): string {
   if (!n) return '₹ --';
-  return new Intl.NumberFormat('en-US', {style: 'currency', currency: 'INR',}).format(n);
+  return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(n);
 }
 
 const Welcome = () => {
@@ -66,9 +68,13 @@ const Welcome = () => {
 
     try {
       if (action === 'download') {
-        await downloadMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+        await downloadPayins(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
       } else if (action === 'submit') {
-        const data = await fetchMerchantAnalytics(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+        const data = await fetchMerchantAnalytics(
+          merchant_code,
+          dateFromMs(from_date),
+          dateFromMs(to_date),
+        );
         setAnalytics(data);
       }
     } catch (error) {
@@ -91,7 +97,7 @@ const Welcome = () => {
   };
 
   const { lastHour, lastDay, lastWeek } = analytics || {
-    lastHour: { deposit_count: '--'},
+    lastHour: { deposit_count: '--' },
     lastDay: { deposit_count: '--', histogram: [] },
     lastWeek: { deposit_count: '--', histogram: [] },
   };
@@ -139,7 +145,7 @@ const Welcome = () => {
             <StatisticCard
               statistic={{
                 title: 'This Hour Deposits',
-                value: `${ asINR(lastHour.deposit_amount) }`,
+                value: `${asINR(lastHour.deposit_amount)}`,
                 description: <Statistic title="Count" value={lh_dc} />,
               }}
               chart={
@@ -155,7 +161,7 @@ const Welcome = () => {
             <StatisticCard
               statistic={{
                 title: "Today's Deposits",
-                value: `${ asINR(lastDay.deposit_amount) }`,
+                value: `${asINR(lastDay.deposit_amount)}`,
                 description: <Statistic title="Count" value={ld_dc} />,
               }}
               chart={
@@ -173,7 +179,7 @@ const Welcome = () => {
             boxShadow
             statistic={{
               title: "Today's Deposits",
-              value: `${ asINR(lastDay.deposit_amount)}`,
+              value: `${asINR(lastDay.deposit_amount)}`,
             }}
             chart={<Column height={400} {...hourlyDataConfig} />}
           />
@@ -187,7 +193,7 @@ const Welcome = () => {
               initialValues={formValues}
               onValuesChange={(_, values) => handleDateChange(values.time_period)}
               submitter={{
-                render: (props, _) => (
+                render: (props, x) => (
                   <Row gutter={8} align="middle">
                     <Col>
                       <Button
@@ -195,7 +201,7 @@ const Welcome = () => {
                         type="primary"
                         onClick={async () => {
                           const values = await props.form?.validateFields();
-			                    console.log(values);
+                          console.log(values, x);
                           handleFormSubmit('submit');
                         }}
                       >
@@ -209,7 +215,7 @@ const Welcome = () => {
                         style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
                         onClick={async () => {
                           const values = await props.form?.validateFields();
-			                    console.log(values);
+                          console.log(values);
                           handleFormSubmit('download');
                         }}
                       >
@@ -240,7 +246,7 @@ const Welcome = () => {
             boxShadow
             statistic={{
               title: "Duration's Deposits",
-              value: `${ asINR(lastWeek.deposit_amount) }`,
+              value: `${asINR(lastWeek.deposit_amount)}`,
             }}
             chart={<Column height={400} {...dailyDataConfig} />}
           />
