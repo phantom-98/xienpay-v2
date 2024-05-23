@@ -176,6 +176,8 @@ const handleRemove = async (selectedRows: API.PayinListItem[]) => {
   }
 };
 
+const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 const PayinList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
@@ -228,6 +230,7 @@ const PayinList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
       dataIndex: 'short_code',
       valueType: 'textarea',
+      copyable: true,
     },
     {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Confirmed" />,
@@ -251,6 +254,7 @@ const PayinList: React.FC = () => {
       ),
       dataIndex: 'merchant_order_id',
       valueType: 'textarea',
+      copyable: true,
     },
     {
       title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
@@ -390,6 +394,16 @@ const PayinList: React.FC = () => {
             {dom}
           </a>
         );
+      },
+      copyable: true,
+      search: {
+        transform: (value: string) => {
+          if (value && !uuidPattern.test(value)) {
+            message.error('Invalid Payin UUID. Defaulting to empty');
+            return { uuid: '' };
+          }
+          return value;
+        },
       },
     },
     {
