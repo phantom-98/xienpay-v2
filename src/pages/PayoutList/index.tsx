@@ -31,6 +31,7 @@ import UpdateForm from './components/UpdateForm';
 const ApprovalModal: React.FC<{
   placeholder: string;
   style: React.CSSProperties;
+  payoutId: number;
   onConfirm?: (value: string) => void;
 }> = (props) => {
   const [visible, setVisible] = useState(false);
@@ -71,7 +72,8 @@ const ApprovalModal: React.FC<{
         okText="OK"
         cancelText="Cancel"
         visible={visible}
-        width="sm"
+        centered
+        width={400}
       >
         <Input
           placeholder="Enter UTR ID"
@@ -378,7 +380,8 @@ const PayoutList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) =>
-        record.status === 'initiated' && [
+        record.status === 'initiated' &&
+        access.canPayoutAuthorize && [
           <ApprovalModal
             key={record.id}
             onConfirm={async (value) => {
@@ -388,6 +391,7 @@ const PayoutList: React.FC = () => {
                 actionRef.current.reload();
               }
             }}
+            payoutId={record.id}
             placeholder={'Input UTR ID'}
             style={{ width: 'md' }}
           />,
