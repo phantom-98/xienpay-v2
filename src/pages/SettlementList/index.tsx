@@ -190,6 +190,8 @@ const SettlementList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
+  const [merchantCode, setMerchantCode] = useState('');
+
   /**
    * @en-US International configuration
    * @zh-CN 国际化配置
