@@ -94,6 +94,13 @@ export default [
     access: 'canPayoutList',
   },
   {
+    name: 'list.settlement-list',
+    icon: 'CalculatorOutlined',
+    path: '/settlement-list',
+    component: './SettlementList',
+    access: 'canSettlementList',
+  },
+  {
     path: '/',
     redirect: '/welcome',
   },

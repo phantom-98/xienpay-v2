@@ -1,12 +1,11 @@
 import {
-  acceptPayout,
-  addPayout,
+  acceptSettlement,
+  addSettlement,
   fetchMerchantsList,
-  fetchPlayerList,
-  payout,
-  rejectPayout,
-  removePayout,
-  updatePayout,
+  rejectSettlement,
+  removeSettlement,
+  settlement,
+  updateSettlement,
 } from '@/services/ant-design-pro/api';
 import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -15,15 +14,14 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
-  ProForm,
+  ProFormDependency,
   ProFormMoney,
   ProFormSelect,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import type { SelectProps } from 'antd';
-import { Button, Drawer, Input, Modal, Popconfirm, Select, message } from 'antd';
+import { Button, Drawer, Input, Modal, Popconfirm, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -31,7 +29,6 @@ import UpdateForm from './components/UpdateForm';
 const ApprovalModal: React.FC<{
   placeholder: string;
   style: React.CSSProperties;
-  payoutId: number;
   onConfirm?: (value: string) => void;
 }> = (props) => {
   const [visible, setVisible] = useState(false);
@@ -66,7 +63,7 @@ const ApprovalModal: React.FC<{
         onClick={showModal}
       />
       <Modal
-        title={`Confirm Approval for ID. ${props.payoutId}`}
+        title={`Confirm Approval for ID. ${props.settlementId}`}
         onOk={handleOk}
         onCancel={handleCancel}
         okText="OK"
@@ -86,76 +83,39 @@ const ApprovalModal: React.FC<{
   );
 };
 
-const SearchUserInput: React.FC<{
-  merchantCode: string;
-  placeholder: string;
-  style: React.CSSProperties;
-  onChange?: (value: string) => void;
-}> = (props) => {
-  const [data, setData] = useState<SelectProps['options']>([]);
-  const [value, setValue] = useState<string>();
-
-  const handleSearch = (newValue: string) => {
-    return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
-      setData(data);
-    });
-  };
-
-  const handleChange = (newValue: string) => {
-    setValue(newValue);
-    props.onChange?.(newValue);
-  };
-
-  return (
-    <Select
-      showSearch
-      value={value}
-      placeholder={props.placeholder}
-      style={props.style}
-      defaultActiveFirstOption={false}
-      suffixIcon={null}
-      filterOption={false}
-      onSearch={handleSearch}
-      onChange={handleChange}
-      notFoundContent={null}
-      options={(data || []).map((d) => ({
-        value: d.value,
-        label: d.label,
-      }))}
-    />
-  );
-};
-
-// const handleReject = async (fields: API.PayoutListItem) => {
-//   rejectPayout({id: fields.id, action: 'reject'}).then(() => { message.success('Payout rejected!'); });
+// const handleReject = async (fields: API.SettlementListItem) => {
+//   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
 // };
+
+function transformToAPI(item: API.AddSettlementItem): API.AddSettlementAPIItem {
+  const { amount, merchant_code, method, ac_no, ac_name, ifsc, address, currency } = item;
+
+  let result: API.AddSettlementAPIItem = {
+    amount,
+    merchant_code,
+    method,
+  };
+
+  if (method === 'bank' && ac_no && ac_name && ifsc) {
+    result.bank = { ac_no, ac_name, ifsc };
+  } else if (method === 'crypto' && address && currency) {
+    result.crypto = { address, currency };
+  }
+
+  return result;
+}
 
 /**
  * @en-US Add node
  * @zh-CN 添加节点
  * @param fields
  */
-const handleAdd = async (fields: API.PaymentLinkResponse) => {
+const handleAdd = async (fields: API.AddSettlementItem) => {
   const hide = message.loading('Adding');
   try {
-    const response = await addPayout({ ...fields });
-    const { payoutUrl } = response;
+    await addSettlement(transformToAPI(fields));
     hide();
-    if (payoutUrl !== null && payoutUrl !== undefined) {
-      navigator.clipboard.writeText(payoutUrl).then(
-        () => {
-          message.success('Payment link copied to clipboard!');
-        },
-        (err) => {
-          message.error('Failed to copy: ', err);
-        },
-      );
-      Modal.success({
-        content: payoutUrl,
-        width: 1000,
-        title: 'Payment Link',
-      });
-    }
+    message.success('Added successfully');
     return true;
   } catch (error) {
     hide();
@@ -173,7 +133,7 @@ const handleAdd = async (fields: API.PaymentLinkResponse) => {
 const handleUpdate = async (fields: FormValueType) => {
   const hide = message.loading('Configuring');
   try {
-    await updatePayout({
+    await updateSettlement({
       name: fields.name,
       desc: fields.desc,
       key: fields.key,
@@ -195,11 +155,11 @@ const handleUpdate = async (fields: FormValueType) => {
  *
  * @param selectedRows
  */
-const handleRemove = async (selectedRows: API.PayoutListItem[]) => {
+const handleRemove = async (selectedRows: API.SettlementListItem[]) => {
   const hide = message.loading('Deleting...');
   if (!selectedRows) return true;
   try {
-    await removePayout({
+    await removeSettlement({
       key: selectedRows.map((row) => row.id),
     });
     hide();
@@ -212,7 +172,7 @@ const handleRemove = async (selectedRows: API.PayoutListItem[]) => {
   }
 };
 
-const PayoutList: React.FC = () => {
+const SettlementList: React.FC = () => {
   /**
    * @en-US Pop-up window of new window
    * @zh-CN 新建窗口的弹窗
@@ -227,10 +187,8 @@ const PayoutList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.PayoutListItem>();
-  const [selectedRowsState, setSelectedRows] = useState<API.PayoutListItem[]>([]);
-
-  const [merchantCode, setMerchantCode] = useState('');
+  const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
+  const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
   /**
    * @en-US International configuration
@@ -254,38 +212,26 @@ const PayoutList: React.FC = () => {
     })();
   }, []);
 
-  const columns: ProColumns<API.PayoutListItem>[] = [
+  const columns: ProColumns<API.SettlementListItem>[] = [
     {
-      title: <FormattedMessage id="pages.payoutTable.short_code" defaultMessage="ID" />,
+      title: <FormattedMessage id="pages.settlementTable.short_code" defaultMessage="ID" />,
       dataIndex: 'id',
       valueType: 'textarea',
     },
     {
-      title: (
-        <FormattedMessage id="pages.payoutTable.mcOrderId" defaultMessage="Merchant Order ID" />
-      ),
-      dataIndex: 'merchant_order_id',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payoutTable.mcOrderId" defaultMessage="Merchant" />,
+      title: <FormattedMessage id="pages.settlementTable.mcOrderId" defaultMessage="Merchant" />,
       dataIndex: 'merchant',
       valueType: 'textarea',
       valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
     },
     {
-      title: <FormattedMessage id="pages.payoutTable.agent" defaultMessage="User" />,
-      dataIndex: 'user_id',
-      valueType: 'textarea',
-    },
-    {
-      title: <FormattedMessage id="pages.payoutTable.status" defaultMessage="Status" />,
+      title: <FormattedMessage id="pages.settlementTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
       valueEnum: {
-        initiated: {
+        pending: {
           text: (
             <FormattedMessage
-              id="pages.payoutTable.payoutStatus.default"
+              id="pages.settlementTable.settlementStatus.default"
               defaultMessage="Initiated"
             />
           ),
@@ -294,7 +240,7 @@ const PayoutList: React.FC = () => {
         success: {
           text: (
             <FormattedMessage
-              id="pages.payoutTable.payoutStatus.success"
+              id="pages.settlementTable.settlementStatus.success"
               defaultMessage="Success"
             />
           ),
@@ -302,14 +248,17 @@ const PayoutList: React.FC = () => {
         },
         failed: {
           text: (
-            <FormattedMessage id="pages.payoutTable.payoutStatus.failed" defaultMessage="Failed" />
+            <FormattedMessage
+              id="pages.settlementTable.settlementStatus.failed"
+              defaultMessage="Failed"
+            />
           ),
           status: 'Error',
         },
       },
     },
     {
-      title: <FormattedMessage id="pages.payoutTable.amount" defaultMessage="Amount" />,
+      title: <FormattedMessage id="pages.settlementTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
       render: (_, record) => (
         <span>
@@ -331,45 +280,30 @@ const PayoutList: React.FC = () => {
       valueType: 'textarea',
       render: (_, record) => (
         <span>
-          {record.account_number}
+          {record.method_account_number}
           <br />
-          {record.account_holder_name}
+          {record.method_account_name}
           <br />
-          {record.ifsc_code}
+          {record.method_account_branch_code}
           <br />
           {record.bank_name}
         </span>
       ),
     },
     {
-      title: (
-        <FormattedMessage
-          id="pages.payoutTable.updateForm.payoutName.nameLabel"
-          defaultMessage="Payout UUID"
-        />
-      ),
-      dataIndex: 'uuid',
-      tip: 'The payout uuid is the unique key',
-      render: (dom, entity) => {
-        return (
-          <a
-            onClick={() => {
-              setCurrentRow(entity);
-              setShowDetail(true);
-            }}
-          >
-            {dom}
-          </a>
-        );
-      },
-    },
-    {
-      title: <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR" />,
-      dataIndex: 'utr_id',
+      title: <FormattedMessage id="pages.settlementTable.utr" defaultMessage="Method" />,
+      dataIndex: 'method',
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated" />,
+      title: <FormattedMessage id="pages.settlementTable.utr" defaultMessage="Ref." />,
+      dataIndex: 'reference_id',
+      valueType: 'textarea',
+    },
+    {
+      title: (
+        <FormattedMessage id="pages.settlementTable.updatedAt" defaultMessage="Last updated" />
+      ),
       dataIndex: 'updated_at',
       hideInForm: true,
       valueType: 'dateTime',
@@ -380,28 +314,28 @@ const PayoutList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) =>
-        record.status === 'initiated' &&
-        access.canPayoutAuthorize && [
+        record.status === 'pending' &&
+        access.canSettlementAuthorize && [
           <ApprovalModal
             key={record.id}
+            settlementId={record.id}
             onConfirm={async (value) => {
-              await acceptPayout({ id: record.id, action: 'approve', utr_id: value });
-              message.success(`Payout No ${record.id} approved!`);
+              await acceptSettlement({ id: record.id, action: 'approve', ref_id: value });
+              message.success(`Settlement No ${record.id} approved!`);
               if (actionRef.current) {
                 actionRef.current.reload();
               }
             }}
-            payoutId={record.id}
             placeholder={'Input UTR ID'}
             style={{ width: 'md' }}
           />,
           <>
             <Popconfirm
               title="Confirm"
-              description="Reject Payout?"
+              description="Reject Settlement?"
               onConfirm={async () => {
-                await rejectPayout({ id: record.id, action: 'reject' });
-                message.success(`Payout No ${record.id} rejected!`);
+                await rejectSettlement({ id: record.id, action: 'reject' });
+                message.success(`Settlement No ${record.id} rejected!`);
                 if (actionRef.current) {
                   actionRef.current.reload();
                 }
@@ -417,10 +351,10 @@ const PayoutList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.PayoutListItem, API.PageParams>
+      <ProTable<API.SettlementListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.payoutTable.title',
-          defaultMessage: 'Payouts List',
+          id: 'pages.settlementTable.title',
+          defaultMessage: 'Settlements List',
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
@@ -429,7 +363,7 @@ const PayoutList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayoutLinkCreate
+          access.canSettlementCreate
             ? [
                 <Button
                   type="primary"
@@ -440,14 +374,14 @@ const PayoutList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage
-                    id="pages.payoutTable.new-payment-link"
-                    defaultMessage="New Payment Link"
+                    id="pages.settlementTable.new-payment-link"
+                    defaultMessage="New Settlement"
                   />
                 </Button>,
               ]
             : null
         }
-        request={payout}
+        request={settlement}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
@@ -496,8 +430,8 @@ const PayoutList: React.FC = () => {
       )}
       <ModalForm
         title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newPayout',
-          defaultMessage: 'New payout',
+          id: 'pages.searchTable.createForm.newSettlement',
+          defaultMessage: 'New settlement',
         })}
         open={createModalOpen}
         onOpenChange={handleModalOpen}
@@ -508,9 +442,10 @@ const PayoutList: React.FC = () => {
         wrapperCol={{
           span: 16,
         }}
+        width={720}
         labelAlign="left"
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.PaymentLinkResponse);
+          const success = await handleAdd(value as API.AddSettlementItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -519,24 +454,6 @@ const PayoutList: React.FC = () => {
           }
         }}
       >
-        <ProFormText
-          rules={[
-            {
-              required: true,
-              message: (
-                <FormattedMessage
-                  id="pages.searchTable.payoutName"
-                  defaultMessage="Merchant Order ID is required"
-                />
-              ),
-            },
-          ]}
-          initialValue={crypto.randomUUID().toString()}
-          label="Merchant Order ID"
-          width="md"
-          name="merchant_order_id"
-          placeholder="Unique order ID generated at the merchant for reference"
-        />
         <ProFormSelect
           width="md"
           options={merchantsList.map((merchant) => merchant.label)}
@@ -546,36 +463,125 @@ const PayoutList: React.FC = () => {
           label="Merchant Code"
           onChange={setMerchantCode}
         />
-        <ProForm.Item name="user_id" label="User ID" valuePropName="value">
-          <SearchUserInput
-            merchantCode={merchantCode}
-            placeholder="Search user id"
-            style={{ width: 'md' }}
-          />
-        </ProForm.Item>
-        <ProFormText
-          colProps={{ span: 12 }}
-          width="md"
-          name="user_email"
-          label="Email"
-          placeholder="Optional user email"
-        />
-        <ProFormText
-          colProps={{ span: 12 }}
-          width="md"
-          name="user_phone_number"
-          label="User Phone #"
-          placeholder="Optional user email"
-        />
         <ProFormMoney
           label="Amount"
           name="amount"
-          colProps={{ span: 12 }}
+          width="md"
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
           min={0}
           placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
         />
+        <ProFormSelect
+          name="method"
+          width="md"
+          label={intl.formatMessage({
+            id: 'pages.searchTable.updateForm.object',
+            defaultMessage: 'bank',
+          })}
+          valueEnum={{
+            bank: 'bank',
+            cash: 'cash',
+            crypto: 'crypto',
+          }}
+        />
+        <ProFormDependency name={['method']}>
+          {({ method }) => {
+            return method === 'bank' ? (
+              <>
+                <ProFormText
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.bankAcctTable.searchTable.ac_name"
+                          defaultMessage="Bank acct holder name is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  label="Bank Account Holders Name"
+                  name="ac_name"
+                  width="md"
+                  placeholder="Enter the bank account holders name"
+                />
+                <ProFormText
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.bankAcctTable.searchTable.ac_name"
+                          defaultMessage="Bank acct no is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  label="Account No."
+                  width="md"
+                  name="ac_no"
+                  placeholder="Enter the 16 digit account number"
+                />
+                <ProFormText
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.bankAcctTable.searchTable.ac_name"
+                          defaultMessage="Bank IFSC is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  label="IFSC Code"
+                  name="ifsc"
+                  width="md"
+                  placeholder="Enter 16 digit IFSC code"
+                />
+              </>
+            ) : null;
+          }}
+        </ProFormDependency>
+        <ProFormDependency name={['method']}>
+          {({ method }) => {
+            return method === 'crypto' ? (
+              <>
+                <ProFormSelect
+                  name="currency"
+                  width="md"
+                  label={intl.formatMessage({
+                    id: 'pages.searchTable.updateForm.object',
+                    defaultMessage: 'Wallet',
+                  })}
+                  valueEnum={{
+                    USDT: 'usdt',
+                    BTC: 'bitcoin',
+                    ETH: 'ethereum',
+                  }}
+                />
+                <ProFormText
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.bankAcctTable.searchTable.ac_name"
+                          defaultMessage="Bank acct no is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  label="Wallet Address"
+                  width="md"
+                  name="address"
+                  placeholder="Enter the wallet address"
+                />
+              </>
+            ) : null;
+          }}
+        </ProFormDependency>
       </ModalForm>
       <UpdateForm
         onSubmit={async (value) => {
@@ -608,16 +614,16 @@ const PayoutList: React.FC = () => {
         closable={false}
       >
         {currentRow?.id && (
-          <ProDescriptions<API.PayoutListItem>
+          <ProDescriptions<API.SettlementListItem>
             column={1}
-            title={<p>Payout ID. {currentRow?.id}</p>}
+            title={<p>Settlement ID. {currentRow?.id}</p>}
             request={async () => ({
               data: currentRow || {},
             })}
             params={{
               id: currentRow?.id,
             }}
-            columns={columns as ProDescriptionsItemProps<API.PayoutListItem>[]}
+            columns={columns as ProDescriptionsItemProps<API.SettlementListItem>[]}
           />
         )}
       </Drawer>
@@ -625,4 +631,4 @@ const PayoutList: React.FC = () => {
   );
 };
 
-export default PayoutList;
+export default SettlementList;

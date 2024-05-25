@@ -108,6 +108,9 @@ declare namespace API {
     min_payin: number;
     max_payin: number;
     commission: number;
+    min_payout: number;
+    max_payout: number;
+    payout_commission: number;
   };
 
   type MerchantListItem = {
@@ -115,6 +118,8 @@ declare namespace API {
     return_url?: string;
     max_payin?: number;
     min_payin?: number;
+    max_payout?: number;
+    min_payout?: number;
     secret_key?: string;
     notify_url?: string;
     site_url?: string;
@@ -126,6 +131,8 @@ declare namespace API {
     is_test_mode: boolean;
     created_at?: string;
     payin_commission?: number;
+    payout_commission?: number;
+    balance: number;
   };
 
   type MerchantList = {
@@ -332,5 +339,64 @@ declare namespace API {
       deposit_amount: number;
       histogram: { day_ist: string; amount: number }[];
     };
+  };
+
+  type BankAcctItem = {
+    ac_no: string;
+    ac_name: string;
+    ifsc: string;
+  };
+
+  type CryptoItem = {
+    address: string;
+    currency: string;
+  };
+
+  type AddSettlementItem = {
+    amount: number;
+    merchant: string;
+    method: string;
+
+    // BankAcctItem
+    ac_no?: string;
+    ac_name?: string;
+    ifsc?: string;
+
+    // CryptoItem
+    address?: string;
+    currency?: string;
+  };
+
+  type AddSettlementAPIItem = {
+    amount: number;
+    merchant_code: string;
+    method: string;
+    bank?: BankAcctItem;
+    crypto?: CryptoItem;
+  };
+
+  type SettlementListItem = {
+    id: number;
+    amount: number;
+    utr_id: string;
+    merchant: string;
+    user_id: string;
+    merchant_order_id: number;
+    account_number: string;
+    account_holder_name: string;
+    ifsc_code: string;
+    bank_name: string;
+    uuid: string;
+    currency: string;
+    status: PayinStatus;
+    updated_at?: string;
+    created_at?: string;
+  };
+
+  type SettlementList = {
+    data?: SettlementListItem[];
+    /** 列表的内容总数 */
+    total?: number;
+    success?: boolean;
   };
 }

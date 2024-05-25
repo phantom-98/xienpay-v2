@@ -56,4 +56,5 @@ export default {
   'menu.list.payout-list': 'Payouts',
   'menu.list.bank-acct-list': 'Bank Accounts',
   'menu.list.admin-user-list': 'Admin Users',
+  'menu.list.settlement-list': 'Settlements',
 };
