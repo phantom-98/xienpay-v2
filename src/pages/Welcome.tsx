@@ -96,7 +96,7 @@ const Welcome = () => {
     }));
   };
 
-  const { lastHour, lastDay, lastWeek } = analytics || {
+  const { balance, lastHour, lastDay, lastWeek } = analytics || {
     lastHour: { deposit_count: '--' },
     lastDay: { deposit_count: '--', histogram: [] },
     lastWeek: { deposit_count: '--', histogram: [] },
@@ -167,6 +167,21 @@ const Welcome = () => {
               chart={
                 <img
                   src="https://gw.alipayobjects.com/zos/alicdn/6YR18tCxJ/huanlv.svg"
+                  alt="百分比"
+                  width="100%"
+                />
+              }
+              chartPlacement="left"
+            />
+            <Divider type="vertical" />
+            <StatisticCard
+              statistic={{
+                title: 'Balance',
+                value: `${asINR(balance)}`,
+              }}
+              chart={
+                <img
+                  src="https://gw.alipayobjects.com/zos/alicdn/ShNDpDTik/huan.svg"
                   alt="百分比"
                   width="100%"
                 />

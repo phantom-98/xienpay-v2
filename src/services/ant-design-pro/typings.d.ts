@@ -325,6 +325,7 @@ declare namespace API {
   };
 
   type AnalyticsData = {
+    balance: number;
     lastHour: {
       deposit_count: number;
       deposit_amount: number;
