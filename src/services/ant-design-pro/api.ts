@@ -93,6 +93,10 @@ export async function removeRule(options?: { [key: string]: any }) {
   });
 }
 
+/****************************************************************************************
+ * Merchant APIs
+ ***************************************************************************************/
+
 /** 获取规则列表 GET /api/merchants */
 export async function merchant(
   params: {
@@ -145,6 +149,86 @@ export async function removeMerchant(options?: { [key: string]: any }) {
     },
   });
 }
+
+export async function fetchMerchantsList(
+  merchant_name: string,
+): Promise<API.LinkedMerchantListItem[]> {
+  console.log('fetching user', merchant_name);
+
+  return request('/api/merchants/lookup', {
+    method: 'POST',
+    data: {
+      merchant_name: merchant_name,
+      limit: 20,
+    },
+  }).then((response) =>
+    response.data.map((merchant: { id: number; name: string; code: string }) => ({
+      label: merchant.code, // `${merchant.name || ''} ${merchant.code}`,
+      value: merchant.id,
+    })),
+  );
+}
+
+export async function fetchPlayerList(
+  merchant_code: string,
+  player_name: string,
+): Promise<API.MerchantUserItem[]> {
+  console.log('fetching player', merchant_code, player_name);
+
+  return request('/api/merchants/players/lookup', {
+    method: 'POST',
+    data: {
+      merchant_code: merchant_code,
+      player_name: player_name,
+      limit: 5,
+    },
+  }).then((response) =>
+    response.data.map((player: { id: string; name: string }) => ({
+      label: player.name,
+      value: player.name,
+    })),
+  );
+}
+
+export async function fetchMerchantAnalytics(
+  merchant_code: string,
+  from_date: string,
+  to_date: string,
+): Promise<API.AnalyticsData> {
+  return request('/api/merchants/analytics', {
+    method: 'POST',
+    data: {
+      merchant_code,
+      from_date,
+      to_date,
+    },
+  }).then((response) => response.data);
+}
+
+export async function downloadPayins(merchant_code: string, from_date: string, to_date: string) {
+  return request('/api/merchants/payins/download', {
+    method: 'POST',
+    data: {
+      merchant_code,
+      from_date,
+      to_date,
+    },
+    getResponse: true, // This will return the full response object
+  }).then((response) => {
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `payins-${from_date}-${to_date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+}
+
+/****************************************************************************************
+ * Agent APIs
+ ***************************************************************************************/
 
 /** 获取规则列表 GET /api/agents */
 export async function agent(
@@ -210,6 +294,10 @@ export async function changeEnableAgent(agent_id: number, checked: boolean) {
     },
   });
 }
+
+/****************************************************************************************
+ * Payin APIs
+ ***************************************************************************************/
 
 /** 获取规则列表 GET /api/payins */
 export async function payin(
@@ -294,6 +382,10 @@ export async function removePayin(options?: { [key: string]: any }) {
   });
 }
 
+/****************************************************************************************
+ * Payout APIs
+ ***************************************************************************************/
+
 /** 获取规则列表 GET /api/payouts */
 export async function payout(
   params: {
@@ -367,6 +459,10 @@ export async function rejectPayout(options?: { [key: string]: any }) {
   });
 }
 
+/****************************************************************************************
+ * Bank Account APIs
+ ***************************************************************************************/
+
 /** 获取规则列表 GET /api/bankAccts */
 export async function bankAcct(
   params: {
@@ -387,7 +483,7 @@ export async function bankAcct(
   });
 }
 
-/** 更新规则 PUT /api/payins */
+/** 更新规则 PUT /api/bankAccts */
 export async function updateBankAcct(options?: { [key: string]: any }) {
   return request<API.BankAcctListItem>('/api/bankAccts', {
     method: 'POST',
@@ -398,7 +494,7 @@ export async function updateBankAcct(options?: { [key: string]: any }) {
   });
 }
 
-/** 新建规则 POST /api/payins */
+/** 新建规则 POST /api/bankAccts */
 export async function addBankAcct(options?: { [key: string]: any }) {
   return request<API.BankAcctListItem>('/api/bankAccts', {
     method: 'POST',
@@ -409,7 +505,7 @@ export async function addBankAcct(options?: { [key: string]: any }) {
   });
 }
 
-/** 删除规则 DELETE /api/payins */
+/** 删除规则 DELETE /api/bankAccts */
 export async function removeBankAcct(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/bankAccts', {
     method: 'POST',
@@ -473,60 +569,9 @@ export async function assignMerchants(bank_id: number, merchant_ids: number[]) {
   });
 }
 
-export async function fetchMerchantsList(
-  merchant_name: string,
-): Promise<API.LinkedMerchantListItem[]> {
-  console.log('fetching user', merchant_name);
-
-  return request('/api/merchants/lookup', {
-    method: 'POST',
-    data: {
-      merchant_name: merchant_name,
-      limit: 20,
-    },
-  }).then((response) =>
-    response.data.map((merchant: { id: number; name: string; code: string }) => ({
-      label: merchant.code, // `${merchant.name || ''} ${merchant.code}`,
-      value: merchant.id,
-    })),
-  );
-}
-
-export async function fetchMerchantAnalytics(
-  merchant_code: string,
-  from_date: string,
-  to_date: string,
-): Promise<API.AnalyticsData> {
-  return request('/api/merchants/analytics', {
-    method: 'POST',
-    data: {
-      merchant_code,
-      from_date,
-      to_date,
-    },
-  }).then((response) => response.data);
-}
-
-export async function downloadPayins(merchant_code: string, from_date: string, to_date: string) {
-  return request('/api/merchants/payins/download', {
-    method: 'POST',
-    data: {
-      merchant_code,
-      from_date,
-      to_date,
-    },
-    getResponse: true, // This will return the full response object
-  }).then((response) => {
-    const blob = new Blob([response.data], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `payins-${from_date}-${to_date}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  });
-}
+/****************************************************************************************
+ * Admin User APIs
+ ***************************************************************************************/
 
 /** 获取规则列表 GET /api/adminUsers */
 export async function adminUser(
@@ -593,6 +638,10 @@ export async function changeEnableAdminUser(adminUser_id: number, checked: boole
   });
 }
 
+/****************************************************************************************
+ * Role APIs
+ ***************************************************************************************/
+
 export async function fetchRolesList(name: string): Promise<API.RoleListItem[]> {
   console.log('fetching role', name);
 
@@ -610,23 +659,79 @@ export async function fetchRolesList(name: string): Promise<API.RoleListItem[]> 
   );
 }
 
-export async function fetchPlayerList(
-  merchant_code: string,
-  player_name: string,
-): Promise<API.MerchantUserItem[]> {
-  console.log('fetching player', merchant_code, player_name);
+/****************************************************************************************
+ * Settlement APIs
+ ***************************************************************************************/
 
-  return request('/api/merchants/players/lookup', {
+/** 获取规则列表 GET /api/settlements */
+export async function settlement(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.SettlementList>('/api/settlements', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
+/** 更新规则 PUT /api/settlements */
+export async function updateSettlement(options?: { [key: string]: any }) {
+  return request<API.SettlementListItem>('/api/settlements', {
     method: 'POST',
     data: {
-      merchant_code: merchant_code,
-      player_name: player_name,
-      limit: 5,
+      method: 'update',
+      ...(options || {}),
     },
-  }).then((response) =>
-    response.data.map((player: { id: string; name: string }) => ({
-      label: player.name,
-      value: player.name,
-    })),
-  );
+  });
+}
+
+/** 新建规则 POST /api/settlements */
+export async function addSettlement(options?: { [key: string]: any }) {
+  return request<API.SettlementListItem>('/api/settlements', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 删除规则 DELETE /api/settlements */
+export async function removeSettlement(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/settlements', {
+    method: 'POST',
+    data: {
+      method: 'delete',
+      ...(options || {}),
+    },
+  });
+}
+
+export async function acceptSettlement(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/settlements/authorize', {
+    method: 'POST',
+    data: {
+      method: 'rejectSettlement',
+      ...(options || {}),
+    },
+  });
+}
+
+export async function rejectSettlement(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/settlements/authorize', {
+    method: 'POST',
+    data: {
+      method: 'rejectSettlement',
+      ...(options || {}),
+    },
+  });
 }

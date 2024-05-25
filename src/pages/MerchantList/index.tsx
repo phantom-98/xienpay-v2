@@ -170,6 +170,21 @@ const MerchantList: React.FC = () => {
       hideInSearch: true,
     },
     {
+      title: <FormattedMessage id="pages.merchantTable.balance" defaultMessage="Balance" />,
+      hideInSearch: true,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.balance}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+    },
+    {
       title: <FormattedMessage id="pages.merchantTable.payin" defaultMessage="Max Payin" />,
       hideInSearch: true,
       render: (_, record) => (
@@ -192,6 +207,50 @@ const MerchantList: React.FC = () => {
       ),
     },
     {
+      title: (
+        <FormattedMessage
+          id="pages.merchantTable.payinCommission"
+          defaultMessage="Payin Commission"
+        />
+      ),
+      dataIndex: 'payin_commission',
+      hideInSearch: true,
+      renderText: (val: number) => `${val} %`,
+    },
+    {
+      title: <FormattedMessage id="pages.merchantTable.payout" defaultMessage="Max Payout" />,
+      hideInSearch: true,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.min_payout}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+          &nbsp;-&nbsp; ₹
+          <FormattedNumber
+            value={record.max_payout}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+    },
+    {
+      title: (
+        <FormattedMessage
+          id="pages.merchantTable.payoutCommission"
+          defaultMessage="Payout Commission"
+        />
+      ),
+      dataIndex: 'payout_commission',
+      hideInSearch: true,
+      renderText: (val: number) => `${val} %`,
+    },
+    {
       title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Test mode?" />,
       hideInSearch: true,
       dataIndex: 'is_test_mode',
@@ -203,17 +262,6 @@ const MerchantList: React.FC = () => {
           disabled
         />
       ),
-    },
-    {
-      title: (
-        <FormattedMessage
-          id="pages.merchantTable.payinCommission"
-          defaultMessage="Payin Commission"
-        />
-      ),
-      dataIndex: 'payin_commission',
-      hideInSearch: true,
-      renderText: (val: number) => `${val} %`,
     },
   ];
 
@@ -357,6 +405,30 @@ const MerchantList: React.FC = () => {
           initialValue={5.0}
           name="commission"
           placeholder="Commission %"
+        />
+        <ProFormMoney
+          label="Min Payout"
+          fieldProps={{ moneySymbol: false }}
+          locale="en-US"
+          initialValue={10.0}
+          name="min_payout"
+          placeholder="Min Payout"
+        />
+        <ProFormMoney
+          label="Max Payout"
+          fieldProps={{ moneySymbol: false }}
+          locale="en-US"
+          initialValue={100.0}
+          name="max_payout"
+          placeholder="Max Payout"
+        />
+        <ProFormMoney
+          label="Payout Commission"
+          fieldProps={{ moneySymbol: false, precision: 2 }}
+          locale="en-US"
+          initialValue={5.0}
+          name="payout_commission"
+          placeholder="Payout Commission %"
         />
       </ModalForm>
       <UpdateForm
