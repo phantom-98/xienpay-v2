@@ -179,13 +179,6 @@ const Welcome = () => {
                 title: 'Balance',
                 value: `${asINR(balance)}`,
               }}
-              chart={
-                <img
-                  src="https://gw.alipayobjects.com/zos/alicdn/ShNDpDTik/huan.svg"
-                  alt="百分比"
-                  width="100%"
-                />
-              }
               chartPlacement="left"
             />
           </StatisticCard.Group>
