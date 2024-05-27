@@ -165,7 +165,7 @@ const Login: React.FC = () => {
             minWidth: 280,
             maxWidth: '75vw',
           }}
-          logo={<img alt="logo" src="https://www.svgrepo.com/show/353863/haxe.svg" />}
+          logo={<img alt="logo" src="/haxe.svg" />}
           title="XienPay"
           subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{

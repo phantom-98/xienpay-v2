@@ -148,13 +148,6 @@ const Welcome = () => {
                 value: `${asINR(lastHour.deposit_amount)}`,
                 description: <Statistic title="Count" value={lh_dc} />,
               }}
-              chart={
-                <img
-                  src="https://gw.alipayobjects.com/zos/alicdn/ShNDpDTik/huan.svg"
-                  alt="百分比"
-                  width="100%"
-                />
-              }
               chartPlacement="left"
             />
             <Divider type="vertical" />
@@ -164,13 +157,6 @@ const Welcome = () => {
                 value: `${asINR(lastDay.deposit_amount)}`,
                 description: <Statistic title="Count" value={ld_dc} />,
               }}
-              chart={
-                <img
-                  src="https://gw.alipayobjects.com/zos/alicdn/6YR18tCxJ/huanlv.svg"
-                  alt="百分比"
-                  width="100%"
-                />
-              }
               chartPlacement="left"
             />
             <Divider type="vertical" />
