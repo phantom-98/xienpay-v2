@@ -17,7 +17,7 @@
           height: 100%;
           margin: 0;
           padding: 0;
-	  font-family: 'Poppins', 'Noto Sans', sans-serif;
+          font-family: 'Poppins', 'Noto Sans', sans-serif;
         }
         #root {
           background-repeat: no-repeat;
