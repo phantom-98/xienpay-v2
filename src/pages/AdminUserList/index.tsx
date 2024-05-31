@@ -220,7 +220,7 @@ const AdminUserList: React.FC = () => {
           defaultMessage: 'AdminUsers List',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="name"
         search={{
           labelWidth: 120,
         }}

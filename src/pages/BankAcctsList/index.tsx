@@ -519,7 +519,7 @@ const TableList: React.FC = () => {
           defaultMessage: 'Enquiry form',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="name"
         search={false}
         // search={{
         //   labelWidth: 120,

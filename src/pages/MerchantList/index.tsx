@@ -16,7 +16,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import { Button, Drawer, Select, Switch, message } from 'antd';
+import { Button, Drawer, Select, Switch, message, Descriptions } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -162,12 +162,14 @@ const MerchantList: React.FC = () => {
       dataIndex: 'notify_url',
       valueType: 'textarea',
       hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.returnUrl" defaultMessage="Return Url" />,
       dataIndex: 'return_url',
       valueType: 'textarea',
       hideInSearch: true,
+      hideInTable: true,
     },
     {
       title: <FormattedMessage id="pages.merchantTable.balance" defaultMessage="Balance" />,
@@ -273,7 +275,7 @@ const MerchantList: React.FC = () => {
           defaultMessage: 'Merchants List',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="code"
         search={false}
         // search={{
         //   labelWidth: 120,
@@ -296,6 +298,13 @@ const MerchantList: React.FC = () => {
         }
         request={merchant}
         columns={columns}
+        expandable={{
+          expandedRowRender: (record) => <Descriptions title="URL Setup" layout="vertical" bordered>
+            <Descriptions.Item label="Notify/ Callback Url">{record.notify_url}</Descriptions.Item>
+            <Descriptions.Item label="Return Url">{record.return_url}</Descriptions.Item>
+            <Descriptions.Item label="Payout Notify/ Callback Url">{record.payout_notify_url}</Descriptions.Item>
+          </Descriptions>
+        }}
         rowSelection={{
           onChange: (_, selectedRows) => {
             setSelectedRows(selectedRows);
