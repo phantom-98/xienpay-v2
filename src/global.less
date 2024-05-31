@@ -7,7 +7,7 @@ body,
 }
 
 * {
-  font-family: Poppins, sans-serif !important;
+  font-family: Be Vietnam, sans-serif !important;
 }
 
 .colorWeak {
@@ -36,7 +36,141 @@ ol {
   list-style: none;
 }
 
+.user-styled-img {
+  width: 440px;
+  margin: auto;
+}
+.row {
+  flex-direction: row;
+}
+.ant-input-affix-wrapper:hover,
+.ant-input-affix-wrapper-focused {
+  border-color: #639f52 !important;
+}
+.ant-checkbox-inner,
+.ant-checkbox-inner:hover {
+  background-color: transparent !important;
+  border-color: #639f52 !important;
+}
+.ant-checkbox-checked .ant-checkbox-inner {
+  background-color: #639f52 !important;
+}
+.ant-btn-primary {
+  background-color: #639f52 !important;
+}
+.ant-btn-lg {
+  height: auto;
+  padding: 4px 12px !important;
+}
+
+// .ant-pro-global-header-logo.ant-pro-global-header-logo-mix {
+//   width: 240px;
+//   border-inline-end: 1px solid rgba(5, 5, 5, 0.06);
+// }
+.ant-pro-global-header {
+  margin: 0 !important;
+}
+.ant-layout-sider-children {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+}
+.ant-menu-item-selected,
+.ant-menu-item-active,
+.ant-menu-submenu .ant-menu-submenu-title {
+  width: 100% !important;
+  border-radius: 24px 0 0 24px !important;
+}
+
+.ant-menu-item-selected {
+  overflow: inherit !important;
+  background: #639f52 !important;
+}
+.ant-menu-item.ant-menu-item-selected:after,
+.ant-menu-item.ant-menu-item-selected:before {
+  position: absolute !important;
+  right: 0 !important;
+  z-index: 1 !important;
+  display: block !important;
+  width: 40px;
+  height: 40px;
+  border-right: 0 none !important;
+  border-radius: 50% !important;
+  content: '' !important;
+}
+.ant-menu-item.ant-menu-item-selected:after {
+  top: auto !important;
+  bottom: -40px !important;
+  box-shadow: 30px -30px 0 10px #639f52 !important;
+  opacity: 1 !important;
+}
+.ant-menu-item.ant-menu-item-selected:before {
+  top: -40px !important;
+  box-shadow: 30px 30px 0 10px #639f52 !important;
+  opacity: 1 !important;
+}
+.ant-pro-layout .ant-pro-layout-bg-list{
+  background: #f4f7fe !important;
+}
+.ant-pro-sider-collapsed-button,
+.ant-pro-setting-drawer-handle {
+  display: none;
+}
+.ant-table-cell {
+  background: transparent !important;
+  border: 1px solid #dfdfdf !important;
+  border-radius: 0 !important;
+}
+.ant-table-thead .ant-table-cell {
+  border-left: none !important;
+  border-right: none !important;
+}
+.ant-table-thead .ant-table-cell:before {
+  display: none;
+}
+.ant-table-tbody .ant-table-cell {
+  border-top: none !important;
+  border-left: none !important;
+  border-right: none !important;
+}
+.ant-pro-table-list-toolbar-setting-items {
+  display: none;
+}
+.ant-pro-card .ant-pro-card-body {
+  padding: 0 !important;
+}
+.ant-table-pagination.ant-pagination {
+  margin: 16px !important;
+}
+.ant-pro-table-list-toolbar-container {
+  padding: 16px !important;
+}
+// .ant-pro-table-search.ant-pro-table-search-query-filter {
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   bottom: 0;
+//   right: 0;
+//   z-index: 100;
+//   margin: 0;
+//   border-radius: 0;
+//   background: #111a !important;
+//   -webkit-backdrop-filter: blur(5px);
+//   backdrop-filter: blur(5px);
+// }
+// .ant-pro-table-search.ant-pro-table-search-query-filter form {
+//   background: white;
+//   max-width: 926px;
+//   margin: 144px auto;
+//   border-radius: 12px;
+// }
 @media (max-width: 768px) {
+  .user-styled-img {
+    width: 90%;
+    margin: 'auto 5%';
+  }
+  .row {
+    flex-direction: column;
+  }
   .ant-table {
     width: 100%;
     overflow-x: auto;
@@ -51,4 +185,32 @@ ol {
       }
     }
   }
+}
+
+.ant-pro-global-header-header-actions-avatar {
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  bottom: 0 !important;
+  width: 256px;
+  background: #639f52 !important;
+  border-inline-end: 1px solid rgba(5, 5, 5, 0.06);
+}
+.ant-pro-global-header-header-actions-avatar > div {
+  color: white !important;
+}
+.ant-avatar-image {
+  width: 40px !important;
+  height: 40px !important;
+}
+.ant-pro-global-header-header-actions-avatar .ant-dropdown-trigger {
+  width: 100% !important;
+  padding-left: 0;
+}
+.ant-pro-global-header-header-actions-avatar .ant-dropdown-trigger:hover {
+  background-color: transparent;
+}
+.ant-pro-global-header-logo {
+  position: absolute!important;
+  left: 272px!important;
 }

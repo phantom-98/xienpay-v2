@@ -1,7 +1,13 @@
+import BalanceStats from '@/components/BalanceStats';
+import Coins from '@/components/CoinStats/Coins';
+import TrackingChart from '@/components/TrackingChart';
 import {
   downloadPayins,
   fetchMerchantAnalytics,
   fetchMerchantsList,
+  fetchMerchantAnalyticsSnapshot,
+  fetchMerchantAnalyticsPayins,
+  fetchMerchantAnalyticsPayouts
 } from '@/services/ant-design-pro/api';
 import { Column } from '@ant-design/charts';
 import { DownloadOutlined } from '@ant-design/icons';
@@ -36,46 +42,117 @@ function asINR(n: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'INR' }).format(n);
 }
 
+const option = [ "12H", "7D", "15D"]
+
 const Welcome = () => {
   /* Preload merchants list */
   const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
   const [analytics, setAnalytics] = useState<API.AnalyticsData>();
+  const [deposit, setDeposit] = useState("7D");
+  const [depositData, setDepositData] = useState({payins: []});
+  const [withdraw, setWithdraw] = useState("7D")
+  const [withdrawData, setWithdrawData] = useState({payouts: []});
+  const [snapshot, setSnapshot] = useState();
+
   const [formValues, setFormValues] = useState({
     merchant_code: '',
-    time_period: [Date.now(), Date.now() - 1000 * 60 * 60 * 24 * 6],
+    time_period: "7d",
+    time_period2: "7d",
   });
+
+  const coins = [
+    {
+      icon: <img src="/assets/icons/deposit.jpg" width="52" alt=""/>,
+      title: `Deposit (${snapshot?.lifetime?.deposits?.count ?? 0})`,
+      description: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`
+    },
+    {
+      icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
+      title: "Deposit %",
+      description:  `${asINR(snapshot?.lifetime?.deposits?.commission ?? 0)}`
+    },
+    {
+      icon: <img src="/assets/icons/withdraw.jpg" width="52" alt=""/>,
+      title: `Withdrawals (${snapshot?.lifetime?.withdrawals?.count ?? 0})`,
+      description: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`
+    },
+    {
+      icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
+      title: "Withdrawals %",
+      description: `${asINR(snapshot?.lifetime?.withdrawals?.commission ?? 0)}`
+    },
+  ]
 
   useEffect(() => {
     (async () => {
       try {
         const fetchedMerchants = await fetchMerchantsList('');
         setMerchantsList(fetchedMerchants);
+        handleMerchantChange(fetchedMerchants[0]?.label)
       } catch (error) {
         console.error('Error fetching merchants:', error);
       }
     })();
   }, []);
 
-  const handleFormSubmit = async (action) => {
-    console.log('Form values:', formValues);
-    const { merchant_code, time_period } = formValues;
-    const [from_date, to_date] = time_period;
+  useEffect(() => {
+    handleFormSubmit("snapshot");
+  }, [formValues.merchant_code])
 
-    if (daysBetween(from_date, to_date) >= 15) {
-      message.error('Please select a date range within 15 days');
-      return;
-    }
+  useEffect(() => {
+    handleFormSubmit("submit");
+  }, [formValues.merchant_code, formValues.time_period])
+
+  useEffect(() => {
+    handleFormSubmit("submit2");
+  }, [formValues.merchant_code, formValues.time_period2])
+
+  useEffect(() => {
+    setFormValues({
+      ...formValues,
+      time_period: deposit?.toLowerCase(),
+    })
+  }, [deposit]);
+
+  useEffect(() => {
+    setFormValues({
+      ...formValues,
+      time_period2: withdraw?.toLowerCase(),
+    })
+  }, [withdraw]);
+
+  const handleFormSubmit = async (action: string) => {
+    console.log('Form values:', formValues);
+    const { merchant_code, time_period, time_period2 } = formValues;
 
     try {
-      if (action === 'download') {
-        await downloadPayins(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
-      } else if (action === 'submit') {
-        const data = await fetchMerchantAnalytics(
+      // if (action === 'download') {
+      //   await downloadPayins(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+      // } else 
+      if (action === 'submit') {
+        
+        const payins = await fetchMerchantAnalyticsPayins(
           merchant_code,
-          dateFromMs(from_date),
-          dateFromMs(to_date),
+          time_period,
         );
-        setAnalytics(data);
+        console.log("-----------payins-------------", payins)
+        setDepositData(payins);
+      } else if (action === 'submit2') {
+        
+        const payouts = await fetchMerchantAnalyticsPayouts(
+          merchant_code,
+          time_period2,
+        );
+        console.log("-----------payouts-------------", payouts)
+        setWithdrawData(payouts);
+      } else if (action === 'snapshot') {
+
+        const snap = await fetchMerchantAnalyticsSnapshot(
+          merchant_code,
+          "15d"
+        )
+        console.log("---------snapshot----------", snap)
+        setSnapshot(snap);
       }
     } catch (error) {
       message.error(`Failed to ${action}`);
@@ -89,39 +166,6 @@ const Welcome = () => {
     }));
   };
 
-  const handleDateChange = (value) => {
-    setFormValues((prevValues) => ({
-      ...prevValues,
-      time_period: value,
-    }));
-  };
-
-  const { balance, lastHour, lastDay, lastWeek } = analytics || {
-    lastHour: { deposit_count: '--' },
-    lastDay: { deposit_count: '--', histogram: [] },
-    lastWeek: { deposit_count: '--', histogram: [] },
-  };
-
-  const hourlyDataConfig = {
-    data: lastDay.histogram.map((value) => ({
-      hour_ist: value.hour_ist.split(' ')[1].split(':')[0] + ':00',
-      amount: value.amount,
-    })),
-    xField: 'hour_ist',
-    yField: 'amount',
-    colorField: 'hour_ist',
-  };
-
-  const dailyDataConfig = {
-    data: lastWeek.histogram,
-    xField: 'day_ist',
-    yField: 'amount',
-    colorField: 'day_ist',
-  };
-
-  const lh_dc = `${lastHour.deposit_count} #`;
-  const ld_dc = `${lastDay.deposit_count} #`;
-
   return (
     <PageContainer>
       <Row gutter={[16, 16]}>
@@ -132,6 +176,7 @@ const Welcome = () => {
             options={merchantsList.map((merchant) => merchant.label)}
             name="merchant_code"
             label="Merchant Code"
+            value={merchantsList[0]?.label}
             required
             onChange={handleMerchantChange}
           />
@@ -139,113 +184,41 @@ const Welcome = () => {
       </Row>
 
       <Row gutter={[16, 16]}>
-        {/* Left Half */}
-        <Col span={12}>
-          <StatisticCard.Group direction="row" boxShadow>
-            <StatisticCard
-              statistic={{
-                title: 'This Hour Deposits',
-                value: `${asINR(lastHour.deposit_amount)}`,
-                description: <Statistic title="Count" value={lh_dc} />,
-              }}
-              chartPlacement="left"
-            />
-            <Divider type="vertical" />
-            <StatisticCard
-              statistic={{
-                title: "Today's Deposits",
-                value: `${asINR(lastDay.deposit_amount)}`,
-                description: <Statistic title="Count" value={ld_dc} />,
-              }}
-              chartPlacement="left"
-            />
-            <Divider type="vertical" />
-            <StatisticCard
-              statistic={{
-                title: 'Balance',
-                value: `${asINR(balance)}`,
-              }}
-              chartPlacement="left"
-            />
-          </StatisticCard.Group>
-          <Divider type="horizontal" />
-          <StatisticCard
-            boxShadow
-            statistic={{
-              title: "Today's Deposits",
-              value: `${asINR(lastDay.deposit_amount)}`,
-            }}
-            chart={<Column height={400} {...hourlyDataConfig} />}
-          />
+        <Col span = {14}>
+          <Coins data = {coins}/>
         </Col>
+        <Col span = {10}>
+          <BalanceStats main ={{name: "Net Balance", value: `${asINR(snapshot?.lifetime?.balance ?? 0)}`}} sub={[
+            {name: "Deposits", value: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`},
+            {name: "Withdrawls", value: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`},
+            {name: "Commission", value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0))}`},
+            {name: "Outstanding", value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
+          ]}/>
 
-        {/* Right Half */}
-        <Col span={12}>
-          <ProCard boxShadow>
-            <ProForm
-              layout="horizontal"
-              initialValues={formValues}
-              onValuesChange={(_, values) => handleDateChange(values.time_period)}
-              submitter={{
-                render: (props, x) => (
-                  <Row gutter={8} align="middle">
-                    <Col>
-                      <Button
-                        key="submit"
-                        type="primary"
-                        onClick={async () => {
-                          const values = await props.form?.validateFields();
-                          console.log(values, x);
-                          handleFormSubmit('submit');
-                        }}
-                      >
-                        Submit
-                      </Button>
-                    </Col>
-                    <Col>
-                      <Button
-                        key="download"
-                        icon={<DownloadOutlined />}
-                        style={{ backgroundColor: '#fa8c16', borderColor: '#fa8c16' }}
-                        onClick={async () => {
-                          const values = await props.form?.validateFields();
-                          console.log(values);
-                          handleFormSubmit('download');
-                        }}
-                      >
-                        Download
-                      </Button>
-                    </Col>
-                  </Row>
-                ),
-                searchConfig: {
-                  submitText: 'Search',
-                },
-              }}
-            >
-              <ProFormDateRangePicker
-                labelCol={{ span: 4 }}
-                width="sm"
-                name="time_period"
-                label="Select Duration"
-                fieldProps={{
-                  format: (value) => value.format('YYYY-MM-DD'),
-                }}
-                required
-              />
-            </ProForm>
-          </ProCard>
-          <Divider type="horizontal" />
-          <StatisticCard
-            boxShadow
-            statistic={{
-              title: "Duration's Deposits",
-              value: `${asINR(lastWeek.deposit_amount)}`,
-            }}
-            chart={<Column height={400} {...dailyDataConfig} />}
-          />
         </Col>
       </Row>
+        <div style={{
+          margin:"20px 0",
+          display: "flex",
+          flexDirection: "column",
+          gap: "20px"
+        }}>
+          <TrackingChart graphData={depositData.payins.map(item => {
+            return {
+              name: item.day_ist,
+              channel1: item.amount,
+              channel2: 0
+            }
+          })} title={`DEPOSIT`} amount={asINR(depositData.amount)} count={depositData.count} duration={deposit} setDuration={setDeposit} options={option} />
+          
+          <TrackingChart graphData={withdrawData.payouts.map(item => {
+            return {
+              name: item.day_ist,
+              channel1: item.amount,
+              channel2: 0
+            }
+          })} title={`WITHDRAW`} amount={asINR(withdrawData.amount)} count={withdrawData.count} duration={withdraw} setDuration={setWithdraw} options={option} />
+        </div>
     </PageContainer>
   );
 };

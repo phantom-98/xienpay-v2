@@ -51,55 +51,7 @@ export default [
   //   path: '/list',
   //   component: './TableList',
   // },
-  {
-    name: 'list.admin-user-list',
-    icon: 'TrophyOutlined',
-    path: '/admin-user-list',
-    component: './AdminUserList',
-    access: 'canAdmin',
-  },
-  {
-    name: 'list.merchant-list',
-    icon: 'CreditCardOutlined',
-    path: '/merchant-list',
-    component: './MerchantList',
-    access: 'canMerchantList',
-  },
-  {
-    name: 'list.agent-list',
-    icon: 'team',
-    path: '/agent-list',
-    component: './AgentList',
-    access: 'canAgentList',
-  },
-  {
-    name: 'list.bank-acct-list',
-    icon: 'BankOutlined',
-    path: '/bank-acct-list',
-    component: './BankAcctsList',
-    access: 'canBankAcctList',
-  },
-  {
-    name: 'list.payin-list',
-    icon: 'DollarOutlined',
-    path: '/payin-list',
-    component: './PayinList',
-    access: 'canPayinList',
-  },
-  {
-    name: 'list.payout-list',
-    icon: 'SendOutlined',
-    path: '/payout-list',
-    component: './PayoutList',
-    access: 'canPayoutList',
-  },
-  {
-    name: 'list.settlement-list',
-    icon: 'CalculatorOutlined',
-    path: '/settlement-list',
-    component: './SettlementList',
-    access: 'canSettlementList',
-  },
+
   {
     path: '/',
     redirect: '/welcome',
@@ -108,5 +60,123 @@ export default [
     path: '*',
     layout: false,
     component: './404',
+  },
+  {
+    name: 'Deposit',
+    key:'deposit',
+    icon: 'DollarOutlined',
+    routes: [
+      {
+        name: 'In Progress', //'list.payin-list',
+        key:'in-progress',
+        path: '/payin-list/in-progress',
+        component: './PayinList/InProgress',
+        access: 'canPayinList',
+      },
+      {
+        name: 'Completed', //'list.payin-list',
+        key:'completed',
+        path: '/payin-list/completed',
+        component: './PayinList/Completed',
+        access: 'canPayinList',
+      },
+      {
+        name: 'Dropped',
+        key:'dropped',
+        path: '/payin-list/dropped',
+        component: './PayinList/Dropped',
+        access: 'canPayinList',
+      },
+    ],
+  },
+  {
+    name: 'Withdrawals', //'list.payout-list',
+    key:'withdrawals',
+    icon: 'SendOutlined',
+    routes: [
+      {
+        name: 'In Progress',
+        key:'in-progress',
+        path: '/payout-list/in-progress',
+        component: './PayoutList/InProgress',
+        access: 'canPayoutList',
+      },
+      {
+        name: 'Completed',
+        key:'completed',
+        path: '/payout-list/completed',
+        component: './PayoutList/Completed',
+        access: 'canPayoutList',
+      }
+    ],
+  },
+  {
+    name: 'Settlements',
+    key:'settlements',
+    icon: 'CalculatorOutlined',
+    routes: [
+      {
+        name: 'Transactions',//'list.settlement-list',
+        key:'Transactions',
+        path: '/settlement-list',
+        component: './SettlementList',
+        access: 'canSettlementList',
+      },
+      {
+        name: 'Accounts',//'list.settlement-list',
+        key:'Accounts',
+        path: '/settlement-list',
+        component: './SettlementList',
+        access: 'canSettlementList',
+      },
+    ]
+  },
+  {
+    path: '/chargebacks',
+    name: 'Chargebacks',
+    icon: 'RollbackOutlined',
+    component: './Chargebacks',
+  },
+  {
+    name: 'Merchant',//list.merchant-list',
+    icon: 'CreditCardOutlined',
+    path: '/merchant-list',
+    component: './MerchantList',
+    access: 'canMerchantList',
+  },
+  {
+    name: 'Back Accounts',//'list.bank-acct-list',
+    icon: 'BankOutlined',
+    path: '/bank-acct-list',
+    component: './BankAcctsList',
+    access: 'canBankAcctList',
+  },
+  {
+    name: 'Users',
+    key: 'users',
+    icon: 'team',
+    routes: [
+      {
+        name: 'Roles',//'list.admin-user-list',
+        key: 'roles',
+        // icon: 'TrophyOutlined',
+        path: '/admin-user-list',
+        component: './AdminUserList',
+        access: 'canAdmin',
+      },
+      {
+        name: 'Agents',//'list.agent-list',
+        key: 'agents',
+        path: '/agent-list',
+        component: './AgentList',
+        access: 'canAgentList',
+      },
+    ]
+  },
+  {
+    path: '/reports',
+    name: 'Reports',
+    icon: 'WarningOutlined',
+    component: './Reports',
   },
 ];
