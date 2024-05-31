@@ -227,7 +227,7 @@ const AgentList: React.FC = () => {
           defaultMessage: 'Agents List',
         })}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="name"
         toolBarRender={() =>
           access.canAgentCreate
             ? [
