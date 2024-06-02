@@ -266,6 +266,27 @@ export async function downloadPayins(merchant_code: string, from_date: string, t
   });
 }
 
+export async function downloadPayouts(merchant_code: string, from_date: string, to_date: string) {
+  return request('/api/merchants/payouts/download', {
+    method: 'POST',
+    data: {
+      merchant_code,
+      from_date,
+      to_date,
+    },
+    getResponse: true, // This will return the full response object
+  }).then((response) => {
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `payouts-${from_date}-${to_date}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });
+}
+
 /****************************************************************************************
  * Agent APIs
  ***************************************************************************************/
