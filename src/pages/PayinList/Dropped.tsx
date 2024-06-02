@@ -35,10 +35,12 @@ import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import SimpleSearchForm from '../../components/SimpleSearchForm';
 
-async function droppedPayin(params: API.PayinListItem & API.PageParams, options?: { [key: string]: any }) {
-  return payin({...params, status: 'dropped'}, options);
+async function droppedPayin(
+  params: API.PayinListItem & API.PageParams,
+  options?: { [key: string]: any },
+) {
+  return payin({ ...params, status: 'dropped' }, options);
 }
 
 const SearchUserInput: React.FC<{
@@ -248,6 +250,23 @@ const PayinList: React.FC = () => {
         </span>
       ),
       order: 2,
+      hideInTable: true,
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
+      dataIndex: 'amount',
+      order: 2,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.amount}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
     },
     {
       title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
@@ -410,23 +429,8 @@ const PayinList: React.FC = () => {
           return value;
         },
       },
-      order: 9
+      order: 9,
     },
-    // {
-    //   title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
-    //   dataIndex: 'amount',
-    //   render: (_, record) => (
-    //     <span>
-    //       ₹
-    //       <FormattedNumber
-    //         value={record.amount}
-    //         currencySign="accounting"
-    //         minimumFractionDigits={2}
-    //         maximumFractionDigits={2}
-    //       />
-    //     </span>
-    //   ),
-    // },
     // {
     //   title: <FormattedMessage id="pages.agentTable.testMode" defaultMessage="Test?" />,
     //   dataIndex: 'is_test_mode',
@@ -451,16 +455,14 @@ const PayinList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
-      order: 10
+      order: 10,
     },
   ];
 
   return (
     <PageContainer>
       <ProTable<API.PayinListItem, API.PageParams>
-        headerTitle={
-          "Dropped"
-        }
+        headerTitle={'Dropped'}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
         rowKey="key"
