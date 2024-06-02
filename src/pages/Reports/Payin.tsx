@@ -84,7 +84,7 @@ const Reports: React.FC = () => {
                 initialValues={formValues}
                 onValuesChange={(_, values) => handleDateChange(values.time_period)}
                 submitter={{
-                  render: (props, x) => (
+                  render: (props, _x) => (
                     <Row gutter={8} align="middle">
                       <Col>
                         <Button

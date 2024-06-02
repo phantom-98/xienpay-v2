@@ -177,6 +177,21 @@ export default [
     path: '/reports',
     name: 'Reports',
     icon: 'WarningOutlined',
-    component: './Reports',
+    routes: [
+      {
+        name: 'Payins',
+        path: '/reports/payins',
+        key: 'reports-payins',
+        component: './Reports/Payin',
+        access: 'canPayinList',
+      },
+      {
+        name: 'Payouts',
+        path: '/reports/payouts',
+        key: 'reports-payouts',
+        component: './Reports/Payout',
+        access: 'canPayoutList',
+      }
+    ]
   },
 ];
