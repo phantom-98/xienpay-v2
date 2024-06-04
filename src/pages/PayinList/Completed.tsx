@@ -258,6 +258,23 @@ const PayinList: React.FC = () => {
       order: 2,
     },
     {
+      title: <FormattedMessage id="pages.payinTable.commission" defaultMessage="Commission" />,
+      dataIndex: 'commission',
+      hideInSearch: true,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.commission}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+      order: 2,
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
       hideInSearch: true,
