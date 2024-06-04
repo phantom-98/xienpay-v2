@@ -315,6 +315,7 @@ const PayoutList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.payoutTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -335,7 +336,7 @@ const PayoutList: React.FC = () => {
         <span>
           ₹
           <FormattedNumber
-            value={record.agent_submitted_amount}
+            value={record.commission}
             currencySign="accounting"
             minimumFractionDigits={2}
             maximumFractionDigits={2}
