@@ -13,6 +13,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
+  ReloadOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -458,9 +459,10 @@ const PayinList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<API.PayinListItem, API.PageParams>
-        headerTitle={
-          "In Progress"
-        }
+        headerTitle={intl.formatMessage({
+          id: 'pages.payinTable.inProgress',
+          defaultMessage: 'In Progress',
+        })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
         rowKey="key"
@@ -468,8 +470,8 @@ const PayinList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayinLinkCreate
-            ? [
+          [access.canPayinLinkCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -482,13 +484,26 @@ const PayinList: React.FC = () => {
                     id="pages.payinTable.new-payment-link"
                     defaultMessage="New Payment Link"
                   />
-                </Button>,
+                </Button>
+            : null,
+                  <Button
+                    type="text"
+                    key="text"
+                    onClick={() => {
+                      actionRef.current?.reload();
+                    }}
+                  >
+                    <ReloadOutlined />
+                  </Button>,
               ]
-            : null
         }
         request={inprogressPayin}
         columns={columns}
-        rowSelection={false}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar

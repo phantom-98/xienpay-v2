@@ -89,6 +89,11 @@ export default {
   'pages.payinTable.payinStatus.dropped': 'dropped',
   'pages.payinTable.payinStatus.dispute': 'dispute',
 
+  'pages.payinTable.title': 'Payins List',
+  'pages.payinTable.completed': 'Completed',
+  'pages.payinTable.dropped': 'Dropped',
+  'pages.payinTable.inProgress': 'In Progress',
+
   'pages.payinTable.new-payment-link': 'New Payment Link',
 
   'pages.payinTable.remit.upi-mc': 'UPI-MC (Intent)',
@@ -101,6 +106,8 @@ export default {
   'pages.payoutTable.payoutStatus.failed': 'failed',
   'pages.payoutTable.payoutStatus.dropped': 'dropped',
   'pages.payoutTable.payoutStatus.dispute': 'dispute',
+  'pages.payoutTable.completed': 'Completed',
+  'pages.payoutTable.inProgress': 'In Progress',
 
   'pages.bankAcctTable.searchTable.title': 'Bank Accounts',
   'pages.bankAcctTable.searchTable.name': 'Account Name',
@@ -113,4 +120,15 @@ export default {
   'pages.bankAcctTable.createform.newBankAcct': 'New Bank Account',
 
   'pages.admin-user-list': 'Users',
+
+  'pages.dashboard.deposits': 'Deposits',
+  'pages.dashboard.withdrawals': 'Withdrawals',
+  'pages.dashboard.commission': 'Commission',
+  'pages.dashboard.outstanding': 'Outstanding',
+  'pages.dashboard.netBalance': 'Net Balance',
+
+  'pages.general.download': 'Download',
+  'pages.general.deposit': 'Deposit',
+  'pages.general.withdrawals': 'Withdrawals',
+  'pages.general.merchantCode': 'Merchant Code',
 };

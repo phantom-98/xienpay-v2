@@ -7,7 +7,7 @@ import {
   settlement,
   updateSettlement,
 } from '@/services/ant-design-pro/api';
-import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -365,8 +365,8 @@ const SettlementList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canSettlementCreate
-            ? [
+          [access.canSettlementCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -379,9 +379,18 @@ const SettlementList: React.FC = () => {
                     id="pages.settlementTable.new-payment-link"
                     defaultMessage="New Settlement"
                   />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
               ]
-            : null
         }
         request={settlement}
         columns={columns}

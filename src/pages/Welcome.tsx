@@ -19,6 +19,7 @@ import {
   ProFormSelect,
   StatisticCard,
 } from '@ant-design/pro-components';
+import { useIntl } from '@umijs/max';
 import { Button, Col, Row, message } from 'antd';
 import { useEffect, useState } from 'react';
 
@@ -60,25 +61,39 @@ const Welcome = () => {
     time_period2: "7d",
   });
 
+  const intl = useIntl();
+
   const coins = [
     {
       icon: <img src="/assets/icons/deposit.jpg" width="52" alt=""/>,
-      title: `Deposit (${snapshot?.lifetime?.deposits?.count ?? 0})`,
+      title: `${intl.formatMessage({
+        id: 'pages.general.deposit',
+        defaultMessage: 'Deposit'
+      })} (${snapshot?.lifetime?.deposits?.count ?? 0})`,
       description: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
-      title: "Deposit %",
+      title: `${intl.formatMessage({
+        id: 'pages.general.deposit',
+        defaultMessage: 'Deposit'
+      })} %`,
       description:  `${asINR(snapshot?.lifetime?.deposits?.commission ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/withdraw.jpg" width="52" alt=""/>,
-      title: `Withdrawals (${snapshot?.lifetime?.withdrawals?.count ?? 0})`,
+      title: `${intl.formatMessage({
+        id: 'pages.general.withdrawals',
+        defaultMessage: 'Withdrawals'
+      })} (${snapshot?.lifetime?.withdrawals?.count ?? 0})`,
       description: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
-      title: "Withdrawals %",
+      title: `${intl.formatMessage({
+        id: 'pages.general.withdrawals',
+        defaultMessage: 'Withdrawals'
+      })} %`,
       description: `${asINR(snapshot?.lifetime?.withdrawals?.commission ?? 0)}`
     },
   ]
@@ -188,11 +203,26 @@ const Welcome = () => {
           <Coins data = {coins}/>
         </Col>
         <Col span = {10}>
-          <BalanceStats main ={{name: "Net Balance", value: `${asINR(snapshot?.lifetime?.balance ?? 0)}`}} sub={[
-            {name: "Deposits", value: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`},
-            {name: "Withdrawls", value: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`},
-            {name: "Commission", value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0))}`},
-            {name: "Outstanding", value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
+          <BalanceStats main ={{name: `${intl.formatMessage({
+            id: 'pages.dashboard.netBalance',
+            defaultMessage: 'Net Balance'
+          })}`, value: `${asINR(snapshot?.lifetime?.balance ?? 0)}`}} sub={[
+            {name: `${intl.formatMessage({
+              id: 'pages.dashboard.deposits',
+              defaultMessage: 'Deposits'
+            })}`, value: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`},
+            {name: `${intl.formatMessage({
+              id: 'pages.dashboard.withdrawals',
+              defaultMessage: 'Withdrawals'
+            })}`, value: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`},
+            {name: `${intl.formatMessage({
+              id: 'pages.dashboard.commission',
+              defaultMessage: 'Commission'
+            })}`, value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0))}`},
+            {name: `${intl.formatMessage({
+              id: 'pages.dashboard.outstanding',
+              defaultMessage: 'Outstanding'
+            })}`, value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
           ]}/>
 
         </Col>
@@ -209,7 +239,10 @@ const Welcome = () => {
               channel1: item.amount,
               channel2: 0
             }
-          })} title={`DEPOSIT`} amount={asINR(depositData.amount)} count={depositData.count} duration={deposit} setDuration={setDeposit} options={option} />
+          })} title={`${intl.formatMessage({
+            id: 'pages.general.deposit',
+            defaultMessage: 'Deposit'
+          }).toUpperCase()}`} amount={asINR(depositData.amount)} count={depositData.count} duration={deposit} setDuration={setDeposit} options={option} />
           
           <TrackingChart graphData={withdrawData.payouts.map(item => {
             return {
@@ -217,7 +250,10 @@ const Welcome = () => {
               channel1: item.amount,
               channel2: 0
             }
-          })} title={`WITHDRAW`} amount={asINR(withdrawData.amount)} count={withdrawData.count} duration={withdraw} setDuration={setWithdraw} options={option} />
+          })} title={`${intl.formatMessage({
+            id: 'pages.general.withdrawals',
+            defaultMessage: 'Withdrawals'
+          }).toUpperCase()}`} amount={asINR(withdrawData.amount)} count={withdrawData.count} duration={withdraw} setDuration={setWithdraw} options={option} />
         </div>
     </PageContainer>
   );

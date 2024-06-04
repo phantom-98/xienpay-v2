@@ -14,6 +14,7 @@ import {
 } from '@ant-design/pro-components';
 import { Button, Col, Row, message } from 'antd';
 import { useEffect, useState } from 'react';
+import { useIntl } from '@umijs/max';
 
 function dateFromMs(ms: number): string {
   return new Date(ms).toISOString().substring(0, 10);
@@ -26,6 +27,7 @@ const Reports: React.FC = () => {
     merchant_code: '',
     time_period: [Date.now() - 1000 * 3600 * 24 * 15, Date.now()],
   });
+  const intl = useIntl();
 
   const handleMerchantChange = (value) => {
     setFormValues((prevValues) => ({
@@ -97,7 +99,10 @@ const Reports: React.FC = () => {
                             handleDownload();
                           }}
                         >
-                          Download
+                          {intl.formatMessage({
+                            id: 'pages.general.download',
+                            defaultMessage: 'Download',
+                          })}
                         </Button>
                       </Col>
                     </Row>

@@ -13,6 +13,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
+  ReloadOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -462,7 +463,10 @@ const PayinList: React.FC = () => {
   return (
     <PageContainer>
       <ProTable<API.PayinListItem, API.PageParams>
-        headerTitle={'Dropped'}
+        headerTitle={intl.formatMessage({
+          id: 'pages.payinTable.dropped',
+          defaultMessage: 'Dropped',
+        })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
         rowKey="key"
@@ -470,27 +474,25 @@ const PayinList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayinLinkCreate && false
-            ? [
-                <Button
-                  type="primary"
-                  key="primary"
-                  onClick={() => {
-                    handleModalOpen(true);
-                  }}
-                >
-                  <PlusOutlined />{' '}
-                  <FormattedMessage
-                    id="pages.payinTable.new-payment-link"
-                    defaultMessage="New Payment Link"
-                  />
-                </Button>,
-              ]
-            : null
+          [
+            <Button
+              type="text"
+              key="text"
+              onClick={() => {
+                actionRef.current?.reload();
+              }}
+            >
+              <ReloadOutlined />
+            </Button>,
+          ]
         }
         request={droppedPayin}
         columns={columns}
-        rowSelection={false}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar

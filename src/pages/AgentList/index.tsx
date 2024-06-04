@@ -5,7 +5,7 @@ import {
   removeAgent,
   updateAgent,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -229,8 +229,8 @@ const AgentList: React.FC = () => {
         actionRef={actionRef}
         rowKey="name"
         toolBarRender={() =>
-          access.canAgentCreate
-            ? [
+          [access.canAgentCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -240,9 +240,18 @@ const AgentList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
-              ]
-            : null
+          ]
         }
         request={agent}
         columns={columns}

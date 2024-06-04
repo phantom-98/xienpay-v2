@@ -4,7 +4,7 @@ import {
   removeMerchant,
   updateMerchant,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -281,8 +281,8 @@ const MerchantList: React.FC = () => {
         //   labelWidth: 120,
         // }}
         toolBarRender={() =>
-          access.canMerchantCreate
-            ? [
+          [access.canMerchantCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -292,9 +292,18 @@ const MerchantList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
-              ]
-            : null
+          ]
         }
         request={merchant}
         columns={columns}

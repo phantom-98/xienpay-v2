@@ -13,6 +13,7 @@ import {
   CheckCircleOutlined,
   ExclamationCircleOutlined,
   PlusOutlined,
+  ReloadOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
@@ -467,8 +468,8 @@ const PayinList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayinLinkCreate
-            ? [
+          [access.canPayinLinkCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -481,9 +482,18 @@ const PayinList: React.FC = () => {
                     id="pages.payinTable.new-payment-link"
                     defaultMessage="New Payment Link"
                   />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
               ]
-            : null
         }
         request={payin}
         columns={columns}

@@ -7,7 +7,7 @@ import {
   removeAdminUser,
   updateAdminUser,
 } from '@/services/ant-design-pro/api';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -225,8 +225,8 @@ const AdminUserList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canAdmin
-            ? [
+          [access.canAdmin
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -236,9 +236,18 @@ const AdminUserList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
-              ]
-            : null
+          ]
         }
         request={adminUser}
         columns={columns}

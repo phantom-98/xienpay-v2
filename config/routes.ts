@@ -62,33 +62,33 @@ export default [
     component: './404',
   },
   {
-    name: 'Deposit',
+    name: 'list.deposit',
     key: 'deposit',
     icon: 'DollarOutlined',
     routes: [
       {
-        name: 'In Progress', //'list.payin-list',
+        name: 'in-progress',
         key: 'in-progress',
         path: '/payin-list/in-progress',
         component: './PayinList/InProgress',
         access: 'canPayinList',
       },
       {
-        name: 'Completed', //'list.payin-list',
+        name: 'completed',
         key: 'completed',
         path: '/payin-list/completed',
         component: './PayinList/Completed',
         access: 'canPayinList',
       },
       {
-        name: 'Dropped',
+        name: 'dropped',
         key: 'dropped',
         path: '/payin-list/dropped',
         component: './PayinList/Dropped',
         access: 'canPayinList',
       },
       {
-        name: 'All',
+        name: 'all',
         key: 'all',
         path: '/payin-list/all',
         component: './PayinList/All',
@@ -97,19 +97,19 @@ export default [
     ],
   },
   {
-    name: 'Withdrawals', //'list.payout-list',
+    name: 'list.withdrawals',
     key: 'withdrawals',
     icon: 'SendOutlined',
     routes: [
       {
-        name: 'In Progress',
+        name: 'in-progress',
         key: 'in-progress',
         path: '/payout-list/in-progress',
         component: './PayoutList/InProgress',
         access: 'canPayoutList',
       },
       {
-        name: 'Completed',
+        name: 'completed',
         key: 'completed',
         path: '/payout-list/completed',
         component: './PayoutList/Completed',
@@ -118,19 +118,19 @@ export default [
     ],
   },
   {
-    name: 'Settlements',
+    name: 'list.settlement-list',
     key: 'settlements',
     icon: 'CalculatorOutlined',
     routes: [
       {
-        name: 'Transactions', //'list.settlement-list',
+        name: 'transactions',
         key: 'Transactions',
         path: '/settlement-list',
         component: './SettlementList',
         access: 'canSettlementList',
       },
       {
-        name: 'Accounts', //'list.settlement-list',
+        name: 'accounts',
         key: 'Accounts',
         path: '/settlement-list',
         component: './SettlementList',
@@ -140,31 +140,31 @@ export default [
   },
   {
     path: '/chargebacks',
-    name: 'Chargebacks',
+    name: 'list.chargebacks',
     icon: 'RollbackOutlined',
     component: './Chargebacks',
   },
   {
-    name: 'Merchant', //list.merchant-list',
+    name: 'list.merchant-list',
     icon: 'CreditCardOutlined',
     path: '/merchant-list',
     component: './MerchantList',
     access: 'canMerchantList',
   },
   {
-    name: 'Back Accounts', //'list.bank-acct-list',
+    name: 'list.bank-acct-list',
     icon: 'BankOutlined',
     path: '/bank-acct-list',
     component: './BankAcctsList',
     access: 'canBankAcctList',
   },
   {
-    name: 'Users',
+    name: 'list.users',
     key: 'users',
     icon: 'team',
     routes: [
       {
-        name: 'Roles', //'list.admin-user-list',
+        name: 'admin-user-list',
         key: 'roles',
         // icon: 'TrophyOutlined',
         path: '/admin-user-list',
@@ -172,7 +172,7 @@ export default [
         access: 'canAdmin',
       },
       {
-        name: 'Agents', //'list.agent-list',
+        name: 'agent-list',
         key: 'agents',
         path: '/agent-list',
         component: './AgentList',
@@ -182,18 +182,18 @@ export default [
   },
   {
     path: '/reports',
-    name: 'Reports',
+    name: 'list.reports',
     icon: 'WarningOutlined',
     routes: [
       {
-        name: 'Payins',
+        name: 'payins',
         path: '/reports/payins',
         key: 'reports-payins',
         component: './Reports/Payin',
         access: 'canPayinList',
       },
       {
-        name: 'Payouts',
+        name: 'payouts',
         path: '/reports/payouts',
         key: 'reports-payouts',
         component: './Reports/Payout',
