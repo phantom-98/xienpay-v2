@@ -328,6 +328,23 @@ const PayoutList: React.FC = () => {
       ),
     },
     {
+      title: <FormattedMessage id="pages.payinTable.commission" defaultMessage="Commission" />,
+      dataIndex: 'commission',
+      hideInSearch: true,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.agent_submitted_amount}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
+      order: 2,
+    },
+    {
       title: (
         <FormattedMessage id="pages.bankAcctTable.searchTable.details" defaultMessage="Details" />
       ),

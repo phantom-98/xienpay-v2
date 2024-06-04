@@ -222,6 +222,7 @@ declare namespace API {
     time_taken?: string;
 
     payinUrl?: string;
+    commission: number;
   };
 
   type PayinList = {
@@ -247,6 +248,8 @@ declare namespace API {
     status: PayinStatus;
     updated_at?: string;
     created_at?: string;
+
+    commission: number;
   };
 
   type PayoutList = {
