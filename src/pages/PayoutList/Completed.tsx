@@ -8,7 +8,7 @@ import {
   removePayout,
   updatePayout,
 } from '@/services/ant-design-pro/api';
-import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -425,8 +425,8 @@ const PayoutList: React.FC = () => {
     <PageContainer>
       <ProTable<API.PayoutListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.payoutTable.title',
-          defaultMessage: 'Payouts List',
+          id: 'pages.payoutTable.completed',
+          defaultMessage: 'Completed',
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
@@ -435,27 +435,25 @@ const PayoutList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          access.canPayoutLinkCreate
-            ? [
-                <Button
-                  type="primary"
-                  key="primary"
-                  onClick={() => {
-                    handleModalOpen(true);
-                  }}
-                >
-                  <PlusOutlined />{' '}
-                  <FormattedMessage
-                    id="pages.payoutTable.new-payment-link"
-                    defaultMessage="New Payment Link"
-                  />
-                </Button>,
-              ]
-            : null
+          [
+            <Button
+              type="text"
+              key="text"
+              onClick={() => {
+                actionRef.current?.reload();
+              }}
+            >
+              <ReloadOutlined />
+            </Button>,
+          ]
         }
         request={successPayout}
         columns={columns}
-        rowSelection={false}
+        rowSelection={{
+          onChange: (_, selectedRows) => {
+            setSelectedRows(selectedRows);
+          },
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar

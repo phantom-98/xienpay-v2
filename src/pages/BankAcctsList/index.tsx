@@ -10,7 +10,7 @@ import {
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
-import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -525,8 +525,8 @@ const TableList: React.FC = () => {
         //   labelWidth: 120,
         // }}
         toolBarRender={() =>
-          access.canBankAcctCreate
-            ? [
+          [access.canBankAcctCreate
+            ? 
                 <Button
                   type="primary"
                   key="primary"
@@ -536,9 +536,18 @@ const TableList: React.FC = () => {
                 >
                   <PlusOutlined />{' '}
                   <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+                </Button>
+            : null,
+                <Button
+                  type="text"
+                  key="text"
+                  onClick={() => {
+                    actionRef.current?.reload();
+                  }}
+                >
+                  <ReloadOutlined />
                 </Button>,
               ]
-            : null
         }
         request={bankAcct}
         columns={columns}
