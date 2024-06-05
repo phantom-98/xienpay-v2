@@ -399,7 +399,6 @@ const TableList: React.FC = () => {
           defaultMessage="Show Bank?"
         />
       ),
-      hideInTable: true,
       dataIndex: 'has_remit_bank',
       render: (_, record) => (
         <Switch
@@ -524,31 +523,28 @@ const TableList: React.FC = () => {
         // search={{
         //   labelWidth: 120,
         // }}
-        toolBarRender={() =>
-          [access.canBankAcctCreate
-            ? 
-                <Button
-                  type="primary"
-                  key="primary"
-                  onClick={() => {
-                    handleModalOpen(true);
-                  }}
-                >
-                  <PlusOutlined />{' '}
-                  <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
-                </Button>
-            : null,
-                <Button
-                  type="text"
-                  key="text"
-                  onClick={() => {
-                    actionRef.current?.reload();
-                  }}
-                >
-                  <ReloadOutlined />
-                </Button>,
-              ]
-        }
+        toolBarRender={() => [
+          access.canBankAcctCreate ? (
+            <Button
+              type="primary"
+              key="primary"
+              onClick={() => {
+                handleModalOpen(true);
+              }}
+            >
+              <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="New" />
+            </Button>
+          ) : null,
+          <Button
+            type="text"
+            key="text"
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+          >
+            <ReloadOutlined />
+          </Button>,
+        ]}
         request={bankAcct}
         columns={columns}
         rowSelection={{
