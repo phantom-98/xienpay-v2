@@ -22,6 +22,8 @@ import {
 import { useIntl } from '@umijs/max';
 import { Button, Col, Row, message } from 'antd';
 import { useEffect, useState } from 'react';
+import { getInitialState } from '@/app';
+import { useModel } from 'umi';
 
 const { Statistic, Divider } = StatisticCard;
 
@@ -136,6 +138,11 @@ const Welcome = () => {
     })
   }, [withdraw]);
 
+  const { initialState } = useModel('@@initialState');
+
+  useEffect(() => {
+  }, [initialState]); 
+
   const handleFormSubmit = async (action: string) => {
     console.log('Form values:', formValues);
     const { merchant_code, time_period, time_period2 } = formValues;
@@ -182,7 +189,7 @@ const Welcome = () => {
   };
 
   return (
-    <PageContainer>
+    <PageContainer className={`${initialState?.settings?.navTheme}`}>
       <Row gutter={[16, 16]}>
         <ProForm layout="horizontal" submitter={false}>
           <ProFormSelect

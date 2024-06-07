@@ -3,14 +3,15 @@ import React from 'react';
 const CoinStats: React.FC = ({icon, title, description}) => {
 
     return (
-        <div className='coin-stats-card' style={{
+        <div className='coin-stats-card ant-pro-card' style={{
             display: "flex",
             alignItems: "center",
             justifyContent: "start",
             gap: "24px",
             minWidth: "200px",
             borderRadius: "12px",
-            background: "white",
+            background: "var(--bg-color)",
+            color: "var(--text-color)",
             padding: "16px 24px",
             boxShadow: "3px 3px 5px #1111",
         }}>

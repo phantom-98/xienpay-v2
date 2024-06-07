@@ -360,7 +360,7 @@ const SettlementList: React.FC = () => {
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}

@@ -7,7 +7,7 @@ const TrackingChart: React.FC = ({graphData, title, amount, count, duration, set
     return (
       <div style={{
         borderRadius: "12px",
-        background: "white",
+        background: "var(--bg-color)",
         boxShadow: "3px 3px 5px #1111",
         padding: "20px"
       }}>

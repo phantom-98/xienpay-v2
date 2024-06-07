@@ -1,14 +1,12 @@
 import {
-  acceptPayout,
   addPayout,
   fetchMerchantsList,
   fetchPlayerList,
   payout,
-  rejectPayout,
   removePayout,
   updatePayout,
 } from '@/services/ant-design-pro/api';
-import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -23,13 +21,16 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Input, Modal, Popconfirm, Select, message } from 'antd';
+import { Button, Drawer, Input, Modal, Select, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
-async function successPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
-  return payout({...params, status: 'success'}, options);
+async function successPayout(
+  params: API.PayoutListItem & API.PageParams,
+  options?: { [key: string]: any },
+) {
+  return payout({ ...params, status: 'success' }, options);
 }
 
 const ApprovalModal: React.FC<{
@@ -448,23 +449,21 @@ const PayoutList: React.FC = () => {
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() =>
-          [
-            <Button
-              type="text"
-              key="text"
-              onClick={() => {
-                actionRef.current?.reload();
-              }}
-            >
-              <ReloadOutlined />
-            </Button>,
-          ]
-        }
+        toolBarRender={() => [
+          <Button
+            type="text"
+            key="text"
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+          >
+            <ReloadOutlined />
+          </Button>,
+        ]}
         request={successPayout}
         columns={columns}
         rowSelection={{
