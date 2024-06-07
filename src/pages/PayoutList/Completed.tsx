@@ -314,6 +314,12 @@ const PayoutList: React.FC = () => {
       },
     },
     {
+      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
+      dataIndex: 'time_taken',
+      valueType: 'textarea',
+      order: 6,
+    },
+    {
       title: <FormattedMessage id="pages.payoutTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
       hideInSearch: true,
@@ -390,7 +396,7 @@ const PayoutList: React.FC = () => {
       title: <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR" />,
       dataIndex: 'utr_id',
       valueType: 'textarea',
-      hideInTable: true,
+      hideInTable: false,
     },
     {
       title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated" />,

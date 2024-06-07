@@ -376,7 +376,6 @@ const PayinList: React.FC = () => {
       valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
       order: 5,
     },
-
     {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
       dataIndex: 'time_taken',
