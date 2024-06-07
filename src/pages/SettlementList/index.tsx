@@ -282,9 +282,9 @@ const SettlementList: React.FC = () => {
       valueType: 'textarea',
       render: (_, record) => (
         <span>
-          {record.method_account_number}
-          <br />
           {record.method_account_name}
+          <br />
+          {record.method_account_number}
           <br />
           {record.method_account_branch_code}
           <br />
@@ -366,7 +366,7 @@ const SettlementList: React.FC = () => {
         }}
         toolBarRender={() =>
           [access.canSettlementCreate
-            ? 
+            ?
                 <Button
                   type="primary"
                   key="primary"
@@ -478,16 +478,16 @@ const SettlementList: React.FC = () => {
           label="Amount"
           name="amount"
           width="md"
+          required={true}
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
-          min={0}
-          placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
+          min={1.0}
         />
         <ProFormSelect
           name="method"
           width="md"
           label={intl.formatMessage({
-            id: 'pages.searchTable.updateForm.object',
+            id: 'pages.settlementTable.method',
             defaultMessage: 'bank',
           })}
           valueEnum={{
@@ -563,7 +563,7 @@ const SettlementList: React.FC = () => {
                   name="currency"
                   width="md"
                   label={intl.formatMessage({
-                    id: 'pages.searchTable.updateForm.object',
+                    id: 'pages.settlementTable.wallet',
                     defaultMessage: 'Wallet',
                   })}
                   valueEnum={{
