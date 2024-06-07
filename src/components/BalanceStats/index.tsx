@@ -9,7 +9,8 @@ const BalanceStats: React.FC = ({main, sub}) => {
         gap: "16px",
         padding: "16px 24px",
         borderRadius: "12px",
-        background: "white",
+        background: "var(--bg-color)",
+        color: "var(--text-color)",
         boxShadow: "3px 3px 5px #1111",
       }}>
         <div style={{

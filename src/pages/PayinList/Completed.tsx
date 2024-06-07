@@ -12,7 +12,6 @@ import {
   BellOutlined,
   CheckCircleOutlined,
   ExclamationCircleOutlined,
-  PlusOutlined,
   ReloadOutlined,
   SyncOutlined,
 } from '@ant-design/icons';
@@ -36,10 +35,12 @@ import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import SimpleSearchForm from '../../components/SimpleSearchForm';
 
-async function successPayin(params: API.PayinListItem & API.PageParams, options?: { [key: string]: any }) {
-  return payin({...params, status: 'success'}, options);
+async function successPayin(
+  params: API.PayinListItem & API.PageParams,
+  options?: { [key: string]: any },
+) {
+  return payin({ ...params, status: 'success' }, options);
 }
 
 const SearchUserInput: React.FC<{
@@ -428,7 +429,7 @@ const PayinList: React.FC = () => {
           return value;
         },
       },
-      order: 9
+      order: 9,
     },
     // {
     //   title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
@@ -469,7 +470,7 @@ const PayinList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
-      order: 10
+      order: 10,
     },
   ];
 
@@ -482,23 +483,21 @@ const PayinList: React.FC = () => {
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
-        rowKey="key"
+        rowKey="id"
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() =>
-          [
-            <Button
-              type="text"
-              key="text"
-              onClick={() => {
-                actionRef.current?.reload();
-              }}
-            >
-              <ReloadOutlined />
-            </Button>,
-          ]
-        }
+        toolBarRender={() => [
+          <Button
+            type="text"
+            key="text"
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+          >
+            <ReloadOutlined />
+          </Button>,
+        ]}
         request={successPayin}
         columns={columns}
         rowSelection={{

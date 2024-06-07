@@ -10,6 +10,23 @@ body,
   font-family: Be Vietnam, sans-serif !important;
 }
 
+:root .light {
+  --body-color: #f4f7fe;
+  --border-color: #dfdfdf;
+  --text-color: black;
+  --bg-color: white;
+}
+:root .realDark {
+  --body-color: #111111;
+  --border-color: #797979;
+  --text-color: white;
+  --bg-color: #191919;
+}
+
+:root {
+  --primary-color: #639f52;
+}
+
 .colorWeak {
   filter: invert(80%);
 }
@@ -45,18 +62,18 @@ ol {
 }
 .ant-input-affix-wrapper:hover,
 .ant-input-affix-wrapper-focused {
-  border-color: #639f52 !important;
+  border-color: var(--primary-color) !important;
 }
 .ant-checkbox-inner,
 .ant-checkbox-inner:hover {
   background-color: transparent !important;
-  border-color: #639f52 !important;
+  border-color: var(--primary-color) !important;
 }
 .ant-checkbox-checked .ant-checkbox-inner {
-  background-color: #639f52 !important;
+  background-color: var(--primary-color) !important;
 }
 .ant-btn-primary {
-  background-color: #639f52 !important;
+  background-color: var(--primary-color) !important;
 }
 .ant-btn-lg {
   height: auto;
@@ -83,7 +100,7 @@ ol {
 
 .ant-menu-item-selected {
   overflow: inherit !important;
-  background: #639f52 !important;
+  background: var(--primary-color) !important;
 }
 .ant-menu-item.ant-menu-item-selected:after,
 .ant-menu-item.ant-menu-item-selected:before {
@@ -108,8 +125,8 @@ ol {
   box-shadow: 30px 30px 0 10px #639f52 !important;
   opacity: 1 !important;
 }
-.ant-pro-layout .ant-pro-layout-bg-list{
-  background: #f4f7fe !important;
+.ant-pro-layout {
+  height: 100%;
 }
 .ant-pro-sider-collapsed-button,
 .ant-pro-setting-drawer-handle {
@@ -117,7 +134,7 @@ ol {
 }
 .ant-table-cell {
   background: transparent !important;
-  border: 1px solid #dfdfdf !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 0 !important;
 }
 .ant-table-thead .ant-table-cell {
@@ -193,8 +210,8 @@ ol {
   top: 0 !important;
   bottom: 0 !important;
   width: 256px;
-  background: #639f52 !important;
-  border-inline-end: 1px solid rgba(5, 5, 5, 0.06);
+  background: var(--primary-color) !important;
+  // border-inline-end: 1px solid var(--border-color);
 }
 .ant-pro-global-header-header-actions-avatar > div {
   color: white !important;
@@ -213,4 +230,7 @@ ol {
 .ant-pro-global-header-logo {
   position: absolute!important;
   left: 272px!important;
+}
+.ant-pro-global-header-right-content {
+  margin-right: 16px;
 }

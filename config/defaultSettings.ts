@@ -25,20 +25,9 @@ const Settings: ProLayoutProps & {
     typography: {
       fontFamily: 'Poppins',
     },
-    header: {
-      colorBgHeader: 'white',
-      colorHeaderTitle: 'black',
-      colorTextMenu: '#313131',
-      colorTextMenuSecondary: '#313131',
-      colorTextMenuSelected: '#fff',
-      colorBgMenuItemSelected: '#22272b',
-      colorTextMenuActive: 'rgba(255,255,255,0.85)',
-      colorTextRightActionsItem: '#313131',
-    },
     colorTextAppListIconHover: '#fff',
     colorTextAppListIcon: '#313131',
     sider: {
-      colorMenuBackground: '#495365',
       colorMenuItemDivider: '#313131',
       colorBgMenuItemHover: '#e1e1e149',
       colorTextMenu: 'white',
