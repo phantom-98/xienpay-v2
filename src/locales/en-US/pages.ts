@@ -118,6 +118,7 @@ export default {
   'pages.bankAcctTable.searchTable.remit-qr?': 'Allow QR?',
   'pages.bankAcctTable.searchTable.remit-bank?': 'Show Bank?',
   'pages.bankAcctTable.createform.newBankAcct': 'New Bank Account',
+  'pages.settlementTable.method': 'Settlement Instrument',
 
   'pages.admin-user-list': 'Users',
 

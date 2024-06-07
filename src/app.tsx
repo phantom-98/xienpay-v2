@@ -1,14 +1,55 @@
 import { AvatarDropdown, AvatarName, Question, SelectLang } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
-import { LinkOutlined } from '@ant-design/icons';
+import { LinkOutlined, SunOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
 import { Link, history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
+import { useEffect } from 'react';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
+
+const toggleTheme = (initialSetting : any, theme: string | undefined) => {
+  const settings = {...initialSetting};
+  const flag = theme === "realDark" ? true : theme === "light" ? false : settings?.navTheme === "light";
+  localStorage.setItem('theme', flag ? "realDark" : "light");
+  settings.navTheme = flag ? "realDark" : "light";
+  settings.token.header = !flag ? {
+    colorBgHeader: 'white',
+    colorHeaderTitle: 'black',
+    colorTextMenu: '#313131',
+    colorTextMenuSecondary: '#313131',
+    colorTextMenuSelected: '#fff',
+    colorBgMenuItemSelected: '#22272b',
+    colorTextMenuActive: 'rgba(255,255,255,0.85)',
+    colorTextRightActionsItem: '#313131',
+  } : {
+    colorBgHeader: '#111111',
+    colorHeaderTitle: 'white',
+    colorTextMenu: '#dfdfdf',
+    colorTextMenuSecondary: '#dfdfdf',
+    colorTextMenuSelected: '#111',
+    colorBgMenuItemSelected: '#e9e9e9de',
+    colorTextMenuActive: 'rgba(0,0,0,0.85)',
+    colorTextRightActionsItem: '#dfdfdf',
+  }
+  settings.token.sider = !flag ? {
+    ...settings.token.sider,
+    colorMenuBackground: '#495365',
+  } : {
+    ...settings.token.sider,
+    colorMenuBackground: '#191919',
+  }
+  settings.token.pageContainer = !flag ? {
+    colorBgPageContainer: '#f4f7fe'
+  } : {
+    colorBgPageContainer: '#111'
+  }
+  
+  return settings;
+}
 
 /**
  * @see  https://umijs.org/zh-CN/plugins/plugin-initial-state
@@ -30,6 +71,8 @@ export async function getInitialState(): Promise<{
     }
     return undefined;
   };
+  const theme = localStorage.getItem("theme") || "light";
+  const settings = toggleTheme(defaultSettings, theme) as Partial<LayoutSettings>;
   // 如果不是登录页面，执行
   const { location } = history;
   if (location.pathname !== loginPath) {
@@ -37,19 +80,28 @@ export async function getInitialState(): Promise<{
     return {
       fetchUserInfo,
       currentUser,
-      settings: defaultSettings as Partial<LayoutSettings>,
+      settings,
     };
   }
   return {
     fetchUserInfo,
-    settings: defaultSettings as Partial<LayoutSettings>,
+    settings,
   };
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
+    actionsRender: () => [
+      <SunOutlined key="theme" onClick={() => {
+        const settings = toggleTheme(initialState?.settings, undefined) as Partial<LayoutSettings>;
+        setInitialState({
+          ...initialState,
+          settings
+        })
+        }}/>,
+      <SelectLang key="SelectLang" />
+    ],
     avatarProps: {
       src: initialState?.currentUser?.avatar,
       title: <AvatarName />,
@@ -60,7 +112,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     waterMarkProps: {
       content: initialState?.currentUser?.name,
     },
-    footerRender: () => <></>, // <Footer />,
+    footerRender: () => <></>,
     onPageChange: () => {
       const { location } = history;
       // 如果没有登录，重定向到 login
