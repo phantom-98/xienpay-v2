@@ -21,67 +21,11 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import { Button, Drawer, Input, Modal, Popconfirm, message } from 'antd';
+import { Button, Drawer, Dropdown, Input, Modal, Popconfirm, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-
-const ApprovalModal: React.FC<{
-  placeholder: string;
-  style: React.CSSProperties;
-  onConfirm?: (value: string) => void;
-}> = (props) => {
-  const [visible, setVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-
-  const showModal = () => {
-    setVisible(true);
-  };
-
-  const handleOk = () => {
-    if (inputValue && inputValue.length > 0) {
-      props.onConfirm?.(inputValue);
-      setVisible(false);
-      setInputValue(''); // Reset input value
-    }
-  };
-
-  const handleCancel = () => {
-    setVisible(false);
-    setInputValue(''); // Reset input value
-  };
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  return (
-    <>
-      <CheckCircleTwoTone
-        style={{ fontSize: '20px' }}
-        twoToneColor={'#00ff00'}
-        onClick={showModal}
-      />
-      <Modal
-        title={`Confirm Approval for ID. ${props.settlementId}`}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="OK"
-        cancelText="Cancel"
-        visible={visible}
-        centered
-        width={400}
-      >
-        <Input
-          placeholder="Enter UTR ID"
-          width="sm"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-      </Modal>
-    </>
-  );
-};
+import { ApprovalModal, ConfirmModal } from '@/components/Modals';
 
 // const handleReject = async (fields: API.SettlementListItem) => {
 //   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
@@ -191,6 +135,11 @@ const SettlementList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
   const [merchantCode, setMerchantCode] = useState('');
+  
+  const [approve, setApprove] = useState(false);
+  const [reject, setReject] = useState(false);
+  const [reset, setReset] = useState(false);
+  const [settlementId, setSettlementId] = useState("");
 
   /**
    * @en-US International configuration
@@ -316,38 +265,33 @@ const SettlementList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) =>
-        record.status === 'pending' &&
-        access.canSettlementAuthorize && [
-          <ApprovalModal
-            key={record.id}
-            settlementId={record.id}
-            onConfirm={async (value) => {
-              await acceptSettlement({ id: record.id, action: 'approve', ref_id: value });
-              message.success(`Settlement No ${record.id} approved!`);
-              if (actionRef.current) {
-                actionRef.current.reload();
+        access.canSettlementAuthorize && (
+          record.status === 'pending' ? [
+            <Dropdown.Button menu={{
+              items: [
+                {
+                  label: "Approve",
+                  key: "approve"
+                },
+                {
+                  label: "Reject",
+                  key: "reject"
+                },
+              ],
+              onClick: async (e) => {
+                e.key === 'approve' ? setApprove(true) : setReject(true)
               }
-            }}
-            placeholder={'Input UTR ID'}
-            style={{ width: 'md' }}
-          />,
-          <>
-            <Popconfirm
-              title="Confirm"
-              description="Reject Settlement?"
-              onConfirm={async () => {
-                await rejectSettlement({ id: record.id, action: 'reject' });
-                message.success(`Settlement No ${record.id} rejected!`);
-                if (actionRef.current) {
-                  actionRef.current.reload();
-                }
-              }}
-              onOpenChange={() => console.log('open change')}
-            >
-              <CloseCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#ff0000'} />
-            </Popconfirm>
-          </>,
-        ],
+            }} onClick={ async (e) => {
+              setSettlementId(record.id)
+              setApprove(true)
+            }} type='primary'>Approve</Dropdown.Button>
+          ] : record.status === 'success' ? [
+            <Button onClick={() => {
+              setSettlementId(record.id)
+              setReset(true)
+            }}>Reset</Button>
+          ] : null
+        )
     },
   ];
 
@@ -638,6 +582,51 @@ const SettlementList: React.FC = () => {
           />
         )}
       </Drawer>
+      <ApprovalModal
+        key={settlementId}
+        visible={approve}
+        setVisible={setApprove}
+        Id={settlementId}
+        onConfirm={async (value) => {
+          await acceptSettlement({ id: settlementId, action: 'approve', ref_id: value });
+          message.success(`Settlement No ${settlementId} approved!`);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+        placeholder={'Input UTR ID'}
+        style={{ width: 'md' }}
+      />
+      <ConfirmModal
+        title={`Confirm Reject for ID. `}
+        description="Reject Settlement?"
+        visible={reject}
+        setVisible={setReject}
+        Id={settlementId}
+        onConfirm={async () => {
+          await rejectSettlement({ id: settlementId, action: 'reject' });
+          message.success(`Settlement No ${settlementId} rejected!`);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+      >
+      </ConfirmModal>
+      <ConfirmModal
+        title={"Confirm Reset for ID. "}
+        description="Reset Settlement?"
+        visible={reset}
+        setVisible={setReset}
+        Id={settlementId}
+        onConfirm={async () => {
+          await updateSettlement({ id: settlementId, status: 'pending' });
+          message.success(`Settlement No ${settlementId} reset!`);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+      >
+      </ConfirmModal>
     </PageContainer>
   );
 };
