@@ -425,7 +425,6 @@ const SettlementList: React.FC = () => {
           required={true}
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
-          min={1.0}
         />
         <ProFormSelect
           name="method"
