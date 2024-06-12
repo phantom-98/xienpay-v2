@@ -27,7 +27,7 @@ import { Button, Drawer, Dropdown, Input, Modal, Popconfirm, Select, message } f
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { ApprovalModal, ConfirmModal } from '@/components/Modals';
+import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 
 async function inprogressPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
   return payout({...params, status: 'initiated'}, options);
@@ -586,21 +586,20 @@ const PayoutList: React.FC = () => {
         placeholder={'Input UTR ID'}
         style={{ width: 'md' }}
       />
-      <ConfirmModal
+      <RejectModal
         visible={reject}
         setVisible={setReject}
         Id={payoutId}
-        title="Confirm Reject for ID. "
-        description="Reject Payout?"
-        onConfirm={async () => {
-          await rejectPayout({ id: payoutId, action: 'reject' });
+        onConfirm={async (value) => {
+          await rejectPayout({ id: payoutId, action: 'reject', reason: value});
           message.success(`Payout No ${payoutId} rejected!`);
           if (actionRef.current) {
             actionRef.current.reload();
           }
         }}
+        style={{ width: 'md' }}
       >
-      </ConfirmModal>
+      </RejectModal>
     </PageContainer>
   );
 };
