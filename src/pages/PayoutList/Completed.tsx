@@ -3,6 +3,7 @@ import {
   fetchMerchantsList,
   fetchPlayerList,
   payout,
+  rejectPayout,
   removePayout,
   updatePayout,
 } from '@/services/ant-design-pro/api';
@@ -570,7 +571,7 @@ const PayoutList: React.FC = () => {
         title="Confirm Reset for ID. "
         description="Reset Payout?"
         onConfirm={async () => {
-          await updatePayout({ id: payoutId, action: 'reset' });
+          await rejectPayout({ id: payoutId, action: 'reset' });
           message.success(`Payout No ${payoutId} reset!`);
           if (actionRef.current) {
             actionRef.current.reload();
