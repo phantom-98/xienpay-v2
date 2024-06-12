@@ -32,7 +32,7 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
+import { Button, Drawer, Modal, Select, Tag, message, Dropdown } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -513,7 +513,28 @@ const PayinList: React.FC = () => {
             </div>
           }
         >
-          <Button
+          <Dropdown.Button menu={{
+            items: [
+              {
+                label: "Approve",
+                key: "approve"
+              },
+              {
+                label: "Reject",
+                key: "reject"
+              },
+              {
+                label: "Delete",
+                key: "delete"
+              },
+            ],
+            onClick: async (e) => {
+              console.log("on click", e)
+            }
+          }} onClick={ async (e) => {
+            console.log("button click", e)
+          }} type='primary'>Approve</Dropdown.Button>
+          {/* <Button
             onClick={async () => {
               await handleRemove(selectedRowsState);
               setSelectedRows([]);
@@ -530,7 +551,7 @@ const PayinList: React.FC = () => {
               id="pages.searchTable.batchApproval"
               defaultMessage="Batch approval"
             />
-          </Button>
+          </Button> */}
         </FooterToolbar>
       )}
       <ModalForm

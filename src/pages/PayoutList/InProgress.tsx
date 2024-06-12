@@ -23,72 +23,15 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import type { SelectProps } from 'antd';
-import { Button, Drawer, Input, Modal, Popconfirm, Select, message } from 'antd';
+import { Button, Drawer, Dropdown, Input, Modal, Popconfirm, Select, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import { ApprovalModal, ConfirmModal } from '@/components/Modals';
 
 async function inprogressPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
   return payout({...params, status: 'initiated'}, options);
 }
-
-const ApprovalModal: React.FC<{
-  placeholder: string;
-  style: React.CSSProperties;
-  payoutId: number;
-  onConfirm?: (value: string) => void;
-}> = (props) => {
-  const [visible, setVisible] = useState(false);
-  const [inputValue, setInputValue] = useState('');
-
-  const showModal = () => {
-    setVisible(true);
-  };
-
-  const handleOk = () => {
-    if (inputValue && inputValue.length > 0) {
-      props.onConfirm?.(inputValue);
-      setVisible(false);
-      setInputValue(''); // Reset input value
-    }
-  };
-
-  const handleCancel = () => {
-    setVisible(false);
-    setInputValue(''); // Reset input value
-  };
-
-  const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-  };
-
-  return (
-    <>
-      <CheckCircleTwoTone
-        style={{ fontSize: '20px' }}
-        twoToneColor={'#00ff00'}
-        onClick={showModal}
-      />
-      <Modal
-        title={`Confirm Approval for ID. ${props.payoutId}`}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="OK"
-        cancelText="Cancel"
-        visible={visible}
-        centered
-        width={400}
-      >
-        <Input
-          placeholder="Enter UTR ID"
-          width="sm"
-          value={inputValue}
-          onChange={handleInputChange}
-        />
-      </Modal>
-    </>
-  );
-};
 
 const SearchUserInput: React.FC<{
   merchantCode: string;
@@ -235,6 +178,9 @@ const PayoutList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.PayoutListItem[]>([]);
 
   const [merchantCode, setMerchantCode] = useState('');
+  const [approve, setApprove] = useState(false);
+  const [reject, setReject] = useState(false);
+  const [payoutId, setPayoutId] = useState("");
 
   /**
    * @en-US International configuration
@@ -384,38 +330,29 @@ const PayoutList: React.FC = () => {
       dataIndex: 'option',
       valueType: 'option',
       render: (_, record) =>
-        record.status === 'initiated' &&
-        access.canPayoutAuthorize && [
-          <ApprovalModal
-            key={record.id}
-            onConfirm={async (value) => {
-              await acceptPayout({ id: record.id, action: 'approve', utr_id: value });
-              message.success(`Payout No ${record.id} approved!`);
-              if (actionRef.current) {
-                actionRef.current.reload();
+        access.canPayoutAuthorize && (
+          [
+            <Dropdown.Button menu={{
+              items: [
+                {
+                  label: "Approve",
+                  key: "approve"
+                },
+                {
+                  label: "Reject",
+                  key: "reject"
+                },
+              ],
+              onClick: async (e) => {
+                setPayoutId(record.id)
+                e.key === 'approve' ? setApprove(true) : setReject(true)
               }
-            }}
-            payoutId={record.id}
-            placeholder={'Input UTR ID'}
-            style={{ width: 'md' }}
-          />,
-          <>
-            <Popconfirm
-              title="Confirm"
-              description="Reject Payout?"
-              onConfirm={async () => {
-                await rejectPayout({ id: record.id, action: 'reject' });
-                message.success(`Payout No ${record.id} rejected!`);
-                if (actionRef.current) {
-                  actionRef.current.reload();
-                }
-              }}
-              onOpenChange={() => console.log('open change')}
-            >
-              <CloseCircleTwoTone style={{ fontSize: '20px' }} twoToneColor={'#ff0000'} />
-            </Popconfirm>
-          </>,
-        ],
+            }} onClick={ async (e) => {
+              setPayoutId(record.id)
+              setApprove(true)
+            }} type='primary'>Approve</Dropdown.Button>
+          ]
+        )
     },
   ];
 
@@ -634,6 +571,36 @@ const PayoutList: React.FC = () => {
           />
         )}
       </Drawer>
+      <ApprovalModal
+        key={payoutId}
+        visible={approve}
+        setVisible={setApprove}
+        Id={payoutId}
+        onConfirm={async (value) => {
+          await acceptPayout({ id: payoutId, action: 'approve', utr_id: value });
+          message.success(`Payout No ${payoutId} approved!`);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+        placeholder={'Input UTR ID'}
+        style={{ width: 'md' }}
+      />
+      <ConfirmModal
+        visible={reject}
+        setVisible={setReject}
+        Id={payoutId}
+        title="Confirm Reject for ID. "
+        description="Reject Payout?"
+        onConfirm={async () => {
+          await rejectPayout({ id: payoutId, action: 'reject' });
+          message.success(`Payout No ${payoutId} rejected!`);
+          if (actionRef.current) {
+            actionRef.current.reload();
+          }
+        }}
+      >
+      </ConfirmModal>
     </PageContainer>
   );
 };
