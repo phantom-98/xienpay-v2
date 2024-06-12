@@ -25,7 +25,7 @@ import { Button, Drawer, Dropdown, Input, Modal, Popconfirm, message } from 'ant
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { ApprovalModal, ConfirmModal } from '@/components/Modals';
+import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 
 // const handleReject = async (fields: API.SettlementListItem) => {
 //   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
@@ -596,21 +596,20 @@ const SettlementList: React.FC = () => {
         placeholder={'Input UTR ID'}
         style={{ width: 'md' }}
       />
-      <ConfirmModal
-        title={`Confirm Reject for ID. `}
-        description="Reject Settlement?"
+      <RejectModal
         visible={reject}
         setVisible={setReject}
         Id={settlementId}
-        onConfirm={async () => {
-          await rejectSettlement({ id: settlementId, action: 'reject' });
+        onConfirm={async (value) => {
+          await rejectSettlement({ id: settlementId, action: 'reject', reason: value});
           message.success(`Settlement No ${settlementId} rejected!`);
           if (actionRef.current) {
             actionRef.current.reload();
           }
         }}
+        style={{ width: 'md' }}
       >
-      </ConfirmModal>
+      </RejectModal>
       <ConfirmModal
         title={"Confirm Reset for ID. "}
         description="Reset Settlement?"
@@ -618,7 +617,7 @@ const SettlementList: React.FC = () => {
         setVisible={setReset}
         Id={settlementId}
         onConfirm={async () => {
-          await updateSettlement({ id: settlementId, status: 'pending' });
+          await rejectSettlement({ id: settlementId, action: 'reset' });
           message.success(`Settlement No ${settlementId} reset!`);
           if (actionRef.current) {
             actionRef.current.reload();
