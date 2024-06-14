@@ -619,74 +619,24 @@ const PayinList: React.FC = () => {
             return one_time_paylink === true ? (
               <>
                 <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.searchTable.payoutAc_no"
-                          defaultMessage="Account number is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  name="ac_no"
-                  label="Account Number"
-                  placeholder="Account number"
+                  name="user_email"
+                  label="Email"
+                  placeholder="Optional user email"
                   style={{ width: '100%'}}
                 />
                 <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.searchTable.payoutAc_name"
-                          defaultMessage="Account name is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  name="ac_name"
-                  label="Account holder name"
-                  placeholder="Account name"
-                  style={{ width: '100%'}}
-                />
-                <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.searchTable.payoutifsc"
-                          defaultMessage="IFSC is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  name="ifsc"
-                  label="IFSC code"
-                  placeholder="IFSC code"
+                  name="user_phone_number"
+                  label="User Phone #"
+                  placeholder="Optional user phone"
                   style={{ width: '100%'}}
                 />
                 <ProFormMoney
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.searchTable.payoutAmount"
-                          defaultMessage="Amount is required"
-                        />
-                      ),
-                    },
-                  ]}
                   label="Amount"
                   name="amount"
                   fieldProps={{ moneySymbol: false }}
                   locale="en-US"
-                  min={100}
-                  placeholder="Amount"
+                  min={0}
+                  placeholder="Optional amount"
                 />
               </>
             ) : null;
