@@ -28,6 +28,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
+import { response } from 'express';
 
 async function inprogressPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
   return payout({...params, status: 'initiated'}, options);
@@ -44,9 +45,17 @@ const SearchUserInput: React.FC<{
 
   const handleSearch = (newValue: string) => {
     return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
-      setData(data);
+      if (data.length > 0) {
+        setData(data);
+      } else {
+        setData([{label: newValue, value: newValue}]);
+      }
     });
   };
+
+  useEffect(() => {
+    handleSearch("");
+  }, [props.merchantCode])
 
   const handleChange = (newValue: string) => {
     setValue(newValue);
@@ -85,9 +94,10 @@ const SearchUserInput: React.FC<{
 const handleAdd = async (fields: API.PaymentLinkResponse) => {
   const hide = message.loading('Adding');
   try {
-    const response = await addPayout({ ...fields });
-    const { payoutUrl } = response;
+
+    const response = await addPayout({ ...fields, merchant_order_id: crypto.randomUUID().toString() });
     hide();
+    const { payoutUrl } = response;
     if (payoutUrl !== null && payoutUrl !== undefined) {
       navigator.clipboard.writeText(payoutUrl).then(
         () => {
@@ -106,7 +116,7 @@ const handleAdd = async (fields: API.PaymentLinkResponse) => {
     return true;
   } catch (error) {
     hide();
-    message.error('Adding failed, please try again!');
+    message.error(error.response.data.message);
     return false;
   }
 };
@@ -370,7 +380,7 @@ const PayoutList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          [access.canPayoutLinkCreate
+          [access.canPayoutCreate
             ? 
                 <Button
                   type="primary"
@@ -382,7 +392,7 @@ const PayoutList: React.FC = () => {
                   <PlusOutlined />{' '}
                   <FormattedMessage
                     id="pages.payoutTable.new-payment-link"
-                    defaultMessage="New Payment Link"
+                    defaultMessage="New Payout"
                   />
                 </Button>
             : null,
@@ -453,7 +463,7 @@ const PayoutList: React.FC = () => {
         onOpenChange={handleModalOpen}
         layout="horizontal"
         labelCol={{
-          span: 8,
+          span: 10,
         }}
         wrapperCol={{
           span: 16,
@@ -468,63 +478,115 @@ const PayoutList: React.FC = () => {
             }
           }
         }}
+        width={500}
       >
+        <ProFormSelect
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutMerchant_code"
+                  defaultMessage="Merchant Code is required"
+                />
+              ),
+            },
+          ]}
+          options={merchantsList.map((merchant) => merchant.label)}
+          name="merchant_code"
+          label="Merchant Code"
+          onChange={setMerchantCode}
+          style={{ width: '100%'}}
+        />
+        <ProForm.Item
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutUser_id"
+                  defaultMessage="User ID is required"
+                />
+              ),
+            },
+          ]}
+          name="user_id" label="User ID(Account)" valuePropName="value" style={{ width: '100%'}}>
+          <SearchUserInput
+            merchantCode={merchantCode}
+            placeholder="Search user id"
+            style={{width: 'md'}}
+          />
+        </ProForm.Item>
         <ProFormText
           rules={[
             {
               required: true,
               message: (
                 <FormattedMessage
-                  id="pages.searchTable.payoutName"
-                  defaultMessage="Merchant Order ID is required"
+                  id="pages.searchTable.payoutAc_no"
+                  defaultMessage="Account number is required"
                 />
               ),
             },
           ]}
-          initialValue={crypto.randomUUID().toString()}
-          label="Merchant Order ID"
-          width="md"
-          name="merchant_order_id"
-          placeholder="Unique order ID generated at the merchant for reference"
-        />
-        <ProFormSelect
-          width="md"
-          options={merchantsList.map((merchant) => merchant.label)}
-          //options={merchantsList}
-          // request={fetchRolesList}
-          name="merchant_code"
-          label="Merchant Code"
-          onChange={setMerchantCode}
-        />
-        <ProForm.Item name="user_id" label="User ID" valuePropName="value">
-          <SearchUserInput
-            merchantCode={merchantCode}
-            placeholder="Search user id"
-            style={{ width: 'md' }}
-          />
-        </ProForm.Item>
-        <ProFormText
-          colProps={{ span: 12 }}
-          width="md"
-          name="user_email"
-          label="Email"
-          placeholder="Optional user email"
+          name="ac_no"
+          label="Account Number"
+          placeholder="Account number"
+          style={{ width: '100%'}}
         />
         <ProFormText
-          colProps={{ span: 12 }}
-          width="md"
-          name="user_phone_number"
-          label="User Phone #"
-          placeholder="Optional user email"
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutAc_name"
+                  defaultMessage="Account name is required"
+                />
+              ),
+            },
+          ]}
+          name="ac_name"
+          label="Account holder name"
+          placeholder="Account name"
+          style={{ width: '100%'}}
         />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutifsc"
+                  defaultMessage="IFSC is required"
+                />
+              ),
+            },
+          ]}
+          name="ifsc"
+          label="IFSC code"
+          placeholder="IFSC code"
+          style={{ width: '100%'}}
+        />
+        
         <ProFormMoney
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutAmount"
+                  defaultMessage="Amount is required"
+                />
+              ),
+            },
+          ]}
           label="Amount"
           name="amount"
-          colProps={{ span: 12 }}
           fieldProps={{ moneySymbol: false }}
           locale="en-US"
-          min={0}
-          placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
+          min={100}
+          placeholder="Amount"
         />
       </ModalForm>
       <UpdateForm

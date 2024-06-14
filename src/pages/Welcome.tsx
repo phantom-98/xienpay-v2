@@ -71,8 +71,8 @@ const Welcome = () => {
       title: `${intl.formatMessage({
         id: 'pages.general.deposit',
         defaultMessage: 'Deposit'
-      })} (${snapshot?.lifetime?.deposits?.count ?? 0})`,
-      description: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`
+      })} (${snapshot?.lastDay?.deposits?.count ?? 0})`,
+      description: `${asINR(snapshot?.lastDay?.deposits?.amount ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
@@ -80,15 +80,15 @@ const Welcome = () => {
         id: 'pages.general.deposit',
         defaultMessage: 'Deposit'
       })} %`,
-      description:  `${asINR(snapshot?.lifetime?.deposits?.commission ?? 0)}`
+      description:  `${asINR(snapshot?.lastDay?.deposits?.commission ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/withdraw.jpg" width="52" alt=""/>,
       title: `${intl.formatMessage({
         id: 'pages.general.withdrawals',
         defaultMessage: 'Withdrawals'
-      })} (${snapshot?.lifetime?.withdrawals?.count ?? 0})`,
-      description: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`
+      })} (${snapshot?.lastDay?.withdrawals?.count ?? 0})`,
+      description: `${asINR(snapshot?.lastDay?.withdrawals?.amount ?? 0)}`
     },
     {
       icon: <img src="/assets/icons/commission.jpg" width="52" alt=""/>,
@@ -96,7 +96,7 @@ const Welcome = () => {
         id: 'pages.general.withdrawals',
         defaultMessage: 'Withdrawals'
       })} %`,
-      description: `${asINR(snapshot?.lifetime?.withdrawals?.commission ?? 0)}`
+      description: `${asINR(snapshot?.lastDay?.withdrawals?.commission ?? 0)}`
     },
   ]
 
@@ -217,19 +217,19 @@ const Welcome = () => {
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.deposits',
               defaultMessage: 'Deposits'
-            })}`, value: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lastDay?.deposits?.amount ?? 0)}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.withdrawals',
               defaultMessage: 'Withdrawals'
-            })}`, value: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lastDay?.withdrawals?.amount ?? 0)}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.commission',
               defaultMessage: 'Commission'
-            })}`, value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0))}`},
+            })}`, value: `${asINR(parseFloat(snapshot?.lastDay?.deposits?.commission ?? 0) + parseFloat(snapshot?.lastDay?.withdrawals?.commission ?? 0))}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.outstanding',
               defaultMessage: 'Outstanding'
-            })}`, value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lastDay?.settlements?.amount ?? 0)}`},
           ]}/>
 
         </Col>
