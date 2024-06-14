@@ -124,7 +124,7 @@ const handleAdd = async (fields: API.PaymentLinkItem) => {
     return true;
   } catch (error) {
     hide();
-    message.error('Adding failed, please try again!');
+    message.error(error.response.data.message);
     return false;
   }
 };
@@ -551,10 +551,10 @@ const PayinList: React.FC = () => {
         onOpenChange={handleModalOpen}
         layout="horizontal"
         labelCol={{
-          span: 8,
+          span: 10,
         }}
         wrapperCol={{
-          span: 16,
+          span: 14,
         }}
         labelAlign="left"
         onFinish={async (value) => {
@@ -566,17 +566,40 @@ const PayinList: React.FC = () => {
             }
           }
         }}
+        width={500}
       >
         <ProFormSelect
-          width="md"
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutMerchant_code"
+                  defaultMessage="Merchant Code is required"
+                />
+              ),
+            },
+          ]}
           options={merchantsList.map((merchant) => merchant.label)}
-          //options={merchantsList}
-          // request={fetchRolesList}
           name="merchant_code"
           label="Merchant Code"
           onChange={setMerchantCode}
+          style={{width: "100%"}}
         />
-        <ProForm.Item name="user_id" label="User ID" valuePropName="value">
+        <ProForm.Item
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.searchTable.payoutUser_id"
+                  defaultMessage="User ID is required"
+                />
+              ),
+            },
+          ]}
+          style={{width: "100%"}}
+          name="user_id" label="User ID" valuePropName="value">
           <SearchUserInput
             merchantCode={merchantCode}
             placeholder="Search user id"
@@ -596,27 +619,74 @@ const PayinList: React.FC = () => {
             return one_time_paylink === true ? (
               <>
                 <ProFormText
-                  colProps={{ span: 12 }}
-                  width="md"
-                  name="user_email"
-                  label="Email"
-                  placeholder="Optional user email"
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.searchTable.payoutAc_no"
+                          defaultMessage="Account number is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  name="ac_no"
+                  label="Account Number"
+                  placeholder="Account number"
+                  style={{ width: '100%'}}
                 />
                 <ProFormText
-                  colProps={{ span: 12 }}
-                  width="md"
-                  name="user_phone_number"
-                  label="User Phone #"
-                  placeholder="Optional user email"
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.searchTable.payoutAc_name"
+                          defaultMessage="Account name is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  name="ac_name"
+                  label="Account holder name"
+                  placeholder="Account name"
+                  style={{ width: '100%'}}
+                />
+                <ProFormText
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.searchTable.payoutifsc"
+                          defaultMessage="IFSC is required"
+                        />
+                      ),
+                    },
+                  ]}
+                  name="ifsc"
+                  label="IFSC code"
+                  placeholder="IFSC code"
+                  style={{ width: '100%'}}
                 />
                 <ProFormMoney
+                  rules={[
+                    {
+                      required: true,
+                      message: (
+                        <FormattedMessage
+                          id="pages.searchTable.payoutAmount"
+                          defaultMessage="Amount is required"
+                        />
+                      ),
+                    },
+                  ]}
                   label="Amount"
                   name="amount"
-                  colProps={{ span: 12 }}
                   fieldProps={{ moneySymbol: false }}
                   locale="en-US"
-                  min={0}
-                  placeholder="Optional amount: Will default to 0.0 and the amount submitted by the user"
+                  min={100}
+                  placeholder="Amount"
                 />
               </>
             ) : null;

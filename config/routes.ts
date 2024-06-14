@@ -68,28 +68,28 @@ export default [
     routes: [
       {
         name: 'in-progress',
-        key: 'in-progress',
+        key: 'in-progress-in',
         path: '/payin-list/in-progress',
         component: './PayinList/InProgress',
         access: 'canPayinList',
       },
       {
         name: 'completed',
-        key: 'completed',
+        key: 'completed-in',
         path: '/payin-list/completed',
         component: './PayinList/Completed',
         access: 'canPayinList',
       },
       {
         name: 'dropped',
-        key: 'dropped',
+        key: 'dropped-in',
         path: '/payin-list/dropped',
         component: './PayinList/Dropped',
         access: 'canPayinList',
       },
       {
         name: 'all',
-        key: 'all',
+        key: 'all-in',
         path: '/payin-list/all',
         component: './PayinList/All',
         access: 'canPayinList',
@@ -103,14 +103,14 @@ export default [
     routes: [
       {
         name: 'in-progress',
-        key: 'in-progress',
+        key: 'in-progress-out',
         path: '/payout-list/in-progress',
         component: './PayoutList/InProgress',
         access: 'canPayoutList',
       },
       {
         name: 'completed',
-        key: 'completed',
+        key: 'completed-out',
         path: '/payout-list/completed',
         component: './PayoutList/Completed',
         access: 'canPayoutList',

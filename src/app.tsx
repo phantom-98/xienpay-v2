@@ -1,6 +1,6 @@
 import { AvatarDropdown, AvatarName, Question, SelectLang } from '@/components';
 import { currentUser as queryCurrentUser } from '@/services/ant-design-pro/api';
-import { LinkOutlined, SunOutlined } from '@ant-design/icons';
+import { LinkOutlined, MoonOutlined, SunOutlined } from '@ant-design/icons';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
 import { SettingDrawer } from '@ant-design/pro-components';
 import type { RequestConfig, RunTimeLayoutConfig } from '@umijs/max';
@@ -8,6 +8,7 @@ import { Link, history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { errorConfig } from './requestErrorConfig';
 import { useEffect } from 'react';
+import { Switch } from 'antd';
 const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
@@ -93,13 +94,18 @@ export async function getInitialState(): Promise<{
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
     actionsRender: () => [
-      <SunOutlined key="theme" onClick={() => {
-        const settings = toggleTheme(initialState?.settings, undefined) as Partial<LayoutSettings>;
-        setInitialState({
-          ...initialState,
-          settings
-        })
-        }}/>,
+        <Switch key="theme"
+          checkedChildren={<SunOutlined/>}
+          unCheckedChildren={<MoonOutlined/>}
+          defaultChecked={localStorage.getItem("theme") !== "realDark"}
+          onChange={(checked, _) => {
+            const settings = toggleTheme(initialState?.settings, undefined) as Partial<LayoutSettings>;
+            setInitialState({
+              ...initialState,
+              settings
+            })
+          }}
+        />,
       <SelectLang key="SelectLang" />
     ],
     avatarProps: {
