@@ -10,7 +10,7 @@ import {
   removeBankAcct,
   updateBankAcct,
 } from '@/services/ant-design-pro/api';
-import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined, PlusOutlined, ReloadOutlined, EyeOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -38,6 +38,7 @@ import {
   Spin,
   Switch,
   message,
+  Popover,
 } from 'antd';
 import debounce from 'lodash/debounce';
 import React, { useMemo, useRef, useState } from 'react';
@@ -249,9 +250,8 @@ const TableList: React.FC = () => {
    */
   const [updateMerchantsModalOpen, handleUpdateMerchantsModalOpen] = useState<boolean>(false);
   const [merchants, setMerchants] = useState<API.LinkedMerchantListItem[]>([]); // Initial items
-  const [newMerchant, setNewMerchant] = useState<API.LinkedMerchantListItem[]>();
 
-  const [value, setValue] = useState<UserValue[]>([]);
+  const [value, setValue] = useState<UserValue>();
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -264,11 +264,9 @@ const TableList: React.FC = () => {
   };
 
   const handleMerchantsAdd = () => {
-    console.log(newMerchant);
     if (value) {
-      const new_merchants = value.map(toLinkedMerchanListItem);
-      setMerchants([...merchants, ...new_merchants]);
-      setNewMerchant(undefined);
+      const new_merchant = toLinkedMerchanListItem(value);
+      setMerchants([...merchants, new_merchant]);
     }
   };
 
@@ -492,20 +490,36 @@ const TableList: React.FC = () => {
       valueType: 'option',
       hideInTable: false,
       render: (_, record) => [
-        <a
-          key="id"
+        <Popover
+          title={<span>Merchants List</span>}
+          content={
+              <List
+                dataSource={merchants}
+                renderItem={(item: API.LinkedMerchantListItem) => (
+                  <List.Item>
+                    {item.name}
+                  </List.Item>
+                )}
+              />}
+          placement="topRight"
+          onOpenChange={(visible) => {
+            setCurrentRow(record);
+            visible && loadAssignedMerchants(record.id).then(response => setMerchants(response.data))
+          }}
+        >
+          <EyeOutlined style={{cursor: "pointer"}}/>
+        </Popover>,
+        <EditOutlined
           onClick={() => {
             setCurrentRow(record);
             handleUpdateMerchantsModalOpen(true);
 
             loadAssignedMerchants(record.id).then((response) => {
-              console.log('loadAssignedMerchants', response);
+              console.log('loadAssignedMerchants', response.data);
               setMerchants(response.data);
             });
           }}
-        >
-          <FormattedMessage id="pages.merchantTable.title" defaultMessage="Configuration" />
-        </a>,
+        />,
       ],
     },
   ];
@@ -771,7 +785,7 @@ const TableList: React.FC = () => {
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
       />
-
+     
       <Modal
         title="Marchants List"
         open={updateMerchantsModalOpen}
@@ -801,15 +815,10 @@ const TableList: React.FC = () => {
         />
         <Form layout="inline">
           <Form.Item>
-            <DebounceSelect
-              mode="multiple"
-              value={value}
+            <SearchInput
               placeholder="Select users"
-              fetchOptions={fetchMerchantsList}
-              onChange={(newValue) => {
-                setValue(newValue as UserValue[]);
-              }}
-              style={{ width: '200px' }}
+              onChange={setValue}
+              style={{ width: '325px' }}
             />
           </Form.Item>
           <Form.Item>
@@ -848,3 +857,49 @@ const TableList: React.FC = () => {
 };
 
 export default TableList;
+
+const SearchInput: React.FC<{
+  placeholder: string;
+  style: React.CSSProperties;
+  onChange?: (value: UserValue) => void;
+}> = (props) => {
+  const [data, setData] = useState<SelectProps['options']>([]);
+  const [value, setValue] = useState<number>();
+
+  // Ensure that new user ids should also be allowed to be entered here
+  // if they were not present in lookup
+  const handleSearch = (newValue: string) => {
+    return fetchMerchantsList(newValue).then((data: any) => {
+      console.log("merchant data", data)
+      if (data.length > 0) {
+        setData(data);
+      } else {
+        setData([{ label: newValue, value: newValue }]);
+      }
+    });
+  };
+
+  const handleChange = (index: number) => {
+    setValue(index);
+    data && props.onChange?.(data[index]);
+  };
+
+  return (
+    <Select
+      showSearch
+      value={value}
+      style={props.style}
+      placeholder={props.placeholder}
+      defaultActiveFirstOption={false}
+      suffixIcon={null}
+      filterOption={false}
+      onSearch={handleSearch}
+      onChange={handleChange}
+      notFoundContent={null}
+      options={(data || []).map((d, index) => ({
+        value: index,
+        label: d.label,
+      }))}
+    />
+  );
+};

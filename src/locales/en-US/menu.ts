@@ -66,6 +66,7 @@ export default {
   'menu.list.withdrawals': 'Withdrawals',
   'menu.list.withdrawals.in-progress': 'In Progress',
   'menu.list.withdrawals.completed': 'Completed',
+  'menu.list.withdrawals.all': 'All',
   'menu.list.settlement-list.transactions': 'Transactions',
   'menu.list.settlement-list.accounts': 'Accounts',
   'menu.list.chargebacks': 'Chargebacks',

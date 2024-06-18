@@ -13,6 +13,8 @@ import {
   ProDescriptions,
   ProFormMoney,
   ProFormText,
+  ProFormSelect,
+  ProFormSwitch,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
@@ -88,13 +90,21 @@ const handleRemove = async (selectedRows: API.MerchantListItem[]) => {
   }
 };
 
-const { Option } = Select;
-const selectBefore = (
-  <Select defaultValue="http://">
-    <Option value="http://">http://</Option>
-    <Option value="https://">https://</Option>
-  </Select>
-);
+// const { Option } = Select;
+const SelectBefore:React.FC<{name:string}> = ({name}) => {
+  return (
+    <ProFormSelect
+      name={name}
+      placeholder="https://"
+      options={[
+        {label: "http://", value: "http://"},
+        {label: "https://", value: "https://"}
+      ]}
+      initialValue="http://"
+      defaultActiveFirstOption={true}
+    />
+  )
+};
 
 const MerchantList: React.FC = () => {
   /**
@@ -365,11 +375,17 @@ const MerchantList: React.FC = () => {
           defaultMessage: 'New merchant',
         })}
         labelCol={{ span: 6 }}
+        width={640}
         layout="horizontal"
         open={createModalOpen}
         onOpenChange={handleModalOpen}
         onFinish={async (value) => {
-          const success = await handleAdd(value as API.AddMerchantItem);
+          const success = await handleAdd({
+            ...value,
+            site_url: value['site_prefix'] + value['site_url'],
+            return_url: value['return_prefix'] + value['return_url'],
+            notify_url: value['notify_prefix'] + value['notify_url']
+          } as API.AddMerchantItem);
           if (success) {
             handleModalOpen(false);
             if (actionRef.current) {
@@ -378,27 +394,47 @@ const MerchantList: React.FC = () => {
           }
         }}
       >
-        <ProFormText label="Code" name="code" required={true} placeholder="Unique merchant code" />
+        <ProFormText
+          label="Code"
+          name="code" 
+          rules={[{required:true}]}
+          placeholder="Unique merchant code"
+        />
         <ProFormText
           label="Url"
           name="site_url"
-          required={true}
+          rules={[{required:true}]}
           placeholder="Site Url"
-          addonBefore={selectBefore}
+          fieldProps={{
+            style: {
+              width: 336
+            }
+          }}
+          addonBefore={<SelectBefore name="site_prefix"/>}
         />
         <ProFormText
           label="Return"
           name="return_url"
-          required={true}
+          rules={[{required:true}]}
           placeholder="Return Url"
-          addonBefore={selectBefore}
+          fieldProps={{
+            style: {
+              width: 336
+            }
+          }}
+          addonBefore={<SelectBefore name="return_prefix"/>}
         />
         <ProFormText
           label="Callback"
           name="notify_url"
-          required={true}
+          rules={[{required:true}]}
           placeholder="Callback Url"
-          addonBefore={selectBefore}
+          fieldProps={{
+            style: {
+              width: 336
+            }
+          }}
+          addonBefore={<SelectBefore name="notify_prefix"/>}
         />
         <ProFormMoney
           label="Min Payin"
@@ -447,6 +483,10 @@ const MerchantList: React.FC = () => {
           initialValue={5.0}
           name="payout_commission"
           placeholder="Payout Commission %"
+        />
+        <ProFormSwitch
+          label="Test Mode"
+          name="is_test_mode"
         />
       </ModalForm>
       <UpdateForm

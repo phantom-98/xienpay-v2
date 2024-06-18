@@ -58,7 +58,7 @@ const Welcome = () => {
   const [snapshot, setSnapshot] = useState();
 
   const [formValues, setFormValues] = useState({
-    merchant_code: '',
+    merchant_codes: [],
     time_period: "7d",
     time_period2: "7d",
   });
@@ -105,7 +105,7 @@ const Welcome = () => {
       try {
         const fetchedMerchants = await fetchMerchantsList('');
         setMerchantsList(fetchedMerchants);
-        handleMerchantChange(fetchedMerchants[0]?.label)
+        handleMerchantChange([fetchedMerchants[0]?.label])
       } catch (error) {
         console.error('Error fetching merchants:', error);
       }
@@ -114,15 +114,15 @@ const Welcome = () => {
 
   useEffect(() => {
     handleFormSubmit("snapshot");
-  }, [formValues.merchant_code])
+  }, [formValues.merchant_codes])
 
   useEffect(() => {
     handleFormSubmit("submit");
-  }, [formValues.merchant_code, formValues.time_period])
+  }, [formValues.merchant_codes, formValues.time_period])
 
   useEffect(() => {
     handleFormSubmit("submit2");
-  }, [formValues.merchant_code, formValues.time_period2])
+  }, [formValues.merchant_codes, formValues.time_period2])
 
   useEffect(() => {
     setFormValues({
@@ -145,7 +145,8 @@ const Welcome = () => {
 
   const handleFormSubmit = async (action: string) => {
     console.log('Form values:', formValues);
-    const { merchant_code, time_period, time_period2 } = formValues;
+    const { merchant_codes, time_period, time_period2 } = formValues;
+    if (merchant_codes.length == 0) return;
 
     try {
       // if (action === 'download') {
@@ -154,7 +155,7 @@ const Welcome = () => {
       if (action === 'submit') {
         
         const payins = await fetchMerchantAnalyticsPayins(
-          merchant_code,
+          merchant_codes,
           time_period,
         );
         console.log("-----------payins-------------", payins)
@@ -162,7 +163,7 @@ const Welcome = () => {
       } else if (action === 'submit2') {
         
         const payouts = await fetchMerchantAnalyticsPayouts(
-          merchant_code,
+          merchant_codes,
           time_period2,
         );
         console.log("-----------payouts-------------", payouts)
@@ -170,7 +171,7 @@ const Welcome = () => {
       } else if (action === 'snapshot') {
 
         const snap = await fetchMerchantAnalyticsSnapshot(
-          merchant_code,
+          merchant_codes,
           "15d"
         )
         console.log("---------snapshot----------", snap)
@@ -182,9 +183,10 @@ const Welcome = () => {
   };
 
   const handleMerchantChange = (value) => {
+    console.log("selected merchants", value);
     setFormValues((prevValues) => ({
       ...prevValues,
-      merchant_code: value,
+      merchant_codes: value,
     }));
   };
 
@@ -196,10 +198,12 @@ const Welcome = () => {
             width="lg"
             labelCol={{ span: 6 }}
             options={merchantsList.map((merchant) => merchant.label)}
-            name="merchant_code"
-            label="Merchant Code"
-            value={merchantsList[0]?.label}
-            required
+            name="merchant_codes"
+            label="Merchant Codes"
+            value={[merchantsList[0]?.label]}
+            fieldProps={{
+              mode: 'multiple'
+            }}
             onChange={handleMerchantChange}
           />
         </ProForm>

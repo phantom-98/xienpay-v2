@@ -115,6 +115,13 @@ export default [
         component: './PayoutList/Completed',
         access: 'canPayoutList',
       },
+      {
+        name: 'all',
+        key: 'all-out',
+        path: '/payout-list/all',
+        component: './PayoutList/All',
+        access: 'canPayoutList',
+      },
     ],
   },
   {

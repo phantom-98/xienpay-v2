@@ -7,8 +7,9 @@ import {
   rejectPayout,
   removePayout,
   updatePayout,
+  downloadPayoutAsExcel,
 } from '@/services/ant-design-pro/api';
-import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined, DownloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -180,6 +181,7 @@ const PayoutList: React.FC = () => {
    * @zh-CN 分布更新窗口的弹窗
    * */
   const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
+  const [downloadModalOpen, handleDownloadModalOpen] = useState<boolean>(false);
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
@@ -380,7 +382,22 @@ const PayoutList: React.FC = () => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          [access.canPayoutCreate
+          [access.canPayoutPendingDownload
+            ?
+                <Button
+                  key="second"
+                  onClick={() => {
+                    handleDownloadModalOpen(true);
+                  }}
+                >
+                  <DownloadOutlined />{' '}
+                  <FormattedMessage
+                    id="pages.payoutTable.download"
+                    defaultMessage="Download as excel"
+                  />
+                </Button>
+            : null,
+            access.canPayoutCreate
             ? 
                 <Button
                   type="primary"
@@ -587,6 +604,77 @@ const PayoutList: React.FC = () => {
           locale="en-US"
           min={100}
           placeholder="Amount"
+        />
+      </ModalForm>
+      <ModalForm
+        title={intl.formatMessage({
+          id: 'pages.searchTable.createForm.download',
+          defaultMessage: 'Download',
+        })}
+        open={downloadModalOpen}
+        onOpenChange={handleDownloadModalOpen}
+        layout="horizontal"
+        labelCol={{
+          span: 10,
+        }}
+        wrapperCol={{
+          span: 16,
+        }}
+        labelAlign="left"
+        onFinish={async (value) => {
+          const o = Object.keys(value).filter((k) => value[k]).reduce((a, k) => ({ ...a, [k]: value[k] }), {});
+          const res = await downloadPayoutAsExcel({
+            ...o,
+            merchant_codes: JSON.stringify(o.merchant_codes)
+          });
+          if (res) { //download as csv file
+            console.log("success")
+          }
+        }}
+        width={500}
+      >
+        <ProFormText
+          name="id"
+          label="ID"
+          placeholder="ID"
+          style={{ width: '100%'}}
+        />
+        <ProFormText
+          name="merchant_order_id"
+          label="Merchant order id"
+          placeholder="Merchant order id"
+          style={{ width: '100%'}}
+        />
+        <ProFormSelect
+          options={merchantsList.map((merchant) => merchant)}
+          name="merchant_codes"
+          label="Merchant Codes"
+          fieldProps={{ mode: 'multiple'}}
+          style={{ width: '100%'}}
+        />
+        <ProFormText
+          name="user_id"
+          label="User id"
+          placeholder="User id"
+          style={{ width: '100%'}}
+        />
+        <ProFormText
+          name="amount"
+          label="Amount"
+          placeholder="Amount"
+          style={{ width: '100%'}}
+        />
+        <ProFormText
+          name="utr_id"
+          label="Utr id"
+          placeholder="Utr id"
+          style={{ width: '100%'}}
+        />
+        <ProFormText
+          name="uuid"
+          label="Payout UUID"
+          placeholder="Payout UUID"
+          style={{ width: '100%'}}
         />
       </ModalForm>
       <UpdateForm
