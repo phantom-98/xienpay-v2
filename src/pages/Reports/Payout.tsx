@@ -24,7 +24,7 @@ const Reports: React.FC = () => {
   const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
 
   const [formValues, setFormValues] = useState({
-    merchant_code: '',
+    merchant_codes: [],
     time_period: [Date.now() - 1000 * 3600 * 24 * 15, Date.now()],
   });
   const intl = useIntl();
@@ -32,7 +32,7 @@ const Reports: React.FC = () => {
   const handleMerchantChange = (value) => {
     setFormValues((prevValues) => ({
       ...prevValues,
-      merchant_code: value,
+      merchant_codes: value,
     }));
   };
 
@@ -45,10 +45,10 @@ const Reports: React.FC = () => {
 
   const handleDownload = async () => {
 
-    const { merchant_code, time_period } = formValues;
+    const { merchant_codes, time_period } = formValues;
     const [from_date, to_date] = time_period;
 
-    await downloadPayouts(merchant_code, dateFromMs(from_date), dateFromMs(to_date));
+    await downloadPayouts(merchant_codes, dateFromMs(from_date), dateFromMs(to_date));
   }
 
   useEffect(() => {
@@ -56,7 +56,7 @@ const Reports: React.FC = () => {
       try {
         const fetchedMerchants = await fetchMerchantsList('');
         setMerchantsList(fetchedMerchants);
-        handleMerchantChange(fetchedMerchants[0]?.label)
+        handleMerchantChange([fetchedMerchants[0]?.label])
       } catch (error) {
         console.error('Error fetching merchants:', error);
       }
@@ -71,9 +71,12 @@ const Reports: React.FC = () => {
               width="lg"
               labelCol={{ span: 6 }}
               options={merchantsList.map((merchant) => merchant.label)}
-              name="merchant_code"
-              label="Merchant Code"
-              required
+              name="merchant_codes"
+              label="Merchant Codes"
+              rules={[{required: true}]}
+              fieldProps={{
+                mode: 'multiple'
+              }}
               onChange={handleMerchantChange}
             />
           </ProForm>

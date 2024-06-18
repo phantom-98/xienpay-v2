@@ -191,14 +191,14 @@ export async function fetchPlayerList(
 }
 
 export async function fetchMerchantAnalytics(
-  merchant_code: string,
+  merchant_codes: string[],
   from_date: string,
   to_date: string,
 ): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       from_date,
       to_date,
     },
@@ -206,50 +206,50 @@ export async function fetchMerchantAnalytics(
 }
 // Added code-------------------------------------------------------------------------
 export async function fetchMerchantAnalyticsSnapshot(
-  merchant_code: string,
+  merchant_codes: string[],
   duration: string,
 ): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics/snapshot', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       duration,
     },
   }).then((response) => response.data);
 }
 
 export async function fetchMerchantAnalyticsPayins(
-  merchant_code: string,
+  merchant_codes: string[],
   duration: string,
 ): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics/payins', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       duration,
     },
   }).then((response) => response.data);
 }
 
 export async function fetchMerchantAnalyticsPayouts(
-  merchant_code: string,
+  merchant_codes: string[],
   duration: string,
 ): Promise<API.AnalyticsData> {
   return request('/api/merchants/analytics/payouts', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       duration,
     },
   }).then((response) => response.data);
 }
 
 // Finished --------------------------------------------------------------------------
-export async function downloadPayins(merchant_code: string, from_date: string, to_date: string) {
+export async function downloadPayins(merchant_codes: string[], from_date: string, to_date: string) {
   return request('/api/merchants/payins/download', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       from_date,
       to_date,
     },
@@ -266,11 +266,11 @@ export async function downloadPayins(merchant_code: string, from_date: string, t
   });
 }
 
-export async function downloadPayouts(merchant_code: string, from_date: string, to_date: string) {
+export async function downloadPayouts(merchant_codes: string[], from_date: string, to_date: string) {
   return request('/api/merchants/payouts/download', {
     method: 'POST',
     data: {
-      merchant_code,
+      merchant_codes,
       from_date,
       to_date,
     },
@@ -458,6 +458,7 @@ export async function payout(
   },
   options?: { [key: string]: any },
 ) {
+  console.log("optoins her", params)
   return request<API.PayoutList>('/api/payouts', {
     method: 'GET',
     params: {
@@ -518,6 +519,26 @@ export async function rejectPayout(options?: { [key: string]: any }) {
       ...(options || {}),
     },
   });
+}
+
+export async function downloadPayoutAsExcel( params?: { [key: string]: any }) {
+  return request<API.PayoutList>('/api/payouts/downloadForBulkApproval', {
+    method: 'GET',
+    params: {
+      ...params,
+      status: 'initiated'
+    },
+    getResponse: true
+  }).then((response) => {
+    const blob = new Blob([response.data], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', `payouts_in_pending-${new Date().toLocaleString()}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  });;
 }
 
 /****************************************************************************************
