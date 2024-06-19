@@ -665,12 +665,6 @@ const PayoutList: React.FC = () => {
           style={{ width: '100%'}}
         />
         <ProFormText
-          name="utr_id"
-          label="Utr id"
-          placeholder="Utr id"
-          style={{ width: '100%'}}
-        />
-        <ProFormText
           name="uuid"
           label="Payout UUID"
           placeholder="Payout UUID"

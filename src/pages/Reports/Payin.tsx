@@ -26,6 +26,7 @@ const Reports: React.FC = () => {
   const [formValues, setFormValues] = useState({
     merchant_codes: [],
     time_period: [Date.now() - 1000 * 3600 * 24 * 15, Date.now()],
+    status: undefined,
   });
   const intl = useIntl();
 
@@ -43,12 +44,19 @@ const Reports: React.FC = () => {
     }))
   }
 
+  const handleStatusChange = (value) => {
+    setFormValues(prev => ({
+      ...prev,
+      status: value
+    }))
+  }
+
   const handleDownload = async () => {
     
-    const { merchant_codes, time_period } = formValues;
+    const { merchant_codes, time_period, status } = formValues;
     const [from_date, to_date] = time_period;
 
-    await downloadPayins(merchant_codes, dateFromMs(from_date), dateFromMs(to_date));
+    await downloadPayins(merchant_codes, dateFromMs(from_date), dateFromMs(to_date), status);
   }
 
   useEffect(() => {
@@ -79,8 +87,24 @@ const Reports: React.FC = () => {
               }}
               onChange={handleMerchantChange}
             />
+            <ProFormSelect
+              width="lg"
+              labelCol={{ span: 6 }}
+              options={[
+                {label:"Initiated", value: "initiated"},
+                {label:"Assigned", value: "assigned"},
+                {label:"Success", value: "success"},
+                {label:"Failed", value: "failed"},
+                {label:"Dropped", value: "dropped"},
+                {label:"Dispute", value: "dispute"},
+              ]}
+              name="status"
+              label="Status"
+              onChange={handleStatusChange}
+            />
           </ProForm>
         </Row>
+        
         <Row gutter={[16, 16]}>
           <Col span={10}>
             <ProCard boxShadow>
@@ -98,7 +122,6 @@ const Reports: React.FC = () => {
                           style={{ backgroundColor: '#639f52', borderColor: '#639f52', color: "white" }}
                           onClick={async () => {
                             const values = await props.form?.validateFields();
-                            console.log(values);
                             handleDownload();
                           }}
                         >

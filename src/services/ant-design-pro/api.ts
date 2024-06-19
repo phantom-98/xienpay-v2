@@ -245,13 +245,14 @@ export async function fetchMerchantAnalyticsPayouts(
 }
 
 // Finished --------------------------------------------------------------------------
-export async function downloadPayins(merchant_codes: string[], from_date: string, to_date: string) {
+export async function downloadPayins(merchant_codes: string[], from_date: string, to_date: string, status: string | undefined) {
   return request('/api/merchants/payins/download', {
     method: 'POST',
     data: {
       merchant_codes,
       from_date,
       to_date,
+      status
     },
     getResponse: true, // This will return the full response object
   }).then((response) => {
@@ -259,20 +260,21 @@ export async function downloadPayins(merchant_codes: string[], from_date: string
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `payins-${from_date}-${to_date}.csv`);
+    link.setAttribute('download', `payins-${from_date}-${to_date}-${status}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();
   });
 }
 
-export async function downloadPayouts(merchant_codes: string[], from_date: string, to_date: string) {
+export async function downloadPayouts(merchant_codes: string[], from_date: string, to_date: string, status: string | undefined) {
   return request('/api/merchants/payouts/download', {
     method: 'POST',
     data: {
       merchant_codes,
       from_date,
       to_date,
+      status
     },
     getResponse: true, // This will return the full response object
   }).then((response) => {
@@ -280,7 +282,7 @@ export async function downloadPayouts(merchant_codes: string[], from_date: strin
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.setAttribute('download', `payouts-${from_date}-${to_date}.csv`);
+    link.setAttribute('download', `payouts-${from_date}-${to_date}-${status}.csv`);
     document.body.appendChild(link);
     link.click();
     link.remove();
