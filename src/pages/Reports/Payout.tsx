@@ -26,6 +26,7 @@ const Reports: React.FC = () => {
   const [formValues, setFormValues] = useState({
     merchant_codes: [],
     time_period: [Date.now() - 1000 * 3600 * 24 * 15, Date.now()],
+    status: undefined
   });
   const intl = useIntl();
 
@@ -43,12 +44,19 @@ const Reports: React.FC = () => {
     }))
   }
 
+  const handleStatusChange = (value) => {
+    setFormValues(prev => ({
+      ...prev,
+      status: value,
+    }))
+  }
+
   const handleDownload = async () => {
 
-    const { merchant_codes, time_period } = formValues;
+    const { merchant_codes, time_period, status } = formValues;
     const [from_date, to_date] = time_period;
 
-    await downloadPayouts(merchant_codes, dateFromMs(from_date), dateFromMs(to_date));
+    await downloadPayouts(merchant_codes, dateFromMs(from_date), dateFromMs(to_date), status);
   }
 
   useEffect(() => {
@@ -78,6 +86,18 @@ const Reports: React.FC = () => {
                 mode: 'multiple'
               }}
               onChange={handleMerchantChange}
+            />
+            <ProFormSelect
+              width="lg"
+              labelCol={{ span: 6 }}
+              options={[
+                {label:"Initiated", value: "initiated"},
+                {label:"Success", value: "success"},
+                {label:"Failed", value: "failed"},
+              ]}
+              name="status"
+              label="Status"
+              onChange={handleStatusChange}
             />
           </ProForm>
         </Row>
