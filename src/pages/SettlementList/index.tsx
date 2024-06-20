@@ -135,7 +135,7 @@ const SettlementList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
   const [merchantCode, setMerchantCode] = useState('');
-  
+
   const [approve, setApprove] = useState(false);
   const [reject, setReject] = useState(false);
   const [reset, setReset] = useState(false);
@@ -436,6 +436,7 @@ const SettlementList: React.FC = () => {
           valueEnum={{
             bank: 'bank',
             cash: 'cash',
+            aed: 'aed',
             crypto: 'crypto',
           }}
         />
