@@ -360,6 +360,18 @@ const TableList: React.FC = () => {
     },
     {
       title: (
+        <FormattedMessage id="pages.bankAcctTable.searchTable.balance" defaultMessage="Balance" />
+      ),
+      render: (_, record) => (
+        <span>
+          ₹ {record.balance}
+          <br />
+          ({record.num_payins})
+        </span>
+      ),
+    },
+    {
+      title: (
         <FormattedMessage
           id="pages.bankAcctTable.searchTable.remit-intent?"
           defaultMessage="Allow Intent?"
@@ -785,7 +797,7 @@ const TableList: React.FC = () => {
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
       />
-     
+
       <Modal
         title="Marchants List"
         open={updateMerchantsModalOpen}

@@ -290,6 +290,9 @@ declare namespace API {
     has_remit_bank: boolean;
     updated_at: string;
 
+    balance: number;
+    num_payins: number;
+
     merchants?: LinkedMerchantListItem[];
   };
 
