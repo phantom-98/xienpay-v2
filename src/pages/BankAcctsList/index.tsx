@@ -360,11 +360,11 @@ const TableList: React.FC = () => {
     },
     {
       title: (
-        <FormattedMessage id="pages.bankAcctTable.searchTable.details" defaultMessage="Balance" />
+        <FormattedMessage id="pages.bankAcctTable.searchTable.balance" defaultMessage="Balance" />
       ),
       render: (_, record) => (
         <span>
-          {record.balance}
+          ₹ {record.balance}
           <br />
           ({record.num_payins})
         </span>
