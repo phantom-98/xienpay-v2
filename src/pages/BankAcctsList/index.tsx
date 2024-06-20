@@ -364,7 +364,13 @@ const TableList: React.FC = () => {
       ),
       render: (_, record) => (
         <span>
-          ₹ {record.balance}
+          ₹
+          <FormattedNumber
+            value={record.balance}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
           <br />
           ({record.num_payins})
         </span>
