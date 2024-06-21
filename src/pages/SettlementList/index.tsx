@@ -26,6 +26,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
+import { utcToist } from '../../utils';
 
 // const handleReject = async (fields: API.SettlementListItem) => {
 //   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
@@ -259,6 +260,7 @@ const SettlementList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,

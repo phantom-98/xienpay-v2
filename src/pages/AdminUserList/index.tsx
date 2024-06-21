@@ -24,6 +24,7 @@ import { Button, Drawer, Switch, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import { utcToist } from '../../utils';
 
 /******************
  * Switch handlers
@@ -208,7 +209,7 @@ const AdminUserList: React.FC = () => {
       dataIndex: 'last_login',
       valueType: 'dateTime',
       hideInSearch: true,
-      render: (_, record) => (record.is_logged_in ? record.last_login : record.last_logout),
+      render: (_, record) => <span>{utcToist(record.is_logged_in ? record.last_login : record.last_logout)}</span>,
     },
   ];
 

@@ -29,6 +29,7 @@ import {
   import UpdateForm from './components/UpdateForm';
   import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
   import { response } from 'express';
+  import { utcToist } from '../../utils';
   
   const SearchUserInput: React.FC<{
     merchantCode: string;
@@ -330,6 +331,7 @@ import {
         hideInForm: true,
         valueType: 'dateTime',
         hideInSearch: true,
+        render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
       },
       {
         title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,

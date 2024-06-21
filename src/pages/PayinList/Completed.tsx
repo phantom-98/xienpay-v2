@@ -35,6 +35,7 @@ import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import { utcToist } from '../../utils';
 
 async function successPayin(
   params: API.PayinListItem & API.PageParams,
@@ -470,6 +471,7 @@ const PayinList: React.FC = () => {
       valueType: 'dateTime',
       hideInSearch: true,
       order: 10,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
   ];
 

@@ -44,6 +44,7 @@ import debounce from 'lodash/debounce';
 import React, { useMemo, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import { utcToist } from '../../utils';
 
 const EditableCell = ({ text, onEdit }) => {
   const [editing, setEditing] = useState(false);
@@ -483,6 +484,7 @@ const TableList: React.FC = () => {
       sorter: true,
       dataIndex: 'updated_at',
       valueType: 'dateTime',
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
       renderFormItem: (item, { defaultRender, ...rest }, form) => {
         const status = form.getFieldValue('status');
         if (`${status}` === '0') {

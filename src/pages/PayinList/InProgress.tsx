@@ -37,6 +37,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import SimpleSearchForm from '../../components/SimpleSearchForm';
+import { utcToist } from '../../utils';
 
 async function inprogressPayin(params: API.PayinListItem & API.PageParams, options?: { [key: string]: any }) {
   return payin({...params, status: 'assigned'}, options);
@@ -456,7 +457,8 @@ const PayinList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
-      order: 10
+      order: 10,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
   ];
 
