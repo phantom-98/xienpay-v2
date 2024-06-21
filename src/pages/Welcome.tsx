@@ -232,8 +232,8 @@ const Welcome = () => {
               defaultMessage: 'Commission'
             })}`, value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0) + parseFloat(snapshot?.lifetime?.settlements?.commission ?? 0))}`},
             {name: `${intl.formatMessage({
-              id: 'pages.dashboard.outstanding',
-              defaultMessage: 'Outstanding'
+              id: 'pages.dashboard.settlement',
+              defaultMessage: 'Settlement'
             })}`, value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
           ]}/>
 

@@ -125,7 +125,7 @@ export default {
   'pages.dashboard.deposits': 'Deposits',
   'pages.dashboard.withdrawals': 'Withdrawals',
   'pages.dashboard.commission': 'Commission',
-  'pages.dashboard.outstanding': 'Outstanding',
+  'pages.dashboard.settlement': 'Settlement',
   'pages.dashboard.netBalance': 'Net Balance',
 
   'pages.general.download': 'Download',
