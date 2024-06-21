@@ -24,6 +24,7 @@ import { Button, Col, Row, message } from 'antd';
 import { useEffect, useState } from 'react';
 import { getInitialState } from '@/app';
 import { useModel } from 'umi';
+import { utcToist } from '../utils';
 
 const { Statistic, Divider } = StatisticCard;
 
@@ -221,19 +222,19 @@ const Welcome = () => {
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.deposits',
               defaultMessage: 'Deposits'
-            })}`, value: `${asINR(snapshot?.lastDay?.deposits?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lifetime?.deposits?.amount ?? 0)}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.withdrawals',
               defaultMessage: 'Withdrawals'
-            })}`, value: `${asINR(snapshot?.lastDay?.withdrawals?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lifetime?.withdrawals?.amount ?? 0)}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.commission',
               defaultMessage: 'Commission'
-            })}`, value: `${asINR(parseFloat(snapshot?.lastDay?.deposits?.commission ?? 0) + parseFloat(snapshot?.lastDay?.withdrawals?.commission ?? 0))}`},
+            })}`, value: `${asINR(parseFloat(snapshot?.lifetime?.deposits?.commission ?? 0) + parseFloat(snapshot?.lifetime?.withdrawals?.commission ?? 0) + parseFloat(snapshot?.lifetime?.settlements?.commission ?? 0))}`},
             {name: `${intl.formatMessage({
               id: 'pages.dashboard.outstanding',
               defaultMessage: 'Outstanding'
-            })}`, value: `${asINR(snapshot?.lastDay?.settlements?.amount ?? 0)}`},
+            })}`, value: `${asINR(snapshot?.lifetime?.settlements?.amount ?? 0)}`},
           ]}/>
 
         </Col>
@@ -246,7 +247,7 @@ const Welcome = () => {
         }}>
           <TrackingChart graphData={depositData.payins.map(item => {
             return {
-              name: item.day_ist,
+              name: item.day_ist || utcToist(item.hour_ist + ":00:00"),
               channel1: item.amount,
               channel2: 0
             }
@@ -257,7 +258,7 @@ const Welcome = () => {
           
           <TrackingChart graphData={withdrawData.payouts.map(item => {
             return {
-              name: item.day_ist,
+              name: item.day_ist || utcToist(item.hour_ist + ":00:00"),
               channel1: item.amount,
               channel2: 0
             }

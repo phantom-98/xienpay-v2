@@ -27,6 +27,7 @@ import { Button, Drawer, Input, Modal, Popconfirm, Select, message } from 'antd'
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
+import { utcToist } from '../../utils';
 
 const ApprovalModal: React.FC<{
   placeholder: string;
@@ -374,6 +375,7 @@ const PayoutList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,

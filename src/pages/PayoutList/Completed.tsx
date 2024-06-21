@@ -27,6 +27,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ConfirmModal } from '@/components/Modals';
+import { utcToist } from '../../utils';
 
 async function successPayout(
   params: API.PayoutListItem & API.PageParams,
@@ -351,6 +352,7 @@ const PayoutList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,

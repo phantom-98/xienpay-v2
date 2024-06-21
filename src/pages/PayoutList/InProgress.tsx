@@ -30,6 +30,7 @@ import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 import { response } from 'express';
+import { utcToist } from '../../utils';
 
 async function inprogressPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
   return payout({...params, status: 'initiated'}, options);
@@ -336,6 +337,7 @@ const PayoutList: React.FC = () => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
     {
       title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
@@ -633,41 +635,21 @@ const PayoutList: React.FC = () => {
         }}
         width={500}
       >
-        <ProFormText
-          name="id"
-          label="ID"
-          placeholder="ID"
-          style={{ width: '100%'}}
-        />
-        <ProFormText
-          name="merchant_order_id"
-          label="Merchant order id"
-          placeholder="Merchant order id"
-          style={{ width: '100%'}}
-        />
         <ProFormSelect
-          options={merchantsList.map((merchant) => merchant)}
+          options={merchantsList}
           name="merchant_codes"
           label="Merchant Codes"
           fieldProps={{ mode: 'multiple'}}
+          value={merchantsList.map(merchant => merchant.value)}
           style={{ width: '100%'}}
         />
-        <ProFormText
-          name="user_id"
-          label="User id"
-          placeholder="User id"
-          style={{ width: '100%'}}
-        />
-        <ProFormText
-          name="amount"
-          label="Amount"
-          placeholder="Amount"
-          style={{ width: '100%'}}
-        />
-        <ProFormText
-          name="uuid"
-          label="Payout UUID"
-          placeholder="Payout UUID"
+        <ProFormSelect
+          options={[{
+            label: "Jena",
+            value: "jena"
+          }]}
+          name="template"
+          label="Template"
           style={{ width: '100%'}}
         />
       </ModalForm>
