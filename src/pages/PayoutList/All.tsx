@@ -636,8 +636,8 @@ import {
           visible={approve}
           setVisible={setApprove}
           Id={payoutId}
-          onConfirm={async (value) => {
-            await acceptPayout({ id: payoutId, action: 'approve', utr_id: value });
+          onConfirm={async (method, value) => {
+            await acceptPayout({ id: payoutId, action: 'approve', method, utr_id: value });
             message.success(`Payout No ${payoutId} approved!`);
             if (actionRef.current) {
               actionRef.current.reload();

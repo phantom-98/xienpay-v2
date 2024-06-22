@@ -386,8 +386,8 @@ const PayoutList: React.FC = () => {
         access.canPayoutAuthorize && [
           <ApprovalModal
             key={record.id}
-            onConfirm={async (value) => {
-              await acceptPayout({ id: record.id, action: 'approve', utr_id: value });
+            onConfirm={async (method, value) => {
+              await acceptPayout({ id: record.id, action: 'approve', method, utr_id: value });
               message.success(`Payout No ${record.id} approved!`);
               if (actionRef.current) {
                 actionRef.current.reload();
