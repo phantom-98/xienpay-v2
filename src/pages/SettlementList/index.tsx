@@ -254,7 +254,7 @@ const SettlementList: React.FC = () => {
     },
     {
       title: (
-        <FormattedMessage id="pages.settlementTable.updatedAt" defaultMessage="Last updated" />
+        <FormattedMessage id="pages.settlementTable.updatedAt" defaultMessage="Last updated (IST)" />
       ),
       dataIndex: 'updated_at',
       hideInForm: true,

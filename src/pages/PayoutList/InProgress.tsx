@@ -640,16 +640,21 @@ const PayoutList: React.FC = () => {
           name="merchant_codes"
           label="Merchant Codes"
           fieldProps={{ mode: 'multiple'}}
-          value={merchantsList.map(merchant => merchant.value)}
+          initialValue={merchantsList.map(merchant => merchant.value)}
+          rules={[{required:true}]}
           style={{ width: '100%'}}
         />
         <ProFormSelect
           options={[{
             label: "Jena",
             value: "jena"
+          },{
+            label: "Bandhan",
+            value: "bandhan"
           }]}
           name="template"
           label="Template"
+          rules={[{required:true}]}
           style={{ width: '100%'}}
         />
       </ModalForm>

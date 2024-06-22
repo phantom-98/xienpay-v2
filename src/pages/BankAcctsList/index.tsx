@@ -478,7 +478,7 @@ const TableList: React.FC = () => {
       title: (
         <FormattedMessage
           id="pages.searchTable.titleUpdatedAt"
-          defaultMessage="Last scheduled time"
+          defaultMessage="Last scheduled time (IST)"
         />
       ),
       sorter: true,
