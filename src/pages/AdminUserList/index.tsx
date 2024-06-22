@@ -205,7 +205,7 @@ const AdminUserList: React.FC = () => {
       ),
     },
     {
-      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in" />,
+      title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in (IST)" />,
       dataIndex: 'last_login',
       valueType: 'dateTime',
       hideInSearch: true,

@@ -447,7 +447,7 @@ const PayinList: React.FC = () => {
       hideInSearch: true,
     },
     {
-      title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated" />,
+      title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated (IST)" />,
       dataIndex: 'updated_at',
       hideInForm: true,
       valueType: 'dateTime',

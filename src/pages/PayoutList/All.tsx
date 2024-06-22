@@ -326,7 +326,7 @@ import {
       //   valueType: 'textarea',
       // },
       {
-        title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated" />,
+        title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated (IST)" />,
         dataIndex: 'updated_at',
         hideInForm: true,
         valueType: 'dateTime',
