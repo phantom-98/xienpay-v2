@@ -50,7 +50,7 @@ export const ApprovalModal: React.FC<{
         {!props.settlement && (
           <Select
             options={[{label: "Manual", value: "manual"}, {label: "Eko", value: "eko"}]}
-            defaultValue="manual"
+            value={method}
             onChange={handleSelectChange}
             style={{width: "100%"}}
           />
