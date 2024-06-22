@@ -187,6 +187,7 @@ import {
     const [merchantCode, setMerchantCode] = useState('');
     const [approve, setApprove] = useState(false);
     const [reject, setReject] = useState(false);
+    const [reset, setReset] = useState(false);
     const [payoutId, setPayoutId] = useState("");
   
     /**
@@ -339,7 +340,7 @@ import {
         valueType: 'option',
         render: (_, record) =>
           access.canPayoutAuthorize && (
-            [
+            record.status == 'initiated' ? [
               <Dropdown.Button menu={{
                 items: [
                   {
@@ -359,7 +360,12 @@ import {
                 setPayoutId(record.id)
                 setApprove(true)
               }} type='primary'>Approve</Dropdown.Button>
-            ]
+            ] : record.status == 'success' ? [
+              <Button onClick={() => {
+                setPayoutId(record.id)
+                setReset(true)
+              }}>Reset</Button>
+            ] : null
           )
       },
     ];
@@ -660,6 +666,21 @@ import {
           style={{ width: 'md' }}
         >
         </RejectModal>
+        <ConfirmModal
+          visible={reset}
+          setVisible={setReset}
+          Id={payoutId}
+          title="Confirm Reset for ID. "
+          description="Reset Payout?"
+          onConfirm={async () => {
+            await rejectPayout({ id: payoutId, action: 'reset' });
+            message.success(`Payout No ${payoutId} reset!`);
+            if (actionRef.current) {
+              actionRef.current.reload();
+            }
+          }}
+        >
+        </ConfirmModal>
       </PageContainer>
     );
   };
