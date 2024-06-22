@@ -6,23 +6,30 @@ export const ApprovalModal: React.FC<{
   setVisible: (value: boolean) => void;
   Id: string;
   placeholder: string;
+  settlement?: boolean;
   style: React.CSSProperties;
-  onConfirm?: (value: string) => void;
+  onConfirm?: (method: string, value: string) => void;
 }> = (props) => {
   const [inputValue, setInputValue] = useState('');
+  const [method, setMethod] = useState('manual');
 
   const handleOk = () => {
-    if (inputValue && inputValue.length > 0) {
-      props.onConfirm?.(inputValue);
+      props.onConfirm?.(method, inputValue);
       props.setVisible(false);
+      setMethod('manual');
       setInputValue(''); // Reset input value
-    }
   };
 
   const handleCancel = () => {
     props.setVisible(false);
+    setMethod('manual');
     setInputValue(''); // Reset input value
   };
+
+  const handleSelectChange = (value) => {
+    setMethod(value);
+    value == "eko" && setInputValue(undefined);
+  }
 
   const handleInputChange = (e) => {
     setInputValue(e.target.value);
@@ -40,15 +47,25 @@ export const ApprovalModal: React.FC<{
         centered
         width={360}
       >
-        <Input
-          placeholder="Enter UTR ID"
-          width="sm"
-          value={inputValue}
-          onChange={handleInputChange}
-          style={{
-            marginBlock: 8,
-          }}
-        />
+        {!props.settlement && (
+          <Select
+            options={[{label: "Manual", value: "manual"}, {label: "Eko", value: "eko"}]}
+            defaultValue="manual"
+            onChange={handleSelectChange}
+            style={{width: "100%"}}
+          />
+        )}
+        {method == "manual" && (
+          <Input
+            placeholder="Enter UTR ID"
+            width="sm"
+            value={inputValue}
+            onChange={handleInputChange}
+            style={{
+              marginBlock: 8,
+            }}
+          />
+        )}
       </Modal>
     </>
   );

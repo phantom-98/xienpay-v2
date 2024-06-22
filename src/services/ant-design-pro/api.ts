@@ -507,7 +507,7 @@ export async function acceptPayout(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/payouts/authorize', {
     method: 'POST',
     data: {
-      method: 'rejectPayout',
+      action: 'approve',
       ...(options || {}),
     },
   });

@@ -589,7 +589,8 @@ const SettlementList: React.FC = () => {
         visible={approve}
         setVisible={setApprove}
         Id={settlementId}
-        onConfirm={async (value) => {
+        settlement
+        onConfirm={async (_, value) => {
           await acceptSettlement({ id: settlementId, action: 'approve', ref_id: value });
           message.success(`Settlement No ${settlementId} approved!`);
           if (actionRef.current) {
