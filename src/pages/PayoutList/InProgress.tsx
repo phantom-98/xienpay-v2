@@ -627,7 +627,7 @@ const PayoutList: React.FC = () => {
           const o = Object.keys(value).filter((k) => value[k]).reduce((a, k) => ({ ...a, [k]: value[k] }), {});
           const res = await downloadPayoutAsExcel({
             ...o,
-            merchants: JSON.stringify(o.merchant_ids)
+            merchants: JSON.stringify(o.merchant_codes)
           });
           if (res) { //download as csv file
             console.log("success")
@@ -637,7 +637,7 @@ const PayoutList: React.FC = () => {
       >
         <ProFormSelect
           options={merchantsList}
-          name="merchant_ids"
+          name="merchant_codes"
           label="Merchant Codes"
           fieldProps={{ mode: 'multiple'}}
           initialValue={merchantsList.map(merchant => merchant.value)}
