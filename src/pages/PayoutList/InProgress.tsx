@@ -400,7 +400,7 @@ const PayoutList: React.FC = () => {
                 </Button>
             : null,
             access.canPayoutCreate
-            ? 
+            ?
                 <Button
                   type="primary"
                   key="primary"
@@ -587,7 +587,7 @@ const PayoutList: React.FC = () => {
           placeholder="IFSC code"
           style={{ width: '100%'}}
         />
-        
+
         <ProFormMoney
           rules={[
             {
@@ -627,7 +627,7 @@ const PayoutList: React.FC = () => {
           const o = Object.keys(value).filter((k) => value[k]).reduce((a, k) => ({ ...a, [k]: value[k] }), {});
           const res = await downloadPayoutAsExcel({
             ...o,
-            merchant_codes: JSON.stringify(o.merchant_codes)
+            merchants: JSON.stringify(o.merchant_ids)
           });
           if (res) { //download as csv file
             console.log("success")
@@ -637,7 +637,7 @@ const PayoutList: React.FC = () => {
       >
         <ProFormSelect
           options={merchantsList}
-          name="merchant_codes"
+          name="merchant_ids"
           label="Merchant Codes"
           fieldProps={{ mode: 'multiple'}}
           initialValue={merchantsList.map(merchant => merchant.value)}
