@@ -30,7 +30,7 @@ import {
   import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
   import { response } from 'express';
   import { utcToist } from '../../utils';
-  
+
   const SearchUserInput: React.FC<{
     merchantCode: string;
     placeholder: string;
@@ -39,7 +39,7 @@ import {
   }> = (props) => {
     const [data, setData] = useState<SelectProps['options']>([]);
     const [value, setValue] = useState<string>();
-  
+
     const handleSearch = (newValue: string) => {
       return fetchPlayerList(props.merchantCode, newValue).then((data: any) => {
         if (data.length > 0) {
@@ -49,16 +49,16 @@ import {
         }
       });
     };
-  
+
     useEffect(() => {
       handleSearch("");
     }, [props.merchantCode])
-  
+
     const handleChange = (newValue: string) => {
       setValue(newValue);
       props.onChange?.(newValue);
     };
-  
+
     return (
       <Select
         showSearch
@@ -78,11 +78,11 @@ import {
       />
     );
   };
-  
+
   // const handleReject = async (fields: API.PayoutListItem) => {
   //   rejectPayout({id: fields.id, action: 'reject'}).then(() => { message.success('Payout rejected!'); });
   // };
-  
+
   /**
    * @en-US Add node
    * @zh-CN 添加节点
@@ -91,7 +91,7 @@ import {
   const handleAdd = async (fields: API.PaymentLinkResponse) => {
     const hide = message.loading('Adding');
     try {
-  
+
       const response = await addPayout({ ...fields, merchant_order_id: crypto.randomUUID().toString() });
       hide();
       const { payoutUrl } = response;
@@ -117,7 +117,7 @@ import {
       return false;
     }
   };
-  
+
   /**
    * @en-US Update node
    * @zh-CN 更新节点
@@ -133,7 +133,7 @@ import {
         key: fields.key,
       });
       hide();
-  
+
       message.success('Configuration is successful');
       return true;
     } catch (error) {
@@ -142,7 +142,7 @@ import {
       return false;
     }
   };
-  
+
   /**
    *  Delete node
    * @zh-CN 删除节点
@@ -165,7 +165,7 @@ import {
       return false;
     }
   };
-  
+
   const PayoutList: React.FC = () => {
     /**
      * @en-US Pop-up window of new window
@@ -177,29 +177,29 @@ import {
      * @zh-CN 分布更新窗口的弹窗
      * */
     const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
-  
+
     const [showDetail, setShowDetail] = useState<boolean>(false);
-  
+
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.PayoutListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.PayoutListItem[]>([]);
-  
+
     const [merchantCode, setMerchantCode] = useState('');
     const [approve, setApprove] = useState(false);
     const [reject, setReject] = useState(false);
     const [reset, setReset] = useState(false);
     const [payoutId, setPayoutId] = useState("");
-  
+
     /**
      * @en-US International configuration
      * @zh-CN 国际化配置
      * */
     const intl = useIntl();
     const access = useAccess();
-  
+
     /* Preload merchants list */
     const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
-  
+
     useEffect(() => {
       (async () => {
         try {
@@ -211,7 +211,7 @@ import {
         }
       })();
     }, []);
-  
+
     const columns: ProColumns<API.PayoutListItem>[] = [
       {
         title: <FormattedMessage id="pages.payoutTable.short_code" defaultMessage="ID" />,
@@ -360,7 +360,7 @@ import {
                 setPayoutId(record.id)
                 setApprove(true)
               }} type='primary'>Approve</Dropdown.Button>
-            ] : record.status == 'success' ? [
+            ] : (record.status === 'success' || record.status === 'failed') ? [
               <Button onClick={() => {
                 setPayoutId(record.id)
                 setReset(true)
@@ -369,7 +369,7 @@ import {
           )
       },
     ];
-  
+
     return (
       <PageContainer>
         <ProTable<API.PayoutListItem, API.PageParams>
@@ -385,7 +385,7 @@ import {
           }}
           toolBarRender={() =>
             [access.canPayoutCreate
-              ? 
+              ?
                   <Button
                     type="primary"
                     key="primary"
@@ -572,7 +572,7 @@ import {
             placeholder="IFSC code"
             style={{ width: '100%'}}
           />
-          
+
           <ProFormMoney
             rules={[
               {
@@ -613,7 +613,7 @@ import {
           updateModalOpen={updateModalOpen}
           values={currentRow || {}}
         />
-  
+
         <Drawer
           width={600}
           open={showDetail}
@@ -684,6 +684,5 @@ import {
       </PageContainer>
     );
   };
-  
+
   export default PayoutList;
-  
