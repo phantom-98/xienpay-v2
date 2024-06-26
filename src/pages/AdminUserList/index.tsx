@@ -25,6 +25,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { utcToist } from '../../utils';
+import SearchInput from '../../components/MerchantSearch';
 
 /******************
  * Switch handlers
@@ -257,6 +258,9 @@ const AdminUserList: React.FC = () => {
             setSelectedRows(selectedRows);
           },
         }}
+        pagination={{
+          showSizeChanger: true
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar
@@ -358,6 +362,7 @@ const AdminUserList: React.FC = () => {
                   placeholder="Telegram username"
                 />
                 <ProFormSelect
+                  showSearch
                   width="md"
                   options={merchantsList.map((merchant) => merchant.label)}
                   name="merchant_code"
@@ -383,6 +388,7 @@ const AdminUserList: React.FC = () => {
           {({ role }) => {
             return role === 'merchant' ? (
               <ProFormSelect
+                showSearch
                 width="md"
                 options={merchantsList.map((merchant) => merchant.label)}
                 name="merchant_code"
