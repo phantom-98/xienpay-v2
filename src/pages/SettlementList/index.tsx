@@ -345,6 +345,9 @@ const SettlementList: React.FC = () => {
             setSelectedRows(selectedRows);
           },
         }}
+        pagination={{
+          showSizeChanger: true
+        }}
       />
       {selectedRowsState?.length > 0 && (
         <FooterToolbar

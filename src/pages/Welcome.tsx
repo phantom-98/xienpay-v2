@@ -106,7 +106,7 @@ const Welcome = () => {
       try {
         const fetchedMerchants = await fetchMerchantsList('');
         setMerchantsList(fetchedMerchants);
-        handleMerchantChange([fetchedMerchants[0]?.label])
+        handleMerchantChange(fetchedMerchants.map(m => m.label));
       } catch (error) {
         console.error('Error fetching merchants:', error);
       }
@@ -201,7 +201,7 @@ const Welcome = () => {
             options={merchantsList.map((merchant) => merchant.label)}
             name="merchant_codes"
             label="Merchant Codes"
-            value={[merchantsList[0]?.label]}
+            value={merchantsList.map(m => m.label)}
             fieldProps={{
               mode: 'multiple'
             }}
