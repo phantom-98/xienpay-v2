@@ -52,7 +52,7 @@ const Reports: React.FC = () => {
   }
 
   const handleDownload = async () => {
-    
+
     const { merchant_codes, time_period, status } = formValues;
     const [from_date, to_date] = time_period;
 
@@ -97,6 +97,7 @@ const Reports: React.FC = () => {
                 {label:"Failed", value: "failed"},
                 {label:"Dropped", value: "dropped"},
                 {label:"Dispute", value: "dispute"},
+                {label:'Duplicate', value: 'duplicate' },
               ]}
               name="status"
               label="Status"
@@ -104,7 +105,7 @@ const Reports: React.FC = () => {
             />
           </ProForm>
         </Row>
-        
+
         <Row gutter={[16, 16]}>
           <Col span={10}>
             <ProCard boxShadow>
@@ -158,5 +159,5 @@ const Reports: React.FC = () => {
       </PageContainer>
     );
   };
-  
+
   export default Reports;

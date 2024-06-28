@@ -88,6 +88,7 @@ export default {
   'pages.payinTable.payinStatus.failed': 'failed',
   'pages.payinTable.payinStatus.dropped': 'dropped',
   'pages.payinTable.payinStatus.dispute': 'dispute',
+  'pages.payinTable.payinStatus.duplicate': 'duplicate',
 
   'pages.payinTable.title': 'Payins List',
   'pages.payinTable.completed': 'Completed',
@@ -106,6 +107,7 @@ export default {
   'pages.payoutTable.payoutStatus.failed': 'failed',
   'pages.payoutTable.payoutStatus.dropped': 'dropped',
   'pages.payoutTable.payoutStatus.dispute': 'dispute',
+  'pages.payoutTable.payoutStatus.duplicate': 'duplicate',
   'pages.payoutTable.completed': 'Completed',
   'pages.payoutTable.inProgress': 'In Progress',
 
