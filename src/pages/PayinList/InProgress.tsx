@@ -343,6 +343,15 @@ const PayinList: React.FC = () => {
               />
             </Tag>
           ),
+          duplicate: (
+            <Tag icon={<ExclamationCircleOutlined />} color="#f05">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.duplicate"
+                defaultMessage="Duplicate"
+              />
+            </Tag>
+          ),
+
         };
 
         // Return the component corresponding to the status
@@ -477,7 +486,7 @@ const PayinList: React.FC = () => {
         }}
         toolBarRender={() =>
           [access.canPayinLinkCreate
-            ? 
+            ?
                 <Button
                   type="primary"
                   key="primary"

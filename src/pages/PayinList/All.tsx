@@ -281,6 +281,7 @@ const PayinList: React.FC = () => {
         failed: { text: 'Failed', status: 'Error' },
         dropped: { text: 'Dropped', status: 'Error' },
         dispute: { text: 'Dispute', status: 'Error' },
+        duplicate: { text: 'Duplicate', status: 'Error' },
       },
     },
     {
@@ -362,6 +363,14 @@ const PayinList: React.FC = () => {
               <FormattedMessage
                 id="pages.payinTable.payinStatus.dispute"
                 defaultMessage="Dispute"
+              />
+            </Tag>
+          ),
+          duplicate: (
+            <Tag icon={<ExclamationCircleOutlined />} color="#f05">
+              <FormattedMessage
+                id="pages.payinTable.payinStatus.duplicate"
+                defaultMessage="Duplicate"
               />
             </Tag>
           ),
@@ -471,7 +480,7 @@ const PayinList: React.FC = () => {
         }}
         toolBarRender={() =>
           [access.canPayinLinkCreate
-            ? 
+            ?
                 <Button
                   type="primary"
                   key="primary"
