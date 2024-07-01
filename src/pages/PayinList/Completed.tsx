@@ -399,6 +399,12 @@ const PayinList: React.FC = () => {
       order: 7,
     },
     {
+      title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
+      dataIndex: 'bank',
+      valueType: 'textarea',
+      hideInSearch: true,
+    },
+    {
       title: (
         <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
       ),
