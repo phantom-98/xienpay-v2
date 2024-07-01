@@ -393,6 +393,12 @@ const PayinList: React.FC = () => {
       hideInTable: true,
     },
     {
+      title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
+      dataIndex: 'bank',
+      valueType: 'textarea',
+      hideInSearch: true,
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
       dataIndex: 'time_taken',
       valueType: 'textarea',
