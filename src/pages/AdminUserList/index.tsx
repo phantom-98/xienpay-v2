@@ -365,8 +365,11 @@ const AdminUserList: React.FC = () => {
                   showSearch
                   width="md"
                   options={merchantsList.map((merchant) => merchant.label)}
-                  name="merchant_code"
-                  label="Merchant Code"
+                  name="merchant_codes"
+                  label="Merchant Codes"
+                  fieldProps={{
+                    mode: 'multiple'
+                  }}
                 />
               </>
             ) : null;
@@ -391,8 +394,11 @@ const AdminUserList: React.FC = () => {
                 showSearch
                 width="md"
                 options={merchantsList.map((merchant) => merchant.label)}
-                name="merchant_code"
-                label="Merchant Code"
+                name="merchant_codes"
+                label="Merchant Codes"
+                fieldProps={{
+                  mode: 'multiple'
+                }}
               />
             ) : null;
           }}

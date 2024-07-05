@@ -268,7 +268,7 @@ const TableList: React.FC = () => {
   const handleMerchantsAdd = () => {
     if (value) {
       const new_merchant = toLinkedMerchanListItem(value);
-      setMerchants([...merchants, new_merchant]);
+      merchants.find(m => m.name == new_merchant.name) || setMerchants([...merchants, new_merchant]);
     }
   };
 
@@ -738,7 +738,19 @@ const TableList: React.FC = () => {
           colProps={{ md: 12, xl: 12 }}
           placeholder="Enter 16 digit IFSC code"
         />
-        <ProFormText name="upi_id" label="UPI ID" placeholder="UPI ID for this bank account" />
+        <ProFormText
+          rules={[
+            {
+              required: true,
+              message: (
+                <FormattedMessage
+                  id="pages.bankAcctTable.searchTable.upi_id"
+                  defaultMessage="Bank UPI ID is required"
+                />
+              ),
+            },
+          ]}
+          name="upi_id" label="UPI ID" placeholder="UPI ID for this bank account" />
         <ProFormSwitch
           colProps={{
             span: 8,
