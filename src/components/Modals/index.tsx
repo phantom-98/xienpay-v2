@@ -79,19 +79,17 @@ export const RejectModal: React.FC<{
   style: React.CSSProperties;
   onConfirm?: (value: string) => void;
 }> = (props) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState('insufficient_funds');
 
   const handleOk = () => {
     if (value && value.length > 0) {
       props.onConfirm?.(value);
       props.setVisible(false);
-      setValue(''); // Reset input value
     }
   };
 
   const handleCancel = () => {
     props.setVisible(false);
-    setValue(''); // Reset input value
   };
 
   const handleChange = (v) => {

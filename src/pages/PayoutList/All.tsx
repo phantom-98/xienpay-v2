@@ -287,6 +287,7 @@ import {
         ),
         dataIndex: 'ac_name',
         valueType: 'textarea',
+        hideInSearch: true,
         render: (_, record) => (
           <span>
             {record.account_number}
@@ -298,6 +299,29 @@ import {
             {record.bank_name}
           </span>
         ),
+      },
+      {
+        title: (
+          <FormattedMessage id="pages.bankAcctTable.searchTable.ac_name" defaultMessage="Account Name" />
+        ),
+        dataIndex: 'account_holder_name',
+        valueType: 'textarea',
+        hideInTable: true,
+      },
+      {
+        title: (
+          <FormattedMessage id="pages.bankAcctTable.searchTable.ac_no" defaultMessage="Account Number" />
+        ),
+        dataIndex: 'account_number',
+        valueType: 'textarea',
+        hideInTable: true,
+      },
+      {
+        title: (
+          <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR Id" />
+        ),
+        dataIndex: 'utr_id',
+        valueType: 'textarea',
       },
       {
         title: (
@@ -321,11 +345,6 @@ import {
           );
         },
       },
-      // {
-      //   title: <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR" />,
-      //   dataIndex: 'utr_id',
-      //   valueType: 'textarea',
-      // },
       {
         title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated (IST)" />,
         dataIndex: 'updated_at',

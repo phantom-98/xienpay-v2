@@ -20,7 +20,6 @@ const SearchInput: React.FC<{
     // if they were not present in lookup
     const handleSearch = (newValue: string) => {
       return fetchMerchantsList(newValue).then((data: any) => {
-        console.log("merchant data", data)
         if (data.length > 0) {
           setData(data);
         } else {
@@ -44,7 +43,7 @@ const SearchInput: React.FC<{
         suffixIcon={null}
         filterOption={false}
         onSearch={handleSearch}
-        onChange={handleChange}
+        onSelect={handleChange}
         notFoundContent={null}
         options={(data || []).map((d, index) => ({
           value: index,
