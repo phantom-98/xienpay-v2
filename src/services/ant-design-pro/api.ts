@@ -445,6 +445,15 @@ export async function removePayin(options?: { [key: string]: any }) {
   });
 }
 
+export async function getPresignedURL(id: number) {
+  return request<Record<string, any>>('/api/payins/utrImage', {
+    method: 'POST',
+    data: {
+      id,
+    },
+  });
+}
+
 /****************************************************************************************
  * Payout APIs
  ***************************************************************************************/

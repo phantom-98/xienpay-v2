@@ -305,6 +305,7 @@ const TableList: React.FC = () => {
       ),
       dataIndex: 'ac_name',
       valueType: 'textarea',
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           {record.ac_name}
@@ -317,11 +318,19 @@ const TableList: React.FC = () => {
     },
     {
       title: (
+        <FormattedMessage id="pages.bankAcctTable.searchTable.ac_no" defaultMessage="Account Number" />
+      ),
+      dataIndex: 'ac_no',
+      valueType: 'textarea',
+    },
+    {
+      title: (
         <FormattedMessage
           id="pages.bankAcctTable.searchTable.payinLimits"
           defaultMessage="Payin Limits"
         />
       ),
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -364,6 +373,7 @@ const TableList: React.FC = () => {
       title: (
         <FormattedMessage id="pages.bankAcctTable.searchTable.balance" defaultMessage="Balance" />
       ),
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -386,6 +396,7 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_intent',
+      hideInSearch: true,
       render: (_, record) => (
         <Switch
           size="small"
@@ -402,6 +413,7 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_qr',
+      hideInSearch: true,
       render: (_, record) => (
         <Switch
           size="small"
@@ -418,6 +430,7 @@ const TableList: React.FC = () => {
         />
       ),
       dataIndex: 'has_remit_bank',
+      hideInSearch: true,
       render: (_, record) => (
         <Switch
           size="small"
@@ -429,6 +442,7 @@ const TableList: React.FC = () => {
     {
       title: <FormattedMessage id="pages.searchTable.titleStatus" defaultMessage="Status" />,
       dataIndex: 'is_enabled',
+      hideInSearch: true,
       render: (_, record) => (
         <Switch
           size="small"
@@ -442,6 +456,7 @@ const TableList: React.FC = () => {
       dataIndex: 'is_enabled',
       hideInForm: true,
       hideInTable: true,
+      hideInSearch: true,
       valueEnum: {
         0: {
           text: (
@@ -485,6 +500,7 @@ const TableList: React.FC = () => {
       sorter: true,
       dataIndex: 'updated_at',
       valueType: 'dateTime',
+      hideInSearch: true,
       render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
       renderFormItem: (item, { defaultRender, ...rest }, form) => {
         const status = form.getFieldValue('status');
@@ -506,7 +522,7 @@ const TableList: React.FC = () => {
       },
     },
     {
-      title: <FormattedMessage id="pages.searchTable.titleOption" defaultMessage="Operating" />,
+      title: <FormattedMessage id="pages.searchTable.merchants" defaultMessage="Merchants" />,
       dataIndex: 'option',
       valueType: 'option',
       hideInTable: false,
@@ -555,9 +571,9 @@ const TableList: React.FC = () => {
         actionRef={actionRef}
         rowKey="name"
         search={false}
-        // search={{
-        //   labelWidth: 120,
-        // }}
+        search={{
+          labelWidth: 120,
+        }}
         toolBarRender={() => [
           access.canBankAcctCreate ? (
             <Button
