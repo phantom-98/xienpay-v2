@@ -398,7 +398,6 @@ const PayinList: React.FC = () => {
       title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
       dataIndex: 'bank',
       valueType: 'textarea',
-      hideInSearch: true,
     },
     {
       title: (

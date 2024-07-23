@@ -318,6 +318,14 @@ import {
       },
       {
         title: (
+          <FormattedMessage id="pages.bankAcctTable.searchTable.bank_name" defaultMessage="Bank Name" />
+        ),
+        dataIndex: 'bank_name',
+        valueType: 'textarea',
+        hideInTable: true,
+      },
+      {
+        title: (
           <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR Id" />
         ),
         dataIndex: 'utr_id',

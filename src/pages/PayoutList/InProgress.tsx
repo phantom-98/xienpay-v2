@@ -292,6 +292,7 @@ const PayoutList: React.FC = () => {
       ),
       dataIndex: 'ac_name',
       valueType: 'textarea',
+      hideInSearch: true,
       render: (_, record) => (
         <span>
           {record.account_number}
@@ -303,6 +304,14 @@ const PayoutList: React.FC = () => {
           {record.bank_name}
         </span>
       ),
+    },
+    {
+      title: (
+        <FormattedMessage id="pages.bankAcctTable.searchTable.bank_name" defaultMessage="Bank Name" />
+      ),
+      dataIndex: 'bank_name',
+      valueType: 'textarea',
+      hideInTable: true,
     },
     {
       title: (

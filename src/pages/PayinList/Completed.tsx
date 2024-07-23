@@ -7,6 +7,7 @@ import {
   payin,
   removePayin,
   updatePayin,
+  getPresignedURL,
 } from '@/services/ant-design-pro/api';
 import {
   BellOutlined,
@@ -14,6 +15,7 @@ import {
   ExclamationCircleOutlined,
   ReloadOutlined,
   SyncOutlined,
+  PictureOutlined,
 } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -205,6 +207,7 @@ const PayinList: React.FC = () => {
   const [selectedRowsState, setSelectedRows] = useState<API.PayinListItem[]>([]);
 
   const [merchantCode, setMerchantCode] = useState('');
+  const [userImage, setUserImage] = useState('');
 
   /**
    * @en-US International configuration
@@ -397,12 +400,25 @@ const PayinList: React.FC = () => {
       dataIndex: 'utr_id',
       valueType: 'textarea',
       order: 7,
+      render: (_, record) => (<div style={{
+        display: "flex",
+        gap: "6px",
+      }}>
+        <span>{record.utr_id}</span>
+        {
+           record.user_submitted_image && <PictureOutlined onClick={async () => {
+            const url = await getPresignedURL(record.id);
+            setUserImage(url?.url);
+           }} style={{
+            cursor: "pointer"
+           }}/>
+        }
+      </div>)
     },
     {
       title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
       dataIndex: 'bank',
       valueType: 'textarea',
-      hideInSearch: true,
     },
     {
       title: (
@@ -665,6 +681,25 @@ const PayinList: React.FC = () => {
         updateModalOpen={updateModalOpen}
         values={currentRow || {}}
       />
+
+      <div style={{
+        position: "fixed",
+        top: "0",
+        bottom: "0",
+        left: "0",
+        right: "0",
+        transition: "display 0.2s ease",
+        display: userImage ? "flex" : "none",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#111d",
+        zIndex: "100",
+      }} onClick={() => setUserImage('')}>
+        <img src={userImage} style={{
+          maxWidth: "72vw",
+          maxHeight: "80vh"
+        }}/>
+      </div>
 
       <Drawer
         width={600}
