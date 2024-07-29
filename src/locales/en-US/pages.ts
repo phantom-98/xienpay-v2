@@ -105,6 +105,7 @@ export default {
   'pages.payoutTable.payoutStatus.pending': 'pending',
   'pages.payoutTable.payoutStatus.success': 'success',
   'pages.payoutTable.payoutStatus.failed': 'failed',
+  'pages.payoutTable.payoutStatus.reversed': 'reversed',
   'pages.payoutTable.payoutStatus.dropped': 'dropped',
   'pages.payoutTable.payoutStatus.dispute': 'dispute',
   'pages.payoutTable.payoutStatus.duplicate': 'duplicate',
