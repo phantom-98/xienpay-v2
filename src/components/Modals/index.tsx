@@ -28,7 +28,7 @@ export const ApprovalModal: React.FC<{
 
   const handleSelectChange = (value) => {
     setMethod(value);
-    value == "eko" && setInputValue(undefined);
+    (value === "eko" || value === "accurepay") && setInputValue(undefined);
   }
 
   const handleInputChange = (e) => {
@@ -49,7 +49,7 @@ export const ApprovalModal: React.FC<{
       >
         {!props.settlement && (
           <Select
-            options={[{label: "Manual", value: "manual"}, {label: "Eko", value: "eko"}]}
+            options={[{label: "Manual", value: "manual"}, {label: "Eko", value: "eko"}, {label:"Accure", value: "accurepay"}]}
             value={method}
             onChange={handleSelectChange}
             style={{width: "100%"}}
