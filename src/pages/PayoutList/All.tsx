@@ -266,9 +266,9 @@ import {
           },
           reversed: {
             text: (
-              <FormattedMessage id="pages.payoutTable.payoutStatus.failed" defaultMessage="Reversed" />
+              <FormattedMessage id="pages.payoutTable.payoutStatus.reversed" defaultMessage="Reversed" />
             ),
-            status: 'Reversed',
+            status: 'Error',
           },
         },
       },
