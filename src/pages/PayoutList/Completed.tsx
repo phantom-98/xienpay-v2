@@ -259,7 +259,7 @@ const PayoutList: React.FC = () => {
           ),
           status: 'Error',
         },
-      },
+       },
     },
     {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
