@@ -264,6 +264,12 @@ import {
             ),
             status: 'Error',
           },
+          reversed: {
+            text: (
+              <FormattedMessage id="pages.payoutTable.payoutStatus.failed" defaultMessage="Reversed" />
+            ),
+            status: 'Reversed',
+          },
         },
       },
       {
@@ -367,7 +373,7 @@ import {
         valueType: 'option',
         render: (_, record) =>
           access.canPayoutAuthorize && (
-            record.status == 'initiated' ? [
+            record.status === 'initiated' ? [
               <Dropdown.Button menu={{
                 items: [
                   {
@@ -387,7 +393,7 @@ import {
                 setPayoutId(record.id)
                 setApprove(true)
               }} type='primary'>Approve</Dropdown.Button>
-            ] : (record.status === 'success' || record.status === 'failed') ? [
+            ] : (record.status === 'success' || record.status === 'failed' || record.status === 'reversed') ? [
               <Button onClick={() => {
                 setPayoutId(record.id)
                 setReset(true)
