@@ -663,6 +663,9 @@ const PayoutList: React.FC = () => {
           },{
             label: "Bandhan",
             value: "bandhan"
+          },{
+            label: "Axis",
+            value: "axis"
           }]}
           name="template"
           label="Template"
