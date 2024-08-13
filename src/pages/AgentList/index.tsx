@@ -22,16 +22,6 @@ import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { utcToist } from '../../utils';
 
-/******************
- * Switch handlers
- *****************/
-function toggleEnable(agent_id: number) {
-  console.log('toggleStatus', agent_id);
-  return (checked: boolean) => {
-    changeEnableAgent(agent_id, checked);
-  };
-}
-
 /**
  * @en-US Add node
  * @zh-CN 添加节点
@@ -116,6 +106,25 @@ const AgentList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.AgentListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.AgentListItem[]>([]);
+
+  const [loading, setLoading] = useState({});
+
+  /******************
+   * Switch handlers
+   *****************/
+  function toggleEnable(agent: API.AgentListItem) {
+    console.log('toggleStatus', agent.id);
+    return async (checked: boolean) => {
+      setLoading({...loading, [agent.id]: true});
+      try {
+        await changeEnableAgent(agent.id, checked);
+        agent.is_enabled = checked;
+      } catch (error) {
+
+      }
+      setLoading({...loading, [agent.id]: false});
+    };
+  }
 
   /**
    * @en-US International configuration
@@ -205,11 +214,12 @@ const AgentList: React.FC = () => {
       valueType: 'switch',
       render: (_, record) => (
         <Switch
-          defaultChecked={record.is_enabled}
           size="small"
-          onChange={toggleEnable(record.id)}
+          loading={loading[record.id]}
+          checked={record.is_enabled}
+          onClick={toggleEnable(record)}
         />
-      ),
+      ) 
     },
     {
       title: <FormattedMessage id="pages.payinTable.lastLogin" defaultMessage="Last logged in (IST)" />,

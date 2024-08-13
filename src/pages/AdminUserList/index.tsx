@@ -25,17 +25,6 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { utcToist } from '../../utils';
-import SearchInput from '../../components/MerchantSearch';
-
-/******************
- * Switch handlers
- *****************/
-function toggleEnable(adminUser_id: number) {
-  console.log('toggleStatus', adminUser_id);
-  return (checked: boolean) => {
-    changeEnableAdminUser(adminUser_id, checked);
-  };
-}
 
 /**
  * @en-US Add node
@@ -124,6 +113,22 @@ const AdminUserList: React.FC = () => {
 
   /* Preload roles list */
   const [rolesList, setRolesList] = useState<API.RoleListItem[]>([]);
+  const [loading, setLoading] = useState({});
+  
+  /******************
+   * Switch handlers
+   *****************/
+  function toggleEnable(admin: API.AdminUserListItem) {
+    console.log('toggleStatus', admin.id);
+    return async (checked: boolean) => {
+      setLoading({...loading, [admin.id]: true});
+      try {
+        await changeEnableAdminUser(admin.id, checked);
+        admin.is_enabled = checked;
+      } catch(error) {}
+      setLoading({...loading, [admin.id]: false});
+    };
+  }
 
   useEffect(() => {
     (async () => {
@@ -199,9 +204,10 @@ const AdminUserList: React.FC = () => {
       hideInSearch: true,
       render: (_, record) => (
         <Switch
-          defaultChecked={record.is_enabled}
+          checked={record.is_enabled}
           size="small"
-          onChange={toggleEnable(record.id)}
+          loading={loading[record.id]}
+          onChange={toggleEnable(record)}
         />
       ),
     },

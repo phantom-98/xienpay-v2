@@ -147,23 +147,6 @@ function toLinkedMerchanListItem(user: UserValue): API.LinkedMerchantListItem {
   return item;
 }
 
-/******************
- * Switch handlers
- *****************/
-function toggleStatus(bank_id: number) {
-  console.log('toggleStatus', bank_id);
-  return (checked: boolean) => {
-    changeStatusBankAcct(bank_id, checked);
-  };
-}
-
-function toggleRemitFlag(bank_id: number, flag: string) {
-  console.log('toggleRemitFlag', bank_id);
-  return (checked: boolean) => {
-    changeRemitFlagBankAcct(bank_id, flag, checked);
-  };
-}
-
 const loadAssignedMerchants = async (bank_id: number) => {
   return fetchAssignedMerchants(bank_id);
 };
@@ -260,6 +243,35 @@ const TableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.BankAcctListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.BankAcctListItem[]>([]);
+  
+  const [ loading, setLoading ] = useState({});
+
+  /******************
+   * Switch handlers
+   *****************/
+  function toggleStatus(bank: API.BankAcctListItem) {
+    console.log('toggleStatus', bank.id);
+    return async (checked: boolean) => {
+      setLoading({...loading, [bank.id]: true});
+      try {
+        await changeStatusBankAcct(bank.id, checked);
+        bank.is_enabled = checked;
+      } catch (error) {}
+      setLoading({...loading, [bank.id]: false});
+    };
+  }
+  
+  function toggleRemitFlag(bank: API.BankAcctListItem, flag: string) {
+    console.log('toggleRemitFlag', bank.id, flag);
+    return async (checked: boolean) => {
+      setLoading({...loading, [bank.id]: true})
+      try {
+        await changeRemitFlagBankAcct(bank.id, flag, checked);
+        bank[`has_remit_${flag}`] = checked;
+      } catch (error) {}
+      setLoading({...loading, [bank.id]: false});
+    };
+  }
 
   const handleMerchantsDelete = (itemToDelete: API.LinkedMerchantListItem) => {
     setMerchants(merchants.filter((item) => item.id !== itemToDelete.id));
@@ -400,8 +412,9 @@ const TableList: React.FC = () => {
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.has_remit_intent}
-          onChange={toggleRemitFlag(record.id, 'intent')}
+          loading={loading[record.id]}
+          checked={record.has_remit_intent}
+          onChange={toggleRemitFlag(record, 'intent')}
         />
       ),
     },
@@ -417,8 +430,9 @@ const TableList: React.FC = () => {
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.has_remit_qr}
-          onChange={toggleRemitFlag(record.id, 'qr')}
+          loading={loading[record.id]}
+          checked={record.has_remit_qr}
+          onChange={toggleRemitFlag(record, 'qr')}
         />
       ),
     },
@@ -434,8 +448,9 @@ const TableList: React.FC = () => {
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.has_remit_bank}
-          onChange={toggleRemitFlag(record.id, 'bank')}
+          loading={loading[record.id]}
+          checked={record.has_remit_bank}
+          onChange={toggleRemitFlag(record, 'bank')}
         />
       ),
     },
@@ -446,8 +461,9 @@ const TableList: React.FC = () => {
       render: (_, record) => (
         <Switch
           size="small"
-          defaultChecked={record.is_enabled}
-          onChange={toggleStatus(record.id)}
+          loading={loading[record.id]}
+          checked={record.is_enabled}
+          onChange={toggleStatus(record)}
         />
       ),
     },
