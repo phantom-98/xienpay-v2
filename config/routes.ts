@@ -132,7 +132,7 @@ export default [
       {
         name: 'transactions',
         key: 'Transactions',
-        path: '/settlement-list',
+        path: '/transaction-list',
         component: './SettlementList',
         access: 'canSettlementList',
       },
@@ -140,7 +140,7 @@ export default [
         name: 'accounts',
         key: 'Accounts',
         path: '/settlement-list',
-        component: './SettlementList',
+        component: './SettlementList/Accounts',
         access: 'canSettlementList',
       },
     ],
