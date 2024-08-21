@@ -147,6 +147,7 @@ const SettlementList: React.FC = () => {
   const [bankNameOptions, setBankNameOptions] = useState([]);
   const [bankNumberOptions, setBankNumberOptions] = useState([]);
   const [ifscOptions, setifscOptions] = useState([]);
+  const [walletOption, setWalletOption] = useState([]);
 
   useEffect(() => {
     const fetchOptions = async () => {
@@ -168,8 +169,8 @@ const SettlementList: React.FC = () => {
             number: acc.method_account_number,
             code: acc.method_account_branch_code
           }))
-          setBankNumberOptions(options.map(item => item.number))
-          setifscOptions(options.map(item => item.code))
+          setifscOptions([{label: "usdt", value: "USDT"}, {label: "bitcoin", value: "BTC"}, {label: "ethereum", value: "ETH"}])
+          setWalletOption(options?.map(o => o.number));
         }
       }
     }
@@ -208,10 +209,14 @@ const SettlementList: React.FC = () => {
 
   useEffect(() => {
     if (ifsc) {
-      const index = ifscOptions.findIndex(code => code === ifsc);
-      if (bankNumberOptions[index] !== bankNumber) {
-        setBankNumber(bankNumberOptions[index]);
-        form.setFieldValue('ac_no', bankNumberOptions[index]);
+      if (method === 'bank') {
+        const index = ifscOptions.findIndex(code => code === ifsc);
+        if (bankNumberOptions[index] !== bankNumber) {
+          setBankNumber(bankNumberOptions[index]);
+          form.setFieldValue('ac_no', bankNumberOptions[index]);
+        }
+      } else {
+        setBankNumberOptions(walletOption.filter(w => (ifsc !== 'BTC') === w?.startsWith("0x")))
       }
     }
   }, [ifsc])
