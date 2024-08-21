@@ -844,8 +844,8 @@ export async function settlementAccount(
     method: 'GET',
     params: {
       ...params,
-    },
     ...(options || {}),
+    },
   });
 }
 
