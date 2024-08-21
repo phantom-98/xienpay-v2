@@ -281,6 +281,7 @@ const SettlementList: React.FC = () => {
                 },
               ],
               onClick: async (e) => {
+                setSettlementId(record.id);
                 e.key === 'approve' ? setApprove(true) : setReject(true)
               }
             }} onClick={ async (e) => {
