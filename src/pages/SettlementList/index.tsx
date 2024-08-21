@@ -22,7 +22,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import { Button, Drawer, Dropdown, message } from 'antd';
+import { Button, Drawer, Dropdown, Form, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -132,6 +132,7 @@ const SettlementList: React.FC = () => {
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
+  const [form] = Form.useForm();
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
@@ -159,7 +160,7 @@ const SettlementList: React.FC = () => {
       
       if (res.success) {
         setSearchData(res.data);
-        if (method == "bank") {
+        if (method === "bank") {
           const options = res.data?.filter((acc) => acc.method === "bank_transfer" && acc.method_account_name).map(acc => acc.method_account_name);
           setBankNameOptions(options?.filter((opt, pos) => options.indexOf(opt) === pos));
         } else {
@@ -172,9 +173,13 @@ const SettlementList: React.FC = () => {
         }
       }
     }
+    
     setBankName('');
+    form.setFieldValue('ac_name', '');
     setBankNumber('');
+    form.setFieldValue('ac_no', '');
     setIFSC('');
+    form.setFieldValue('ifsc', '');
     if (merchantCode && method) {
       fetchOptions();
     }
@@ -194,14 +199,20 @@ const SettlementList: React.FC = () => {
   useEffect(() => {
     if (bankNumber) {
       const index = bankNumberOptions.findIndex(num => num === bankNumber);
-      ifscOptions[index] !== ifsc && setIFSC(ifscOptions[index]);
+      if (ifscOptions[index] !== ifsc) {
+        setIFSC(ifscOptions[index]);
+        form.setFieldValue('ifsc', ifscOptions[index]);
+      }
     }
   }, [bankNumber])
 
   useEffect(() => {
     if (ifsc) {
       const index = ifscOptions.findIndex(code => code === ifsc);
-      bankNumberOptions[index] !== bankNumber && setBankNumber(bankNumberOptions[index]);
+      if (bankNumberOptions[index] !== bankNumber) {
+        setBankNumber(bankNumberOptions[index]);
+        form.setFieldValue('ac_no', bankNumberOptions[index]);
+      }
     }
   }, [ifsc])
 
@@ -473,6 +484,7 @@ const SettlementList: React.FC = () => {
           }}
           width={720}
           labelAlign="left"
+          form={form}
           onFinish={async (value) => {
             const success = await handleAdd(value as API.AddSettlementItem);
             if (success) {
@@ -533,7 +545,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    value={bankName}
                     onChange={setBankName}
                     options={bankNameOptions}
                     label="Bank Account Holders Name"
@@ -553,7 +564,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    value={bankNumber}
                     onChange={setBankNumber}
                     options={bankNumberOptions}
                     label="Account No."
@@ -573,7 +583,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    value={ifsc}
                     onChange={setIFSC}
                     options={ifscOptions}
                     label="IFSC Code"
@@ -591,7 +600,6 @@ const SettlementList: React.FC = () => {
                       id: 'pages.settlementTable.wallet',
                       defaultMessage: 'Wallet',
                     })}
-                    value={ifsc}
                     onChange={setIFSC}
                     valueEnum={{
                       USDT: 'usdt',
@@ -611,7 +619,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    value={bankNumber}
                     onChange={setBankNumber}
                     options={bankNumberOptions}
                     label="Wallet Address"
