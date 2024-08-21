@@ -162,15 +162,18 @@ const SettlementList: React.FC = () => {
       if (res.success) {
         setSearchData(res.data);
         if (method === "bank") {
-          const options = res.data?.filter((acc) => acc.method === "bank_transfer" && acc.method_account_name).map(acc => acc.method_account_name);
-          setBankNameOptions(options?.filter((opt, pos) => options.indexOf(opt) === pos));
+          let options = res.data?.filter((acc) => acc.method === "bank_transfer" && acc.method_account_name).map(acc => acc.method_account_name);
+          options = options?.filter((opt, pos) => options.indexOf(opt) === pos);
+          setBankNameOptions(options);
+          const ac_name = options?.length > 0 ? options[0] : null;
+          setBankName(ac_name)
+          form.setFieldValue('ac_name', ac_name);
         } else {
-          const options = res.data?.filter(acc => acc.method === 'crypto').map(acc => ({
-            number: acc.method_account_number,
-            code: acc.method_account_branch_code
-          }))
+          const options = res.data?.filter(acc => acc.method === 'crypto').map(acc => acc.method_account_number)
           setifscOptions([{label: "usdt", value: "USDT"}, {label: "bitcoin", value: "BTC"}, {label: "ethereum", value: "ETH"}])
-          setWalletOption(options?.map(o => o.number));
+          setIFSC("USDT");
+          form.setFieldValue('currency', "USDT");
+          setWalletOption(options);
         }
       }
     }
@@ -193,12 +196,18 @@ const SettlementList: React.FC = () => {
         code: acc.method_account_branch_code
       }));
       setBankNumberOptions(option.map(item => item.number))
+      const num = option?.length > 0 ? option[0].number : null;
+      setBankNumber(num);
+      form.setFieldValue('ac_no', num);
       setifscOptions(option.map(item => item.code))
+      // const code = option?.length > 0 ? option[0].code : null;
+      // setIFSC(code);
+      // form.setFieldValue('ac_no', code);
     }
   }, [bankName])
 
   useEffect(() => {
-    if (bankNumber) {
+    if (bankNumber && method === 'bank') {
       const index = bankNumberOptions.findIndex(num => num === bankNumber);
       if (ifscOptions[index] !== ifsc) {
         setIFSC(ifscOptions[index]);
@@ -216,7 +225,11 @@ const SettlementList: React.FC = () => {
           form.setFieldValue('ac_no', bankNumberOptions[index]);
         }
       } else {
-        setBankNumberOptions(walletOption.filter(w => (ifsc !== 'BTC') === w?.startsWith("0x")))
+        const option = walletOption.filter(w => (ifsc !== 'BTC') === w?.startsWith("0x"));
+        setBankNumberOptions(option)
+        const num = option?.length > 0 ? option[0] : null;
+        setBankNumber(num);
+        form.setFieldValue('address', num);
       }
     }
   }, [ifsc])
@@ -550,6 +563,7 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
+                    showSearch
                     onChange={setBankName}
                     options={bankNameOptions}
                     label="Bank Account Holders Name"
