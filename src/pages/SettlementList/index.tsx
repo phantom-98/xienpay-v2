@@ -469,7 +469,7 @@ const SettlementList: React.FC = () => {
               id: 'pages.settlementTable.method',
               defaultMessage: 'bank',
             })}
-            initialValue={selectedRowsState[selectedRowsState.length-1]?.method}
+            initialValue={selectedRowsState[selectedRowsState.length-1]?.method === "bank_transfer" ? "bank" : selectedRowsState[selectedRowsState.length-1]?.method}
             onChange={setMethod}
             valueEnum={{
               bank: 'bank',
