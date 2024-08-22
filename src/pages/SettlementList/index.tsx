@@ -137,19 +137,9 @@ const SettlementList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
-  const [merchantCode, setMerchantCode] = useState("");
-  const [method, setMethod] = useState("");
   const [name, setName] = useState("");
 
   const [searchData, setSearchData] = useState([]);
-
-  useEffect(() => {
-    form.setFieldValue('ac_name', '');
-    form.setFieldValue('ac_no', '');
-    form.setFieldValue('ifsc', '');
-    form.setFieldValue('currency', '');
-    form.setFieldValue('address', '');
-  }, [merchantCode, method])
 
   useEffect(() => {
     const match = searchData.find(acc => acc.name === name);
@@ -346,6 +336,7 @@ const SettlementList: React.FC = () => {
                   key="primary"
                   onClick={() => {
                     handleModalOpen(true);
+                    form.resetFields();
                   }}
                 >
                   <PlusOutlined />{' '}
@@ -447,12 +438,9 @@ const SettlementList: React.FC = () => {
           <ProFormSelect
             width="md"
             options={merchantsList.map((merchant) => merchant.label)}
-            //options={merchantsList}
-            // request={fetchRolesList}
             name="merchant_code"
             label="Merchant Code"
             initialValue={selectedRowsState[selectedRowsState.length-1]?.merchant}
-            onChange={setMerchantCode}
           />
           <ProFormMoney
             label="Amount"
@@ -470,7 +458,6 @@ const SettlementList: React.FC = () => {
               defaultMessage: 'bank',
             })}
             initialValue={selectedRowsState[selectedRowsState.length-1]?.method === "bank_transfer" ? "bank" : selectedRowsState[selectedRowsState.length-1]?.method}
-            onChange={setMethod}
             valueEnum={{
               bank: 'bank',
               cash: 'cash',
@@ -479,8 +466,8 @@ const SettlementList: React.FC = () => {
             }}
           />
           
-          <ProFormDependency name={['method']}>
-            {({method}) => {
+          <ProFormDependency name={['method', 'merchant_code']}>
+            {({method, merchant_code}) => {
               return method === "bank" || method === "crypto" ? (
                 <ProFormSelect
                   width="md"
@@ -488,18 +475,20 @@ const SettlementList: React.FC = () => {
                   showSearch
                   onChange={setName}
                   request={async ({keyWords}) => {
-                    const res = await settlementAccount({
-                      current: 1,
-                      pageSize: 20
-                    }, {
-                      method,
-                      merchantCode,
-                      name:keyWords
-                    });
-                    
-                    if (res.success) {
-                      setSearchData(res.data);
-                      return res.data?.map(acc => ({label: acc.name, value: acc.name}));
+                    if (keyWords) {
+                      const res = await settlementAccount({
+                        current: 1,
+                        pageSize: 20
+                      }, {
+                        method,
+                        merchantCode: merchant_code,
+                        name:keyWords
+                      });
+                      
+                      if (res.success) {
+                        setSearchData(res.data);
+                        return res.data?.map(acc => ({label: acc.name, value: acc.name}));
+                      }
                     }
                     return [];
                   }} 
