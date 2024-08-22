@@ -139,100 +139,30 @@ const SettlementList: React.FC = () => {
 
   const [merchantCode, setMerchantCode] = useState("");
   const [method, setMethod] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [bankNumber, setBankNumber] = useState("");
-  const [ifsc, setIFSC] = useState("")
+  const [name, setName] = useState("");
 
   const [searchData, setSearchData] = useState([]);
-  const [bankNameOptions, setBankNameOptions] = useState([]);
-  const [bankNumberOptions, setBankNumberOptions] = useState([]);
-  const [ifscOptions, setifscOptions] = useState([]);
-  const [walletOption, setWalletOption] = useState([]);
 
   useEffect(() => {
-    const fetchOptions = async () => {
-      const res = await settlementAccount({
-        current: 1,
-        pageSize: 20
-      }, {
-        method,
-        merchantCode
-      });
-      
-      if (res.success) {
-        setSearchData(res.data);
-        if (method === "bank") {
-          let options = res.data?.filter((acc) => acc.method === "bank_transfer" && acc.method_account_name).map(acc => acc.method_account_name);
-          options = options?.filter((opt, pos) => options.indexOf(opt) === pos);
-          setBankNameOptions(options);
-          const ac_name = options?.length > 0 ? options[0] : null;
-          setBankName(ac_name)
-          form.setFieldValue('ac_name', ac_name);
-        } else {
-          const options = res.data?.filter(acc => acc.method === 'crypto').map(acc => acc.method_account_number)
-          setifscOptions([{label: "usdt", value: "USDT"}, {label: "bitcoin", value: "BTC"}, {label: "ethereum", value: "ETH"}])
-          setIFSC("USDT");
-          form.setFieldValue('currency', "USDT");
-          setWalletOption(options);
-        }
-      }
-    }
-    
-    setBankName('');
     form.setFieldValue('ac_name', '');
-    setBankNumber('');
     form.setFieldValue('ac_no', '');
-    setIFSC('');
     form.setFieldValue('ifsc', '');
-    if (merchantCode && method) {
-      fetchOptions();
-    }
+    form.setFieldValue('currency', '');
+    form.setFieldValue('address', '');
   }, [merchantCode, method])
 
   useEffect(() => {
-    if (searchData.length > 0) {
-      const option = searchData.filter((acc) => acc.method === (method==="bank"?"bank_transfer":"crypto") && acc.method_account_name === bankName).map(acc => ({
-        number: acc.method_account_number,
-        code: acc.method_account_branch_code
-      }));
-      setBankNumberOptions(option.map(item => item.number))
-      const num = option?.length > 0 ? option[0].number : null;
-      setBankNumber(num);
-      form.setFieldValue('ac_no', num);
-      setifscOptions(option.map(item => item.code))
-      // const code = option?.length > 0 ? option[0].code : null;
-      // setIFSC(code);
-      // form.setFieldValue('ac_no', code);
+    const match = searchData.find(acc => acc.name === name);
+    if (match) {
+      form.setFieldValue('method', match.method === "bank_transfer" ? "bank" : match.method);
+      form.setFieldValue('merchant_code', match.merchant);
+      form.setFieldValue('ac_name', match.method_account_name);
+      form.setFieldValue('ac_no', match.method_account_number);
+      form.setFieldValue('ifsc', match.method_account_branch_code);
+      form.setFieldValue('address', match.method_account_number);
+      form.setFieldValue('currency', match.method_account_branch_code);
     }
-  }, [bankName])
-
-  useEffect(() => {
-    if (bankNumber && method === 'bank') {
-      const index = bankNumberOptions.findIndex(num => num === bankNumber);
-      if (ifscOptions[index] !== ifsc) {
-        setIFSC(ifscOptions[index]);
-        form.setFieldValue('ifsc', ifscOptions[index]);
-      }
-    }
-  }, [bankNumber])
-
-  useEffect(() => {
-    if (ifsc) {
-      if (method === 'bank') {
-        const index = ifscOptions.findIndex(code => code === ifsc);
-        if (bankNumberOptions[index] !== bankNumber) {
-          setBankNumber(bankNumberOptions[index]);
-          form.setFieldValue('ac_no', bankNumberOptions[index]);
-        }
-      } else {
-        const option = walletOption.filter(w => (ifsc !== 'BTC') === w?.startsWith("0x"));
-        setBankNumberOptions(option)
-        const num = option?.length > 0 ? option[0] : null;
-        setBankNumber(num);
-        form.setFieldValue('address', num);
-      }
-    }
-  }, [ifsc])
+  }, [name])
 
   const [approve, setApprove] = useState(false);
   const [reject, setReject] = useState(false);
@@ -366,7 +296,7 @@ const SettlementList: React.FC = () => {
       render: (_, record) =>
         access.canSettlementAuthorize && (
           record.status === 'pending' ? [
-            <Dropdown.Button menu={{
+            <Dropdown.Button key={record.id} menu={{
               items: [
                 {
                   label: "Approve",
@@ -378,14 +308,15 @@ const SettlementList: React.FC = () => {
                 },
               ],
               onClick: async (e) => {
-                e.key === 'approve' ? setApprove(true) : setReject(true)
+                setSettlementId(record.id);
+                e.key === 'approve' ? setApprove(true) : setReject(true);
               }
             }} onClick={ async (e) => {
               setSettlementId(record.id)
               setApprove(true)
             }} type='primary'>Approve</Dropdown.Button>
           ] : record.status === 'success' ? [
-            <Button onClick={() => {
+            <Button key={record.id} onClick={() => {
               setSettlementId(record.id)
               setReset(true)
             }}>Reset</Button>
@@ -547,11 +478,40 @@ const SettlementList: React.FC = () => {
               crypto: 'crypto',
             }}
           />
+          
+          <ProFormDependency name={['method']}>
+            {({method}) => {
+              return method === "bank" || method === "crypto" ? (
+                <ProFormSelect
+                  width="md"
+                  label="Nick Name"
+                  showSearch
+                  onChange={setName}
+                  request={async ({keyWords}) => {
+                    const res = await settlementAccount({
+                      current: 1,
+                      pageSize: 20
+                    }, {
+                      method,
+                      merchantCode,
+                      name:keyWords
+                    });
+                    
+                    if (res.success) {
+                      setSearchData(res.data);
+                      return res.data?.map(acc => ({label: acc.name, value: acc.name}));
+                    }
+                    return [];
+                  }} 
+                />
+              ) : null;
+            }}
+          </ProFormDependency>
           <ProFormDependency name={['method']}>
             {({ method }) => {
               return method === 'bank' ? (
                 <>
-                  <ProFormSelect
+                  <ProFormText
                     rules={[
                       {
                         required: true,
@@ -563,15 +523,11 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    showSearch
-                    onChange={setBankName}
-                    options={bankNameOptions}
                     label="Bank Account Holders Name"
                     name="ac_name"
                     width="md"
-                    placeholder="Enter the bank account holders name"
                   />
-                  <ProFormSelect
+                  <ProFormText
                     rules={[
                       {
                         required: true,
@@ -583,14 +539,12 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    onChange={setBankNumber}
-                    options={bankNumberOptions}
                     label="Account No."
                     width="md"
                     name="ac_no"
                     placeholder="Enter the 16 digit account number"
                   />
-                  <ProFormSelect
+                  <ProFormText
                     rules={[
                       {
                         required: true,
@@ -602,8 +556,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    onChange={setIFSC}
-                    options={ifscOptions}
                     label="IFSC Code"
                     name="ifsc"
                     width="md"
@@ -612,21 +564,15 @@ const SettlementList: React.FC = () => {
                 </>
               ) : method === 'crypto' ? (
                 <>
-                  <ProFormSelect
+                  <ProFormText
                     name="currency"
                     width="md"
                     label={intl.formatMessage({
                       id: 'pages.settlementTable.wallet',
                       defaultMessage: 'Wallet',
                     })}
-                    onChange={setIFSC}
-                    valueEnum={{
-                      USDT: 'usdt',
-                      BTC: 'bitcoin',
-                      ETH: 'ethereum',
-                    }}
                   />
-                  <ProFormSelect
+                  <ProFormText
                     rules={[
                       {
                         required: true,
@@ -638,8 +584,6 @@ const SettlementList: React.FC = () => {
                         ),
                       },
                     ]}
-                    onChange={setBankNumber}
-                    options={bankNumberOptions}
                     label="Wallet Address"
                     width="md"
                     name="address"

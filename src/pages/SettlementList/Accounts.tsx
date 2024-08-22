@@ -8,7 +8,6 @@ import {
   import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
   import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
   import {
-    FooterToolbar,
     ModalForm,
     PageContainer,
     ProDescriptions,
@@ -22,20 +21,15 @@ import {
   import React, { useEffect, useRef, useState } from 'react';
   import type { FormValueType } from './components/UpdateForm';
   import UpdateForm from './components/UpdateForm';
-  import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
   import { utcToist } from '../../utils';
   
-  // const handleReject = async (fields: API.SettlementListItem) => {
-  //   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
-  // };
+  function transformToAPI(item) {
+    const { name, merchant_code, method, ac_no, ac_name, ifsc, address, currency } = item;
   
-  function transformToAPI(item: API.AddSettlementItem): API.AddSettlementAPIItem {
-    const { amount, merchant_code, method, ac_no, ac_name, ifsc, address, currency } = item;
-  
-    let result: API.AddSettlementAPIItem = {
-      amount,
+    let result = {
       merchant_code,
       method,
+      name
     };
   
     if (method === 'bank' && ac_no && ac_name && ifsc) {
@@ -91,29 +85,6 @@ import {
     }
   };
   
-  /**
-   *  Delete node
-   * @zh-CN 删除节点
-   *
-   * @param selectedRows
-   */
-  const handleRemove = async (selectedRows: API.SettlementListItem[]) => {
-    const hide = message.loading('Deleting...');
-    if (!selectedRows) return true;
-    try {
-      await removeSettlementAccount({
-        key: selectedRows.map((row) => row.id),
-      });
-      hide();
-      message.success('Deleted successfully and will refresh soon');
-      return true;
-    } catch (error) {
-      hide();
-      message.error('Delete failed, please try again');
-      return false;
-    }
-  };
-  
   const SettlementList: React.FC = () => {
     /**
      * @en-US Pop-up window of new window
@@ -131,13 +102,6 @@ import {
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
-  
-    const [merchantCode, setMerchantCode] = useState('');
-  
-    const [approve, setApprove] = useState(false);
-    const [reject, setReject] = useState(false);
-    const [reset, setReset] = useState(false);
-    const [settlementId, setSettlementId] = useState("");
   
     /**
      * @en-US International configuration
@@ -167,6 +131,11 @@ import {
         dataIndex: 'id',
         valueType: 'textarea',
         hideInSearch: true,
+      },
+      {
+        title: <FormattedMessage id="pages.settlementTable.nickname" defaultMessage="Nick Name" />,
+        dataIndex: 'name',
+        valueType: 'textarea',
       },
       {
         title: <FormattedMessage id="pages.settlementTable.mcOrderId" defaultMessage="Merchant" />,
@@ -289,13 +258,17 @@ import {
               }
             }}
           >
+            <ProFormText
+                name="name"
+                label="Nick Name"
+                width="md"
+            />
             <ProFormSelect
               width="md"
               options={merchantsList.map((merchant) => merchant.label)}
               name="merchant_code"
               label="Merchant Code"
               initialValue={selectedRowsState[selectedRowsState.length-1]?.merchant}
-              onChange={setMerchantCode}
             />
             <ProFormSelect
               name="method"
