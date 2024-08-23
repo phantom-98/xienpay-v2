@@ -154,6 +154,16 @@ const SettlementList: React.FC = () => {
     }
   }, [name])
 
+  const clearFields = () => {
+    form.setFieldValue('nickname', '');
+    form.setFieldValue('ac_name', '');
+    form.setFieldValue('ac_no', '');
+    form.setFieldValue('ifsc', '');
+    form.setFieldValue('address', '');
+    form.setFieldValue('currency', '');
+    setSearchData([])
+  }
+
   const [approve, setApprove] = useState(false);
   const [reject, setReject] = useState(false);
   const [reset, setReset] = useState(false);
@@ -441,6 +451,7 @@ const SettlementList: React.FC = () => {
             name="merchant_code"
             label="Merchant Code"
             initialValue={selectedRowsState[selectedRowsState.length-1]?.merchant}
+            onChange={clearFields}
           />
           <ProFormMoney
             label="Amount"
@@ -464,6 +475,7 @@ const SettlementList: React.FC = () => {
               aed: 'aed',
               crypto: 'crypto',
             }}
+            onChange={clearFields}
           />
           
           <ProFormDependency name={['method', 'merchant_code']}>
@@ -471,6 +483,7 @@ const SettlementList: React.FC = () => {
               return method === "bank" || method === "crypto" ? (
                 <ProFormSelect
                   width="md"
+                  name='nickname'
                   label="Nick Name"
                   showSearch
                   onChange={setName}
