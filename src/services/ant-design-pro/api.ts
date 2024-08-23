@@ -828,3 +828,56 @@ export async function rejectSettlement(options?: { [key: string]: any }) {
     },
   });
 }
+
+/** 获取规则列表 GET /api/settlements/accts */
+export async function settlementAccount(
+  params: {
+    // query
+    /** 当前的页码 */
+    current?: number;
+    /** 页面的容量 */
+    pageSize?: number;
+  },
+  options?: { [key: string]: any },
+) {
+  return request<API.SettlementList>('/api/settlements/accts', {
+    method: 'GET',
+    params: {
+      ...params,
+    ...(options || {}),
+    },
+  });
+}
+
+/** 更新规则 PUT /api/settlements/accts */
+export async function updateSettlementAccount(options?: { [key: string]: any }) {
+  return request<API.SettlementListItem>('/api/settlements/accts', {
+    method: 'POST',
+    data: {
+      method: 'update',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 新建规则 POST /api/settlements/accts */
+export async function addSettlementAccount(options?: { [key: string]: any }) {
+  return request<API.SettlementListItem>('/api/settlements/accts', {
+    method: 'POST',
+    data: {
+      method: 'post',
+      ...(options || {}),
+    },
+  });
+}
+
+/** 删除规则 DELETE /api/settlements/accts */
+export async function removeSettlementAccount(options?: { [key: string]: any }) {
+  return request<Record<string, any>>('/api/settlements/accts', {
+    method: 'POST',
+    data: {
+      method: 'delete',
+      ...(options || {}),
+    },
+  });
+}

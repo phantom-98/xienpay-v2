@@ -5,9 +5,10 @@ import {
   rejectSettlement,
   removeSettlement,
   settlement,
+  settlementAccount,
   updateSettlement,
 } from '@/services/ant-design-pro/api';
-import { CheckCircleTwoTone, CloseCircleTwoTone, PlusOutlined, ReloadOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
   FooterToolbar,
@@ -21,7 +22,7 @@ import {
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import { Button, Drawer, Dropdown, Input, Modal, Popconfirm, message } from 'antd';
+import { Button, Drawer, Dropdown, Form, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -131,11 +132,37 @@ const SettlementList: React.FC = () => {
 
   const [showDetail, setShowDetail] = useState<boolean>(false);
 
+  const [form] = Form.useForm();
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
 
-  const [merchantCode, setMerchantCode] = useState('');
+  const [name, setName] = useState("");
+
+  const [searchData, setSearchData] = useState([]);
+
+  useEffect(() => {
+    const match = searchData.find(acc => acc.name === name);
+    if (match) {
+      form.setFieldValue('method', match.method === "bank_transfer" ? "bank" : match.method);
+      form.setFieldValue('merchant_code', match.merchant);
+      form.setFieldValue('ac_name', match.method_account_name);
+      form.setFieldValue('ac_no', match.method_account_number);
+      form.setFieldValue('ifsc', match.method_account_branch_code);
+      form.setFieldValue('address', match.method_account_number);
+      form.setFieldValue('currency', match.method_account_branch_code);
+    }
+  }, [name])
+
+  const clearFields = () => {
+    form.setFieldValue('nickname', '');
+    form.setFieldValue('ac_name', '');
+    form.setFieldValue('ac_no', '');
+    form.setFieldValue('ifsc', '');
+    form.setFieldValue('address', '');
+    form.setFieldValue('currency', '');
+    setSearchData([])
+  }
 
   const [approve, setApprove] = useState(false);
   const [reject, setReject] = useState(false);
@@ -269,7 +296,7 @@ const SettlementList: React.FC = () => {
       render: (_, record) =>
         access.canSettlementAuthorize && (
           record.status === 'pending' ? [
-            <Dropdown.Button menu={{
+            <Dropdown.Button key={record.id} menu={{
               items: [
                 {
                   label: "Approve",
@@ -282,14 +309,14 @@ const SettlementList: React.FC = () => {
               ],
               onClick: async (e) => {
                 setSettlementId(record.id);
-                e.key === 'approve' ? setApprove(true) : setReject(true)
+                e.key === 'approve' ? setApprove(true) : setReject(true);
               }
             }} onClick={ async (e) => {
               setSettlementId(record.id)
               setApprove(true)
             }} type='primary'>Approve</Dropdown.Button>
           ] : record.status === 'success' ? [
-            <Button onClick={() => {
+            <Button key={record.id} onClick={() => {
               setSettlementId(record.id)
               setReset(true)
             }}>Reset</Button>
@@ -319,6 +346,7 @@ const SettlementList: React.FC = () => {
                   key="primary"
                   onClick={() => {
                     handleModalOpen(true);
+                    form.resetFields();
                   }}
                 >
                   <PlusOutlined />{' '}
@@ -389,161 +417,186 @@ const SettlementList: React.FC = () => {
           </Button>
         </FooterToolbar>
       )}
-      <ModalForm
-        title={intl.formatMessage({
-          id: 'pages.searchTable.createForm.newSettlement',
-          defaultMessage: 'New settlement',
-        })}
-        open={createModalOpen}
-        onOpenChange={handleModalOpen}
-        layout="horizontal"
-        labelCol={{
-          span: 8,
-        }}
-        wrapperCol={{
-          span: 16,
-        }}
-        width={720}
-        labelAlign="left"
-        onFinish={async (value) => {
-          const success = await handleAdd(value as API.AddSettlementItem);
-          if (success) {
-            handleModalOpen(false);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-      >
-        <ProFormSelect
-          width="md"
-          options={merchantsList.map((merchant) => merchant.label)}
-          //options={merchantsList}
-          // request={fetchRolesList}
-          name="merchant_code"
-          label="Merchant Code"
-          onChange={setMerchantCode}
-        />
-        <ProFormMoney
-          label="Amount"
-          name="amount"
-          width="md"
-          required={true}
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-        />
-        <ProFormSelect
-          name="method"
-          width="md"
-          label={intl.formatMessage({
-            id: 'pages.settlementTable.method',
-            defaultMessage: 'bank',
+      {createModalOpen && (
+        <ModalForm
+          title={intl.formatMessage({
+            id: 'pages.searchTable.createForm.newSettlement',
+            defaultMessage: 'New settlement',
           })}
-          valueEnum={{
-            bank: 'bank',
-            cash: 'cash',
-            aed: 'aed',
-            crypto: 'crypto',
+          open={createModalOpen}
+          onOpenChange={handleModalOpen}
+          layout="horizontal"
+          labelCol={{
+            span: 8,
           }}
-        />
-        <ProFormDependency name={['method']}>
-          {({ method }) => {
-            return method === 'bank' ? (
-              <>
-                <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.bankAcctTable.searchTable.ac_name"
-                          defaultMessage="Bank acct holder name is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  label="Bank Account Holders Name"
-                  name="ac_name"
-                  width="md"
-                  placeholder="Enter the bank account holders name"
-                />
-                <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.bankAcctTable.searchTable.ac_name"
-                          defaultMessage="Bank acct no is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  label="Account No."
-                  width="md"
-                  name="ac_no"
-                  placeholder="Enter the 16 digit account number"
-                />
-                <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.bankAcctTable.searchTable.ac_name"
-                          defaultMessage="Bank IFSC is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  label="IFSC Code"
-                  name="ifsc"
-                  width="md"
-                  placeholder="Enter 16 digit IFSC code"
-                />
-              </>
-            ) : null;
+          wrapperCol={{
+            span: 16,
           }}
-        </ProFormDependency>
-        <ProFormDependency name={['method']}>
-          {({ method }) => {
-            return method === 'crypto' ? (
-              <>
+          width={720}
+          labelAlign="left"
+          form={form}
+          onFinish={async (value) => {
+            const success = await handleAdd(value as API.AddSettlementItem);
+            if (success) {
+              handleModalOpen(false);
+              if (actionRef.current) {
+                actionRef.current.reload();
+              }
+            }
+          }}
+        >
+          <ProFormSelect
+            width="md"
+            options={merchantsList.map((merchant) => merchant.label)}
+            name="merchant_code"
+            label="Merchant Code"
+            initialValue={selectedRowsState[selectedRowsState.length-1]?.merchant}
+            onChange={clearFields}
+          />
+          <ProFormMoney
+            label="Amount"
+            name="amount"
+            width="md"
+            required={true}
+            fieldProps={{ moneySymbol: false }}
+            locale="en-US"
+          />
+          <ProFormSelect
+            name="method"
+            width="md"
+            label={intl.formatMessage({
+              id: 'pages.settlementTable.method',
+              defaultMessage: 'bank',
+            })}
+            initialValue={selectedRowsState[selectedRowsState.length-1]?.method === "bank_transfer" ? "bank" : selectedRowsState[selectedRowsState.length-1]?.method}
+            valueEnum={{
+              bank: 'bank',
+              cash: 'cash',
+              aed: 'aed',
+              crypto: 'crypto',
+            }}
+            onChange={clearFields}
+          />
+          
+          <ProFormDependency name={['method', 'merchant_code']}>
+            {({method, merchant_code}) => {
+              return method === "bank" || method === "crypto" ? (
                 <ProFormSelect
-                  name="currency"
                   width="md"
-                  label={intl.formatMessage({
-                    id: 'pages.settlementTable.wallet',
-                    defaultMessage: 'Wallet',
-                  })}
-                  valueEnum={{
-                    USDT: 'usdt',
-                    BTC: 'bitcoin',
-                    ETH: 'ethereum',
-                  }}
+                  name='nickname'
+                  label="Nick Name"
+                  showSearch
+                  onChange={setName}
+                  request={async ({keyWords}) => {
+                    if (keyWords) {
+                      const res = await settlementAccount({
+                        current: 1,
+                        pageSize: 20
+                      }, {
+                        method,
+                        merchantCode: merchant_code,
+                        name:keyWords
+                      });
+                      
+                      if (res.success) {
+                        setSearchData(res.data);
+                        return res.data?.map(acc => ({label: acc.name, value: acc.name}));
+                      }
+                    }
+                    return [];
+                  }} 
                 />
-                <ProFormText
-                  rules={[
-                    {
-                      required: true,
-                      message: (
-                        <FormattedMessage
-                          id="pages.bankAcctTable.searchTable.ac_name"
-                          defaultMessage="Bank acct no is required"
-                        />
-                      ),
-                    },
-                  ]}
-                  label="Wallet Address"
-                  width="md"
-                  name="address"
-                  placeholder="Enter the wallet address"
-                />
-              </>
-            ) : null;
-          }}
-        </ProFormDependency>
-      </ModalForm>
+              ) : null;
+            }}
+          </ProFormDependency>
+          <ProFormDependency name={['method']}>
+            {({ method }) => {
+              return method === 'bank' ? (
+                <>
+                  <ProFormText
+                    rules={[
+                      {
+                        required: true,
+                        message: (
+                          <FormattedMessage
+                            id="pages.bankAcctTable.searchTable.ac_name"
+                            defaultMessage="Bank acct holder name is required"
+                          />
+                        ),
+                      },
+                    ]}
+                    label="Bank Account Holders Name"
+                    name="ac_name"
+                    width="md"
+                  />
+                  <ProFormText
+                    rules={[
+                      {
+                        required: true,
+                        message: (
+                          <FormattedMessage
+                            id="pages.bankAcctTable.searchTable.ac_name"
+                            defaultMessage="Bank acct no is required"
+                          />
+                        ),
+                      },
+                    ]}
+                    label="Account No."
+                    width="md"
+                    name="ac_no"
+                    placeholder="Enter the 16 digit account number"
+                  />
+                  <ProFormText
+                    rules={[
+                      {
+                        required: true,
+                        message: (
+                          <FormattedMessage
+                            id="pages.bankAcctTable.searchTable.ac_name"
+                            defaultMessage="Bank IFSC is required"
+                          />
+                        ),
+                      },
+                    ]}
+                    label="IFSC Code"
+                    name="ifsc"
+                    width="md"
+                    placeholder="Enter 16 digit IFSC code"
+                  />
+                </>
+              ) : method === 'crypto' ? (
+                <>
+                  <ProFormText
+                    name="currency"
+                    width="md"
+                    label={intl.formatMessage({
+                      id: 'pages.settlementTable.wallet',
+                      defaultMessage: 'Wallet',
+                    })}
+                  />
+                  <ProFormText
+                    rules={[
+                      {
+                        required: true,
+                        message: (
+                          <FormattedMessage
+                            id="pages.bankAcctTable.searchTable.ac_name"
+                            defaultMessage="Bank acct no is required"
+                          />
+                        ),
+                      },
+                    ]}
+                    label="Wallet Address"
+                    width="md"
+                    name="address"
+                    placeholder="Enter the wallet address"
+                  />
+                </>
+              ) : null;
+            }}
+          </ProFormDependency>
+        </ModalForm>
+      )}
       <UpdateForm
         onSubmit={async (value) => {
           const success = await handleUpdate(value);
