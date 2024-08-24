@@ -406,4 +406,29 @@ declare namespace API {
     total?: number;
     success?: boolean;
   };
+
+  type AddChargebackAPIItem = {
+    amount: number;
+    merchant: string;
+    merchant_order_id: string;
+    username: string;
+    when: string;
+  };
+
+  type AddChargebackItem = {
+    amount: number;
+    merchant: string;
+    merchant_order_id: string;
+    username: string;
+    when: string;
+  };
+
+  type ChargebackListItem = {
+    id: string;
+    amount: number;
+    merchant: string;
+    merchant_order_id: string;
+    username: string;
+    when: string;
+  };
 }

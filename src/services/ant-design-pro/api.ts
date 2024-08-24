@@ -881,3 +881,20 @@ export async function removeSettlementAccount(options?: { [key: string]: any }) 
     },
   });
 }
+
+
+// Function to add a new chargeback
+export async function addChargeback(data: API.AddChargebackItem) {
+  return request('/api/chargebacks', {
+    method: 'POST',
+    data,
+  });
+}
+
+// Function to fetch the list of chargebacks
+export async function chargeback(params: API.PageParams) {
+  return request<API.ChargebackListItem[]>('/api/chargebacks', {
+    method: 'GET',
+    params,
+  });
+}
