@@ -1,8 +1,4 @@
-import {
-  addChargeback,
-  fetchMerchantsList,
-  chargeback,
-} from '@/services/ant-design-pro/api';
+import { addChargeback, chargeback } from '@/services/ant-design-pro/api';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -10,15 +6,13 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
-  ProFormDependency,
   ProFormMoney,
-  ProFormSelect,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { utcToist } from '../../utils';
 
 function transformToAPI(item: API.AddChargebackItem): API.AddChargebackAPIItem {
@@ -26,7 +20,7 @@ function transformToAPI(item: API.AddChargebackItem): API.AddChargebackAPIItem {
 
   return {
     amount,
-    merchant,
+    merchant_code: merchant,
     merchant_order_id,
     username,
     when,
@@ -75,7 +69,12 @@ const ChargebackList: React.FC = () => {
       valueType: 'textarea',
     },
     {
-      title: <FormattedMessage id="pages.chargebackTable.merchant_order_id" defaultMessage="Merchant Order ID" />,
+      title: (
+        <FormattedMessage
+          id="pages.chargebackTable.merchant_order_id"
+          defaultMessage="Merchant Order ID"
+        />
+      ),
       dataIndex: 'merchant_order_id',
       valueType: 'textarea',
     },
@@ -120,35 +119,33 @@ const ChargebackList: React.FC = () => {
         search={{
           labelWidth: 120,
         }}
-        toolBarRender={() =>
-          [access.canChargebackCreate
-            ?
-                <Button
-                  type="primary"
-                  key="primary"
-                  onClick={() => {
-                    handleModalOpen(true);
-                    form.resetFields();
-                  }}
-                >
-                  <PlusOutlined />{' '}
-                  <FormattedMessage
-                    id="pages.chargebackTable.new-payment-link"
-                    defaultMessage="New Chargeback"
-                  />
-                </Button>
-            : null,
-                <Button
-                  type="text"
-                  key="text"
-                  onClick={() => {
-                    actionRef.current?.reload();
-                  }}
-                >
-                  <ReloadOutlined />
-                </Button>,
-              ]
-        }
+        toolBarRender={() => [
+          access.canChargebackCreate ? (
+            <Button
+              type="primary"
+              key="primary"
+              onClick={() => {
+                handleModalOpen(true);
+                form.resetFields();
+              }}
+            >
+              <PlusOutlined />{' '}
+              <FormattedMessage
+                id="pages.chargebackTable.new-payment-link"
+                defaultMessage="New Chargeback"
+              />
+            </Button>
+          ) : null,
+          <Button
+            type="text"
+            key="text"
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+          >
+            <ReloadOutlined />
+          </Button>,
+        ]}
         request={chargeback}
         columns={columns}
         rowSelection={{
@@ -157,7 +154,7 @@ const ChargebackList: React.FC = () => {
           },
         }}
         pagination={{
-          showSizeChanger: true
+          showSizeChanger: true,
         }}
       />
       {selectedRowsState?.length > 0 && (
@@ -221,24 +218,14 @@ const ChargebackList: React.FC = () => {
             }
           }}
         >
-          <ProFormText
-            width="md"
-            name="merchant"
-            label="Merchant"
-            required={true}
-          />
+          <ProFormText width="md" name="merchant" label="Merchant" required={true} />
           <ProFormText
             width="md"
             name="merchant_order_id"
             label="Merchant Order ID"
             required={true}
           />
-          <ProFormText
-            width="md"
-            name="username"
-            label="User"
-            required={true}
-          />
+          <ProFormText width="md" name="username" label="User" required={true} />
           <ProFormMoney
             label="Amount"
             name="amount"
@@ -247,12 +234,7 @@ const ChargebackList: React.FC = () => {
             fieldProps={{ moneySymbol: false }}
             locale="en-US"
           />
-          <ProFormText
-            width="md"
-            name="when"
-            label="When"
-            required={true}
-          />
+          <ProFormText width="md" name="when" label="When" required={false} />
         </ModalForm>
       )}
       <Drawer

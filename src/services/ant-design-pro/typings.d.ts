@@ -409,10 +409,10 @@ declare namespace API {
 
   type AddChargebackAPIItem = {
     amount: number;
-    merchant: string;
+    merchant_code: string;
     merchant_order_id: string;
     username: string;
-    when: string;
+    when?: string;
   };
 
   type AddChargebackItem = {
