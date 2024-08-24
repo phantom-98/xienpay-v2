@@ -430,5 +430,6 @@ declare namespace API {
     merchant_order_id: string;
     username: string;
     when: string;
+    updated_at: string;
   };
 }

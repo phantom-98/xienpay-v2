@@ -100,9 +100,9 @@ const ChargebackList: React.FC = () => {
     },
     {
       title: <FormattedMessage id="pages.chargebackTable.when" defaultMessage="When" />,
-      dataIndex: 'when',
+      dataIndex: 'updated_at',
       valueType: 'dateTime',
-      render: (_, record) => <span>{utcToist(record.when)}</span>,
+      render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
   ];
 
