@@ -16,9 +16,10 @@ import {
   ProFormSelect,
   ProFormSwitch,
   ProTable,
+  ProForm,
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
-import { Button, Drawer, Select, Switch, message, Descriptions } from 'antd';
+import { Button, Drawer, Select, Switch, message, Descriptions, Row, Col, Flex } from 'antd';
 import React, { useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
@@ -263,6 +264,13 @@ const MerchantList: React.FC = () => {
       renderText: (val: number) => `${val} %`,
     },
     {
+      title: <FormattedMessage id="pages.merchantTable.payoutCallbackUrl" defaultMessage="Payout Callback" />,
+      dataIndex: 'payout_notify_url',
+      valueType: 'textarea',
+      hideInSearch: true,
+      hideInTable: true,
+    },
+    {
       title: <FormattedMessage id="pages.merchantTable.testMode" defaultMessage="Test mode?" />,
       hideInSearch: true,
       dataIndex: 'is_test_mode',
@@ -387,7 +395,8 @@ const MerchantList: React.FC = () => {
             ...value,
             site_url: value['site_prefix'] + value['site_url'],
             return_url: value['return_prefix'] + value['return_url'],
-            notify_url: value['notify_prefix'] + value['notify_url']
+            notify_url: value['notify_prefix'] + value['notify_url'],
+            payout_notify_url: value['payout_notify_prefix'] + value['payout_notify_url'],
           } as API.AddMerchantItem);
           if (success) {
             handleModalOpen(false);
@@ -439,22 +448,25 @@ const MerchantList: React.FC = () => {
           }}
           addonBefore={<SelectBefore name="notify_prefix"/>}
         />
-        <ProFormMoney
-          label="Min Payin"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={10.0}
-          name="min_payin"
-          placeholder="Min Payin"
-        />
-        <ProFormMoney
-          label="Max Payin"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={100.0}
-          name="max_payin"
-          placeholder="Max Payin "
-        />
+        <ProForm.Item label="Min Payin">
+          <Flex justify='space-between' gap={40}>
+            <ProFormMoney
+              fieldProps={{ moneySymbol: false }}
+              locale="en-US"
+              initialValue={10.0}
+              name="min_payin"
+              placeholder="Min Payin"
+            />
+            <ProFormMoney
+              label="Max Payin"
+              fieldProps={{ moneySymbol: false }}
+              locale="en-US"
+              initialValue={100.0}
+              name="max_payin"
+              placeholder="Max Payin "
+            />
+          </Flex>
+        </ProForm.Item>
         <ProFormMoney
           label="Commission"
           fieldProps={{ moneySymbol: false, precision: 2 }}
@@ -463,22 +475,25 @@ const MerchantList: React.FC = () => {
           name="commission"
           placeholder="Commission %"
         />
-        <ProFormMoney
-          label="Min Payout"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={10.0}
-          name="min_payout"
-          placeholder="Min Payout"
-        />
-        <ProFormMoney
-          label="Max Payout"
-          fieldProps={{ moneySymbol: false }}
-          locale="en-US"
-          initialValue={100.0}
-          name="max_payout"
-          placeholder="Max Payout"
-        />
+        <ProForm.Item label="Min Payout">
+          <Flex justify='space-between' gap={40}>
+            <ProFormMoney
+              fieldProps={{ moneySymbol: false }}
+              locale="en-US"
+              initialValue={10.0}
+              name="min_payout"
+              placeholder="Min Payout"
+            />
+            <ProFormMoney
+              label="Max Payout"
+              fieldProps={{ moneySymbol: false }}
+              locale="en-US"
+              initialValue={100.0}
+              name="max_payout"
+              placeholder="Max Payout"
+            />
+          </Flex>
+        </ProForm.Item>
         <ProFormMoney
           label="Payout Commission"
           fieldProps={{ moneySymbol: false, precision: 2 }}
@@ -486,6 +501,18 @@ const MerchantList: React.FC = () => {
           initialValue={5.0}
           name="payout_commission"
           placeholder="Payout Commission %"
+        />
+        <ProFormText
+          label="Payout Callback"
+          name="payout_notify_url"
+          rules={[{required:true}]}
+          placeholder="Payout Callback Url"
+          fieldProps={{
+            style: {
+              width: 336
+            }
+          }}
+          addonBefore={<SelectBefore name="payout_notify_prefix"/>}
         />
         <ProFormSwitch
           label="Test Mode"

@@ -111,6 +111,7 @@ declare namespace API {
     min_payout: number;
     max_payout: number;
     payout_commission: number;
+    payout_notify_url: string;
   };
 
   type MerchantListItem = {
