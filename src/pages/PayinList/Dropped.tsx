@@ -36,7 +36,7 @@ import { Button, Drawer, Modal, Select, Tag, message, Dropdown } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 async function droppedPayin(
   params: API.PayinListItem & API.PageParams,
@@ -435,15 +435,6 @@ const PayinList: React.FC = () => {
         );
       },
       copyable: true,
-      search: {
-        transform: (value: string) => {
-          if (value && !uuidPattern.test(value)) {
-            message.error('Invalid Payin UUID. Defaulting to empty');
-            return { uuid: '' };
-          }
-          return value;
-        },
-      },
       order: 9,
     },
     // {
@@ -475,8 +466,11 @@ const PayinList: React.FC = () => {
     },
   ];
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.PayinListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.payinTable.dropped',
@@ -501,7 +495,14 @@ const PayinList: React.FC = () => {
             </Button>,
           ]
         }
-        request={droppedPayin}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await droppedPayin(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

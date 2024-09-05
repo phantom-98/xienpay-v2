@@ -37,7 +37,7 @@ import { Button, Drawer, Modal, Select, Tag, message } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 async function successPayin(
   params: API.PayinListItem & API.PageParams,
@@ -406,10 +406,10 @@ const PayinList: React.FC = () => {
       }}>
         <span>{record.utr_id}</span>
         {
-           record.user_submitted_image && <PictureOutlined onClick={async () => {
+          record.user_submitted_image && <PictureOutlined onClick={async () => {
             const url = await getPresignedURL(record.id);
             setUserImage(url?.url);
-           }} style={{
+          }} style={{
             cursor: "pointer"
            }}/>
         }
@@ -451,15 +451,6 @@ const PayinList: React.FC = () => {
         );
       },
       copyable: true,
-      search: {
-        transform: (value: string) => {
-          if (value && !uuidPattern.test(value)) {
-            message.error('Invalid Payin UUID. Defaulting to empty');
-            return { uuid: '' };
-          }
-          return value;
-        },
-      },
       order: 9,
     },
     // {
@@ -506,8 +497,11 @@ const PayinList: React.FC = () => {
     },
   ];
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.PayinListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.payinTable.completed',
@@ -530,7 +524,14 @@ const PayinList: React.FC = () => {
             <ReloadOutlined />
           </Button>,
         ]}
-        request={successPayin}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await successPayin(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

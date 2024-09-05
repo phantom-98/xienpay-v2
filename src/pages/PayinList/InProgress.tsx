@@ -37,7 +37,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import SimpleSearchForm from '../../components/SimpleSearchForm';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 async function inprogressPayin(params: API.PayinListItem & API.PageParams, options?: { [key: string]: any }) {
   return payin({...params, status: 'assigned'}, options);
@@ -421,15 +421,6 @@ const PayinList: React.FC = () => {
         );
       },
       copyable: true,
-      search: {
-        transform: (value: string) => {
-          if (value && !uuidPattern.test(value)) {
-            message.error('Invalid Payin UUID. Defaulting to empty');
-            return { uuid: '' };
-          }
-          return value;
-        },
-      },
       order: 9
     },
     // {
@@ -476,8 +467,11 @@ const PayinList: React.FC = () => {
     },
   ];
 
+  const [messageApi, contextHolder] = message.useMessage();
+
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.PayinListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.payinTable.inProgress',
@@ -492,32 +486,39 @@ const PayinList: React.FC = () => {
         toolBarRender={() =>
           [access.canPayinLinkCreate
             ?
-                <Button
-                  type="primary"
-                  key="primary"
-                  onClick={() => {
-                    handleModalOpen(true);
-                  }}
-                >
-                  <PlusOutlined />{' '}
-                  <FormattedMessage
-                    id="pages.payinTable.new-payment-link"
-                    defaultMessage="New Payment Link"
-                  />
-                </Button>
+            <Button
+              type="primary"
+              key="primary"
+              onClick={() => {
+                handleModalOpen(true);
+              }}
+            >
+              <PlusOutlined />{' '}
+              <FormattedMessage
+                id="pages.payinTable.new-payment-link"
+                defaultMessage="New Payment Link"
+              />
+            </Button>
             : null,
-                  <Button
-                    type="text"
-                    key="text"
-                    onClick={() => {
-                      actionRef.current?.reload();
-                    }}
-                  >
-                    <ReloadOutlined />
-                  </Button>,
-              ]
+          <Button
+            type="text"
+            key="text"
+            onClick={() => {
+              actionRef.current?.reload();
+            }}
+          >
+            <ReloadOutlined />
+          </Button>,
+          ]
         }
-        request={inprogressPayin}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await inprogressPayin(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

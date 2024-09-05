@@ -1,4 +1,4 @@
-import { addChargeback, chargeback } from '@/services/ant-design-pro/api';
+import { addChargeback, chargeback, fetchMerchantsList } from '@/services/ant-design-pro/api';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -12,8 +12,8 @@ import {
 } from '@ant-design/pro-components';
 import { FormattedMessage, FormattedNumber, useAccess, useIntl } from '@umijs/max';
 import { Button, Drawer, Form, message } from 'antd';
-import React, { useRef, useState } from 'react';
-import { utcToist } from '../../utils';
+import React, { useEffect, useRef, useState } from 'react';
+import { utcToist, validateRequest } from '../../utils';
 
 function transformToAPI(item: API.AddChargebackItem): API.AddChargebackAPIItem {
   const { amount, merchant, merchant_order_id, username, when } = item;
@@ -53,9 +53,25 @@ const ChargebackList: React.FC = () => {
   const [currentRow, setCurrentRow] = useState<API.ChargebackListItem>();
   const [showDetail, setShowDetail] = useState<boolean>(false);
   const [selectedRowsState, setSelectedRows] = useState<API.ChargebackListItem[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const intl = useIntl();
   const access = useAccess();
+  
+  /* Preload merchants list */
+  const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const fetchedMerchants = await fetchMerchantsList('');
+        setMerchantsList(fetchedMerchants);
+      } catch (error) {
+        // Handle error
+        console.error('Error fetching merchants:', error);
+      }
+    })();
+  }, []);
 
   const columns: ProColumns<API.ChargebackListItem>[] = [
     {
@@ -67,6 +83,7 @@ const ChargebackList: React.FC = () => {
       title: <FormattedMessage id="pages.chargebackTable.merchant" defaultMessage="Merchant" />,
       dataIndex: 'merchant',
       valueType: 'textarea',
+      valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
     },
     {
       title: (
@@ -108,6 +125,7 @@ const ChargebackList: React.FC = () => {
 
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.ChargebackListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.chargebackTable.title',
@@ -146,7 +164,14 @@ const ChargebackList: React.FC = () => {
             <ReloadOutlined />
           </Button>,
         ]}
-        request={chargeback}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await chargeback(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

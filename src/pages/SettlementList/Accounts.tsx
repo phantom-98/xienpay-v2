@@ -21,7 +21,7 @@ import {
   import React, { useEffect, useRef, useState } from 'react';
   import type { FormValueType } from './components/UpdateForm';
   import UpdateForm from './components/UpdateForm';
-  import { utcToist } from '../../utils';
+  import { utcToist, validateRequest } from '../../utils';
   
   function transformToAPI(item) {
     const { name, merchant_code, method, ac_no, ac_name, ifsc, address, currency } = item;
@@ -102,6 +102,7 @@ import {
     const actionRef = useRef<ActionType>();
     const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
     const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
+    const [messageApi, contextHolder] = message.useMessage();
   
     /**
      * @en-US International configuration
@@ -147,6 +148,7 @@ import {
         title: <FormattedMessage id="pages.settlementAccountTable.utr" defaultMessage="Instrument Type" />,
         dataIndex: 'method',
         valueType: 'textarea',
+        valueEnum: { bank: "bank_transfer", aed: "aed", cash: "cash", crypto: "crypto"},
       },
       {
         title: <FormattedMessage id="pages.settlementAccountTable.utr" defaultMessage="Account Name" />,
@@ -180,6 +182,7 @@ import {
   
     return (
       <PageContainer>
+        {contextHolder}
         <ProTable<API.SettlementListItem, API.PageParams>
           headerTitle={intl.formatMessage({
             id: 'pages.settlementAccountTable.title',
@@ -219,7 +222,14 @@ import {
                   </Button>,
                 ]
           }
-          request={settlementAccount}
+          request={async (req) => {
+            const res = validateRequest(req);
+            if (typeof res === 'string') {
+              messageApi.error(res);
+              throw new Error(res)
+            }
+            else return await settlementAccount(res);
+          }}
           columns={columns}
           rowSelection={{
             onChange: (_, selectedRows) => {

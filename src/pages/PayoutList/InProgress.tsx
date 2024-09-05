@@ -30,7 +30,7 @@ import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 import { response } from 'express';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 async function inprogressPayout(params: API.PayoutListItem & API.PageParams, options?: { [key: string]: any }) {
   return payout({...params, status: 'initiated'}, options);
@@ -378,9 +378,11 @@ const PayoutList: React.FC = () => {
         )
     },
   ];
+  const [messageApi, contextHolder] = message.useMessage();
 
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.PayoutListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.payoutTable.inProgress',
@@ -435,7 +437,14 @@ const PayoutList: React.FC = () => {
                 </Button>,
               ]
         }
-        request={inprogressPayout}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await inprogressPayout(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

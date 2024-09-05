@@ -27,7 +27,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ConfirmModal } from '@/components/Modals';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 async function successPayout(
   params: API.PayoutListItem & API.PageParams,
@@ -259,7 +259,7 @@ const PayoutList: React.FC = () => {
           ),
           status: 'Error',
         },
-       },
+      },
     },
     {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
@@ -376,9 +376,11 @@ const PayoutList: React.FC = () => {
         ],
     },
   ];
+  const [messageApi, contextHolder] = message.useMessage();
 
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.PayoutListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.payoutTable.completed',
@@ -401,7 +403,14 @@ const PayoutList: React.FC = () => {
             <ReloadOutlined />
           </Button>,
         ]}
-        request={successPayout}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await successPayout(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {

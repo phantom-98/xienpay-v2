@@ -27,7 +27,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
-import { utcToist } from '../../utils';
+import { utcToist, validateRequest } from '../../utils';
 
 // const handleReject = async (fields: API.SettlementListItem) => {
 //   rejectSettlement({id: fields.id, action: 'reject'}).then(() => { message.success('Settlement rejected!'); });
@@ -136,6 +136,7 @@ const SettlementList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState<API.SettlementListItem>();
   const [selectedRowsState, setSelectedRows] = useState<API.SettlementListItem[]>([]);
+  const [messageApi, contextHolder] = message.useMessage();
 
   const [name, setName] = useState("");
 
@@ -273,6 +274,7 @@ const SettlementList: React.FC = () => {
       title: <FormattedMessage id="pages.settlementTable.utr" defaultMessage="Method" />,
       dataIndex: 'method',
       valueType: 'textarea',
+      valueEnum: { bank: "bank_transfer", aed: "aed", cash: "cash", crypto: "crypto"},
     },
     {
       title: <FormattedMessage id="pages.settlementTable.utr" defaultMessage="Ref." />,
@@ -327,6 +329,7 @@ const SettlementList: React.FC = () => {
 
   return (
     <PageContainer>
+      {contextHolder}
       <ProTable<API.SettlementListItem, API.PageParams>
         headerTitle={intl.formatMessage({
           id: 'pages.settlementTable.title',
@@ -367,7 +370,14 @@ const SettlementList: React.FC = () => {
                 </Button>,
               ]
         }
-        request={settlement}
+        request={async (req) => {
+          const res = validateRequest(req);
+          if (typeof res === 'string') {
+            messageApi.error(res);
+            throw new Error(res)
+          }
+          else return await settlement(res);
+        }}
         columns={columns}
         rowSelection={{
           onChange: (_, selectedRows) => {
