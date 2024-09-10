@@ -51,11 +51,11 @@ export default {
   'menu.editor.koni': 'Koni Editor',
 
   'menu.list.merchant-list': 'Merchants',
-  'menu.list.users.agent-list': 'Agents',
+  'menu.list.admin.agent-list': 'Agents',
   'menu.list.reports.payins': 'Payins',
   'menu.list.reports.payouts': 'Payouts',
   'menu.list.bank-acct-list': 'Bank Accounts',
-  'menu.list.users.admin-user-list': 'Roles',
+  'menu.list.admin.users': 'Users',
   'menu.list.settlement-list': 'Settlements',
 
   'menu.list.deposit': 'Deposit',
@@ -70,6 +70,6 @@ export default {
   'menu.list.settlement-list.transactions': 'Transactions',
   'menu.list.settlement-list.accounts': 'Accounts',
   'menu.list.chargebacks': 'Chargebacks',
-  'menu.list.users': 'Users',
+  'menu.list.admin': 'Admin',
   'menu.list.reports': 'Reports',
 };

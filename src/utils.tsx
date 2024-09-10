@@ -1,3 +1,5 @@
+import * as XLSX from 'xlsx/xlsx.mjs';
+import { saveAs } from 'file-saver';
 
 export const utcToist = (date: string | null | undefined) => {
     if (!date) return "";
@@ -22,4 +24,18 @@ export const validateRequest = (req: any) => {
         return 'Amount should be number'
     }
     return req;
+}
+
+export const downloadXLSX = (data: string, filename: string) => {
+    const dataAsArray = data.split("\n").map(row => row.split(","));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(dataAsArray);
+    XLSX.utils.book_append_sheet(wb, ws, "Sheet1");
+    const res = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer'});
+    saveAs(new Blob([res]), filename);
+}
+
+export const downloadCSV = (data: string, filename: string) => {
+    const blob = new Blob([data], { type: "text/csv"});
+    saveAs(blob, filename);
 }

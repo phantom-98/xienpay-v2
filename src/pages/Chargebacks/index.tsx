@@ -1,4 +1,4 @@
-import { addChargeback, chargeback, fetchMerchantsList } from '@/services/ant-design-pro/api';
+import { addChargeback, chargeback, fetchMerchantsList, fetchPlayerList } from '@/services/ant-design-pro/api';
 import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProDescriptionsItemProps } from '@ant-design/pro-components';
 import {
@@ -6,7 +6,9 @@ import {
   ModalForm,
   PageContainer,
   ProDescriptions,
+  ProFormDateTimePicker,
   ProFormMoney,
+  ProFormSelect,
   ProFormText,
   ProTable,
 } from '@ant-design/pro-components';
@@ -60,6 +62,7 @@ const ChargebackList: React.FC = () => {
   
   /* Preload merchants list */
   const [merchantsList, setMerchantsList] = useState<API.LinkedMerchantListItem[]>([]);
+  const [merchantCode, setMerchantCode] = useState<string | null>();
 
   useEffect(() => {
     (async () => {
@@ -243,14 +246,33 @@ const ChargebackList: React.FC = () => {
             }
           }}
         >
-          <ProFormText width="md" name="merchant" label="Merchant" required={true} />
+          <ProFormSelect
+            width="md" 
+            name="merchant" 
+            label="Merchant" 
+            required={true} 
+            options={merchantsList.map((merchant) => merchant.label)}
+            onChange={setMerchantCode}
+          />
           <ProFormText
             width="md"
             name="merchant_order_id"
             label="Merchant Order ID"
             required={true}
           />
-          <ProFormText width="md" name="username" label="User" required={true} />
+          <ProFormSelect
+            width="md" 
+            name="username" 
+            label="User" 
+            required={true} 
+            showSearch
+            request={ async (e) => {
+              if (merchantCode && e.keyWords) {
+                return await fetchPlayerList(merchantCode, e.keyWords);
+              }
+              return null;
+            }}
+          />
           <ProFormMoney
             label="Amount"
             name="amount"
@@ -259,7 +281,12 @@ const ChargebackList: React.FC = () => {
             fieldProps={{ moneySymbol: false }}
             locale="en-US"
           />
-          <ProFormText width="md" name="when" label="When" required={false} />
+          <ProFormDateTimePicker
+            width="md" 
+            name="when" 
+            label="When" 
+            required={false} 
+          />
         </ModalForm>
       )}
       <Drawer

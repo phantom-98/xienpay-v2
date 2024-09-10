@@ -1,5 +1,6 @@
 // @ts-ignore
 /* eslint-disable */
+import { downloadCSV, downloadXLSX } from '@/utils';
 import { request } from '@umijs/max';
 
 /** 获取当前的用户 GET /api/currentUser */
@@ -256,14 +257,7 @@ export async function downloadPayins(merchant_codes: string[], from_date: string
     },
     getResponse: true, // This will return the full response object
   }).then((response) => {
-    const blob = new Blob([response.data], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `payins-${from_date}-${to_date}-${status}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    downloadXLSX(response.data, `payins-${from_date}-${to_date}-${status}.xlsx`);
   });
 }
 
@@ -278,14 +272,7 @@ export async function downloadPayouts(merchant_codes: string[], from_date: strin
     },
     getResponse: true, // This will return the full response object
   }).then((response) => {
-    const blob = new Blob([response.data], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `payouts-${from_date}-${to_date}-${status}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
+    downloadXLSX(response.data, `payouts-${from_date}-${to_date}-${status}.xlsx`);
   });
 }
 
@@ -533,7 +520,7 @@ export async function rejectPayout(options?: { [key: string]: any }) {
 }
 
 export async function downloadPayoutAsExcel( params?: { [key: string]: any }) {
-  return request<API.PayoutList>('/api/payouts/downloadForBulkApproval', {
+  return request('/api/payouts/downloadForBulkApproval', {
     method: 'GET',
     params: {
       ...params,
@@ -541,15 +528,8 @@ export async function downloadPayoutAsExcel( params?: { [key: string]: any }) {
     },
     getResponse: true
   }).then((response) => {
-    const blob = new Blob([response.data], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `payouts_in_pending-${new Date().toLocaleString()}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-  });;
+    downloadCSV(response.data, `payouts_in_pending-${new Date().toLocaleString()}.csv`);
+  });
 }
 
 /****************************************************************************************

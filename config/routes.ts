@@ -166,14 +166,13 @@ export default [
     access: 'canBankAcctList',
   },
   {
-    name: 'list.users',
-    key: 'users',
+    name: 'list.admin',
+    key: 'admin',
     icon: 'team',
     routes: [
       {
-        name: 'admin-user-list',
-        key: 'roles',
-        // icon: 'TrophyOutlined',
+        name: 'users',
+        key: 'users',
         path: '/admin-user-list',
         component: './AdminUserList',
         access: 'canAdmin',
