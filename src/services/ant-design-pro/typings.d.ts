@@ -223,6 +223,7 @@ declare namespace API {
     time_taken?: string;
 
     payinUrl?: string;
+    permalink?: string;
     commission: number;
   };
 
