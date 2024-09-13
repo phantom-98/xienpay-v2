@@ -251,6 +251,7 @@ declare namespace API {
     updated_at?: string;
     created_at?: string;
 
+    payoutUrl?: string;
     commission: number;
   };
 

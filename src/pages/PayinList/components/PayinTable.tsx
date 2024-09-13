@@ -710,6 +710,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           style={{width: "100%"}}
         />
         <ProFormSelect
+          showSearch
           rules={[
             {
               required: true,
