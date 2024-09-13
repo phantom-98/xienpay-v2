@@ -152,10 +152,10 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
 
   const columns: ProColumns<API.PayinListItem>[] = [
     {
-      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="ID" />,
+      title: <FormattedMessage id="pages.payinTable.id" defaultMessage="ID" />,
       dataIndex: 'id',
       valueType: 'textarea',
-      order: 1,
+      order: type === 'all' ? 9 : 1
     },
     type === 'drop' ? {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
@@ -173,11 +173,18 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         </span>
       ),
     } : null,
-    type !== 'drop' ? {
+    type !== 'success' && type !== 'progress' ? {
       title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
       dataIndex: 'short_code',
       valueType: 'textarea',
       copyable: true,
+      order: type === 'all' ? 9 : undefined
+    } : null,
+    type === 'success' ? {
+      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
+      dataIndex: 'short_code',
+      valueType: 'textarea',
+      hideInTable: true,
     } : null,
     type !== 'drop' ? {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage={type === 'all' ? "Confirmed" : "Amount"} />,
@@ -194,6 +201,29 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           />
         </span>
       ),
+      order: type === 'all' ? 9 : 2
+    } : null,
+    type === 'progress' ? {
+      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
+      dataIndex: 'short_code',
+      valueType: 'textarea',
+      copyable: true,
+    } : null,
+    type === 'success' ? {
+      title: <FormattedMessage id="pages.payinTable.commission" defaultMessage="Commission" />,
+      dataIndex: 'commission',
+      hideInSearch: true,
+      render: (_, record) => (
+        <span>
+          ₹
+          <FormattedNumber
+            value={record.commission}
+            currencySign="accounting"
+            minimumFractionDigits={2}
+            maximumFractionDigits={2}
+          />
+        </span>
+      ),
       order: 2,
     } : null,
     ...(type === 'all' ? [
@@ -204,22 +234,26 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         dataIndex: 'merchant_order_id',
         valueType: 'textarea',
         copyable: true,
+        order: 9,
       },
       {
         title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
         dataIndex: 'merchant',
         valueType: 'textarea',
         valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
+        order: 9,
       },
       {
         title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
         dataIndex: 'user_id',
         valueType: 'textarea',
+        order: 9,
       },
       {
         title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
         dataIndex: 'bank',
         valueType: 'textarea',
+        order: 9,
       },
       {
         title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
@@ -235,6 +269,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           dispute: { text: 'Dispute', status: 'Error' },
           duplicate: { text: 'Duplicate', status: 'Error' },
         },
+        order: 9,
       },
     ] : []),
     {
@@ -333,13 +368,13 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         return statusMap[status] || null;
       },
     },
-    {
+    type !== 'success' ? {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
       dataIndex: 'time_taken',
       valueType: 'textarea',
       order: 6,
       hideInTable: type === 'drop' || type === 'progress'
-    },
+    } : null,
     ...(type !== 'all' ? [
       {
         title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
@@ -354,6 +389,13 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
         order: 5,
       },
+      type === 'success' ? {
+        title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
+        dataIndex: 'time_taken',
+        valueType: 'textarea',
+        order: 6,
+        hideInTable: type === 'drop' || type === 'progress'
+      } : null,
       type === 'success' ? {
         title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
         dataIndex: 'utr_id',
@@ -380,6 +422,11 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         order: 7,
         hideInTable: true,
       },
+      type !== 'progress' ? {
+        title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
+        dataIndex: 'bank',
+        valueType: 'textarea',
+      } : null,
       {
         title: (
           <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
@@ -389,11 +436,11 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         copyable: true,
         order: 8,
       },
-      {
+      type === 'progress' ? {
         title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
         dataIndex: 'bank',
         valueType: 'textarea',
-      },
+      } : null,
     ] : []),
     {
       title: (
@@ -417,7 +464,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         );
       },
       copyable: true,
-      order: 9,
+      order: type === 'all' ? 6 : 9,
     },
     ...(type === 'all' ? [
       {
@@ -434,11 +481,13 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
             />
           </span>
         ),
+        order: 6
       },
       {
         title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
         dataIndex: 'agent',
         valueType: 'textarea',
+        order: 6
       },
       {
         title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
@@ -457,13 +506,15 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
               cursor: "pointer"
              }}/>
           }
-        </div>)
+        </div>),
+        order: 6
       },
       {
         title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
         dataIndex: 'user_submitted_utr',
         valueType: 'textarea',
         hideInSearch: true,
+        order: 6
       },
     ] : []),
     {
@@ -472,7 +523,6 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
       hideInForm: true,
       valueType: 'dateTime',
       hideInSearch: true,
-      order: 10,
       render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
   ].filter(item => item);
