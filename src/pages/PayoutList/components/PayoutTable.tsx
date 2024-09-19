@@ -1,4 +1,4 @@
-import { acceptPayout, addPayout, downloadPayoutAsExcel, fetchMerchantsList, fetchPlayerList, payout, rejectPayout, removePayout, updatePayout } from '@/services/ant-design-pro/api';
+import { acceptPayout, addPayout, downloadPayoutAsExcel, fetchMerchantsList, fetchPlayerList, rejectPayout, removePayout, updatePayout } from '@/services/ant-design-pro/api';
 import { Button, Drawer, Dropdown, message, Modal } from 'antd';
 import { useState, useEffect, useRef } from 'react';
 import UpdateForm, { FormValueType } from './UpdateForm';
@@ -10,10 +10,21 @@ import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 
 
 type PayoutType = {
-    type: 'all' | 'progress' | 'success'
+    type: 'all' | 'progress' | 'success',
+    table: string[],
+    search: string[],
+    download?: boolean,
+    createPayout?: boolean,
+    action?: boolean,
+    confirm?: boolean,
+    payout: (parems: API.PageParams & {
+        pageSize?: number;
+        current?: number;
+        keyword?: string;
+    }) => Promise<API.PayoutList>
 }
 
-const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
+const PayoutTable: React.FC<PayoutType> = ({type = 'all', table, search, download = false, createPayout = false, action = false, confirm = false, payout}) => {
     /**
      * @en-US Add node
      * @zh-CN 添加节点
@@ -202,16 +213,14 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                 } : undefined,
             },
         },
-        type === 'success' ? {
+        {
             title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
             dataIndex: 'time_taken',
             valueType: 'textarea',
-            order: 6,
-        } : null,
+        },
         {
             title: <FormattedMessage id="pages.payoutTable.amount" defaultMessage="Amount" />,
             dataIndex: 'amount',
-            hideInSearch: type === 'success',
             render: (_, record) => (
               <span>
                 ₹
@@ -224,10 +233,9 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
               </span>
             ),
         },
-        type === 'success' ? {
+        {
             title: <FormattedMessage id="pages.payinTable.commission" defaultMessage="Commission" />,
             dataIndex: 'commission',
-            hideInSearch: true,
             render: (_, record) => (
               <span>
                 ₹
@@ -239,15 +247,13 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                 />
               </span>
             ),
-            order: 2,
-        } : null,
+        },
         {
             title: (
               <FormattedMessage id="pages.bankAcctTable.searchTable.details" defaultMessage="Details" />
             ),
             dataIndex: 'ac_name',
             valueType: 'textarea',
-            hideInSearch: true,
             render: (_, record) => (
               <span>
                 {record.account_number}
@@ -260,39 +266,34 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
               </span>
             ),
         },
-        ...(type === 'all' ? [
-            {
-                title: (
-                  <FormattedMessage id="pages.bankAcctTable.searchTable.ac_name" defaultMessage="Account Name" />
-                ),
-                dataIndex: 'account_holder_name',
-                valueType: 'textarea',
-                hideInTable: true,
-            },
-            {
-                title: (
-                  <FormattedMessage id="pages.bankAcctTable.searchTable.ac_no" defaultMessage="Account Number" />
-                ),
-                dataIndex: 'account_number',
-                valueType: 'textarea',
-                hideInTable: true,
-            },
-        ] : []),
+        {
+            title: (
+                <FormattedMessage id="pages.bankAcctTable.searchTable.ac_name" defaultMessage="Account Name" />
+            ),
+            dataIndex: 'account_holder_name',
+            valueType: 'textarea',
+        },
+        {
+            title: (
+                <FormattedMessage id="pages.bankAcctTable.searchTable.ac_no" defaultMessage="Account Number" />
+            ),
+            dataIndex: 'account_number',
+            valueType: 'textarea',
+        },
         {
             title: (
               <FormattedMessage id="pages.bankAcctTable.searchTable.bank_name" defaultMessage="Bank Name" />
             ),
             dataIndex: 'bank_name',
             valueType: 'textarea',
-            hideInTable: true,
         },
-        type === 'all' ? {
+        {
             title: (
               <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR Id" />
             ),
             dataIndex: 'utr_id',
             valueType: 'textarea',
-        } : null,
+        },
         {
             title: (
               <FormattedMessage
@@ -315,18 +316,10 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
               );
             },
         },
-        type === 'success' ? {
-            title: <FormattedMessage id="pages.payoutTable.utr" defaultMessage="UTR" />,
-            dataIndex: 'utr_id',
-            valueType: 'textarea',
-            hideInTable: false,
-        } : null,
         {
             title: <FormattedMessage id="pages.payoutTable.updatedAt" defaultMessage="Last updated (IST)" />,
             dataIndex: 'updated_at',
-            hideInForm: true,
             valueType: 'dateTime',
-            hideInSearch: true,
             render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
         },
         {
@@ -365,7 +358,17 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                 ] : null
             )
         },
-    ].filter(item => item);
+    ].map(item => {
+        const hideInSearch = !search.includes(item.dataIndex);
+        const hideInTable = !table.includes(item.dataIndex);
+        return {
+          ...item,
+          hideInSearch,
+          hideInTable,
+          order: hideInSearch ? 0 : search.length - search.indexOf(item.dataIndex),
+          sort: hideInTable ? 0 : table.length - table.indexOf(item.dataIndex),
+        };
+      }).filter(item => !item.hideInSearch || !item.hideInTable).sort((a, b) => (b.sort - a.sort));
 
     const [messageApi, contextHolder] = message.useMessage();
 
@@ -384,7 +387,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                     labelWidth: 120,
                 }}
                 toolBarRender={() => [
-                    type === 'progress' && access.canPayoutPendingDownload
+                    download && access.canPayoutPendingDownload
                     ?
                         <Button
                             key="second"
@@ -399,7 +402,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                             />
                         </Button>
                     : null,
-                    type !== 'success' && access.canPayoutCreate
+                    createPayout && access.canPayoutCreate
                     ?
                         <Button
                             type="primary"
@@ -433,14 +436,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                         throw new Error(res)
                     }
                     else {
-                        switch (type) {
-                            case 'all':
-                                return await payout(res);
-                            case 'progress':
-                                return await payout({...res, status: 'initiated'})
-                            case 'success':
-                                return await payout({...res, status: 'success'})
-                        }
+                        return await payout(res);
                     }
                 }}
                 columns={columns}
@@ -488,7 +484,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                     </Button>
                 </FooterToolbar>
             )}
-            {type !== 'success' && (
+            {createPayout && (
                 <ModalForm
                     title={intl.formatMessage({
                         id: 'pages.searchTable.createForm.newPayout',
@@ -633,7 +629,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                     />
                 </ModalForm>
             )}
-            {type === 'progress' && (
+            {download && (
                 <ModalForm
                     title={intl.formatMessage({
                         id: 'pages.searchTable.createForm.download',
@@ -733,7 +729,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                 )}
             </Drawer>
 
-            {type !== 'success' && (
+            {action && (
                 <>
                     <ApprovalModal
                         key={payoutId}
@@ -766,7 +762,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all'}) => {
                 </>
             )}
 
-            {type !== 'progress' && (
+            {confirm && (
                 <ConfirmModal
                     visible={reset}
                     setVisible={setReset}

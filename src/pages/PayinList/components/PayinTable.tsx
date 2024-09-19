@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { confirmNotified, fetchMerchantsList, fetchPlayerList, generatePaymentLink, generatePermaPaymentLink, getPresignedURL, payin, removePayin, updatePayin } from "@/services/ant-design-pro/api";
+import { confirmNotified, fetchMerchantsList, fetchPlayerList, generatePaymentLink, generatePermaPaymentLink, getPresignedURL, removePayin, updatePayin } from "@/services/ant-design-pro/api";
 import { ActionType, FooterToolbar, ModalForm, PageContainer, ProColumns, ProDescriptions, ProDescriptionsItemProps, ProFormDependency, ProFormMoney, ProFormSelect, ProFormSwitch, ProFormText, ProTable } from "@ant-design/pro-components"
 import { Button, Drawer, Dropdown, message, Modal, Tag } from "antd";
 import UpdateForm, { FormValueType } from "./UpdateForm";
@@ -8,11 +8,20 @@ import { BellOutlined, CheckCircleOutlined, ExclamationCircleOutlined, PictureOu
 import { utcToist, validateRequest } from '@/utils';
 
 type PayinType = {
-  type: 'all' | 'progress' | 'drop' | 'success'
+  type: 'all' | 'progress' | 'drop' | 'success',
+  table: string[],
+  search: string[],
+  createPayin?: boolean,
+  utrImage?: boolean,
+  payin: (parems: API.PageParams & {
+    pageSize?: number;
+    current?: number;
+    keyword?: string;
+  }) => Promise<API.PayinList>,
 };
 
 
-const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
+const PayinTable: React.FC<PayinType> = ({ type = 'all', table, search, createPayin = false, utrImage = false, payin}) => {
 
   /**
    * @en-US Add node
@@ -155,12 +164,10 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
       title: <FormattedMessage id="pages.payinTable.id" defaultMessage="ID" />,
       dataIndex: 'id',
       valueType: 'textarea',
-      order: type === 'all' ? 9 : 1
     },
-    type === 'drop' ? {
+    {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
       dataIndex: 'amount',
-      order: 2,
       render: (_, record) => (
         <span>
           ₹
@@ -172,24 +179,16 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           />
         </span>
       ),
-    } : null,
-    type !== 'success' && type !== 'progress' ? {
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
       dataIndex: 'short_code',
       valueType: 'textarea',
       copyable: true,
-      order: type === 'all' ? 9 : undefined
-    } : null,
-    type === 'success' ? {
-      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
-      dataIndex: 'short_code',
-      valueType: 'textarea',
-      hideInTable: true,
-    } : null,
-    type !== 'drop' ? {
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.amount" defaultMessage={type === 'all' ? "Confirmed" : "Amount"} />,
       dataIndex: 'agent_submitted_amount',
-      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -201,18 +200,10 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           />
         </span>
       ),
-      order: type === 'all' ? 9 : 2
-    } : null,
-    type === 'progress' ? {
-      title: <FormattedMessage id="pages.payinTable.short_code" defaultMessage="Code" />,
-      dataIndex: 'short_code',
-      valueType: 'textarea',
-      copyable: true,
-    } : null,
-    type === 'success' ? {
+    },
+    {
       title: <FormattedMessage id="pages.payinTable.commission" defaultMessage="Commission" />,
       dataIndex: 'commission',
-      hideInSearch: true,
       render: (_, record) => (
         <span>
           ₹
@@ -224,58 +215,55 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           />
         </span>
       ),
-      order: 2,
-    } : null,
-    ...(type === 'all' ? [
-      {
-        title: (
-          <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
-        ),
-        dataIndex: 'merchant_order_id',
-        valueType: 'textarea',
-        copyable: true,
-        order: 9,
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
-        dataIndex: 'merchant',
-        valueType: 'textarea',
-        valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
-        order: 9,
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
-        dataIndex: 'user_id',
-        valueType: 'textarea',
-        order: 9,
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
-        dataIndex: 'bank',
-        valueType: 'textarea',
-        order: 9,
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
-        dataIndex: 'status',
-        hideInTable: true,
-        valueEnum: {
-          initiated: { text: 'Initiated', status: 'Default' },
-          assigned: { text: 'Assigned', status: 'Processing' },
-          pending: { text: 'Pending', status: 'Warning' },
-          success: { text: 'Success', status: 'Success' },
-          failed: { text: 'Failed', status: 'Error' },
-          dropped: { text: 'Dropped', status: 'Error' },
-          dispute: { text: 'Dispute', status: 'Error' },
-          duplicate: { text: 'Duplicate', status: 'Error' },
-        },
-        order: 9,
-      },
-    ] : []),
+    },
+    {
+      title: (
+        <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
+      ),
+      dataIndex: 'merchant_order_id',
+      valueType: 'textarea',
+      copyable: true,
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
+      dataIndex: 'merchant',
+      valueType: 'textarea',
+      valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
+      dataIndex: 'user_id',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
+      dataIndex: 'agent',
+      valueType: 'textarea',
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
+      dataIndex: 'bank',
+      valueType: 'textarea',
+    },
     {
       title: <FormattedMessage id="pages.payinTable.status" defaultMessage="Status" />,
       dataIndex: 'status',
-      hideInSearch: true,
+      renderFormItem: () => (
+        <ProFormSelect
+          name={'status'}
+          style={{ width: "100%" }}
+          valueEnum={{
+            initiated: { text: 'Initiated', status: 'Default' },
+            assigned: { text: 'Assigned', status: 'Processing' },
+            pending: { text: 'Pending', status: 'Warning' },
+            success: { text: 'Success', status: 'Success' },
+            failed: { text: 'Failed', status: 'Error' },
+            dropped: { text: 'Dropped', status: 'Error' },
+            dispute: { text: 'Dispute', status: 'Error' },
+            duplicate: { text: 'Duplicate', status: 'Error' },
+          }}
+        />
+      ),
       render: (status, record) => {
         const statusMap = {
           initiated: (
@@ -368,80 +356,30 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         return statusMap[status] || null;
       },
     },
-    type !== 'success' ? {
+    {
       title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
       dataIndex: 'time_taken',
       valueType: 'textarea',
-      order: 6,
-      hideInTable: type === 'drop' || type === 'progress'
-    } : null,
-    ...(type !== 'all' ? [
-      {
-        title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User" />,
-        dataIndex: 'user_id',
-        valueType: 'textarea',
-        order: 4,
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant" />,
-        dataIndex: 'merchant',
-        valueType: 'textarea',
-        valueEnum: Map.from(merchantsList, (merchant) => [merchant.value, merchant.label]),
-        order: 5,
-      },
-      type === 'success' ? {
-        title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="Dur" />,
-        dataIndex: 'time_taken',
-        valueType: 'textarea',
-        order: 6,
-        hideInTable: type === 'drop' || type === 'progress'
-      } : null,
-      type === 'success' ? {
-        title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
-        dataIndex: 'utr_id',
-        valueType: 'textarea',
-        order: 7,
-        render: (_, record) => (<div style={{
-          display: "flex",
-          gap: "6px",
-        }}>
-          <span>{record.utr_id}</span>
-          {
-            record.user_submitted_image && <PictureOutlined onClick={async () => {
-              const url = await getPresignedURL(record.id);
-              setUserImage(url?.url);
-            }} style={{
-              cursor: "pointer"
-             }}/>
-          }
-        </div>)
-      } : {
-        title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
-        dataIndex: 'utr_id',
-        valueType: 'textarea',
-        order: 7,
-        hideInTable: true,
-      },
-      type !== 'progress' ? {
-        title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
-        dataIndex: 'bank',
-        valueType: 'textarea',
-      } : null,
-      {
-        title: (
-          <FormattedMessage id="pages.payinTable.mcOrderId" defaultMessage="Merchant Order ID" />
-        ),
-        dataIndex: 'merchant_order_id',
-        valueType: 'textarea',
-        copyable: true,
-        order: 8,
-      },
-      type === 'progress' ? {
-        title: <FormattedMessage id="pages.payinTable.bank" defaultMessage="Bank" />,
-        dataIndex: 'bank',
-        valueType: 'textarea',
-      } : null,
-    ] : []),
+    },
+    {
+      title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
+      dataIndex: 'utr_id',
+      valueType: 'textarea',
+      render: (_, record) => (<div style={{
+        display: "flex",
+        gap: "6px",
+      }}>
+        <span>{record.utr_id}</span>
+        {
+          record.user_submitted_image && <PictureOutlined onClick={async () => {
+            const url = await getPresignedURL(record.id);
+            setUserImage(url?.url);
+          }} style={{
+            cursor: "pointer"
+           }}/>
+        }
+      </div>)
+    },
     {
       title: (
         <FormattedMessage
@@ -464,68 +402,30 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         );
       },
       copyable: true,
-      order: type === 'all' ? 6 : 9,
     },
-    ...(type === 'all' ? [
-      {
-        title: <FormattedMessage id="pages.payinTable.amount" defaultMessage="Amount" />,
-        dataIndex: 'amount',
-        render: (_, record) => (
-          <span>
-            ₹
-            <FormattedNumber
-              value={record.amount}
-              currencySign="accounting"
-              minimumFractionDigits={2}
-              maximumFractionDigits={2}
-            />
-          </span>
-        ),
-        order: 6
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="Agent" />,
-        dataIndex: 'agent',
-        valueType: 'textarea',
-        order: 6
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.utr" defaultMessage="UTR" />,
-        dataIndex: 'utr_id',
-        valueType: 'textarea',
-        render: (_, record) => (<div style={{
-          display: "flex",
-          gap: "6px",
-        }}>
-          <span>{record.utr_id}</span>
-          {
-            record.user_submitted_image && <PictureOutlined onClick={async () => {
-              const url = await getPresignedURL(record.id);
-              setUserImage(url?.url);
-            }} style={{
-              cursor: "pointer"
-             }}/>
-          }
-        </div>),
-        order: 6
-      },
-      {
-        title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
-        dataIndex: 'user_submitted_utr',
-        valueType: 'textarea',
-        hideInSearch: true,
-        order: 6
-      },
-    ] : []),
+    {
+      title: <FormattedMessage id="pages.payinTable.agent" defaultMessage="User Submitted UTR" />,
+      dataIndex: 'user_submitted_utr',
+      valueType: 'textarea',
+      hideInSearch: true,
+    },
     {
       title: <FormattedMessage id="pages.payinTable.updatedAt" defaultMessage="Last updated (IST)" />,
       dataIndex: 'updated_at',
-      hideInForm: true,
       valueType: 'dateTime',
-      hideInSearch: true,
       render: (_, record) => <span>{utcToist(record.updated_at)}</span>,
     },
-  ].filter(item => item);
+  ].map(item => {
+    const hideInSearch = !search.includes(item.dataIndex);
+    const hideInTable = !table.includes(item.dataIndex);
+    return {
+      ...item,
+      hideInSearch,
+      hideInTable,
+      order: hideInSearch ? 0 : search.length - search.indexOf(item.dataIndex),
+      sort: hideInTable ? 0 : table.length - table.indexOf(item.dataIndex),
+    };
+  }).filter(item => !item.hideInSearch || !item.hideInTable).sort((a, b) => (b.sort - a.sort));
 
   const [messageApi, contextHolder] = message.useMessage();
 
@@ -544,7 +444,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
           labelWidth: 120,
         }}
         toolBarRender={() =>
-          [(type === 'all' || type === 'progress') && access.canPayinLinkCreate
+          [createPayin && access.canPayinLinkCreate
             ?
             <Button
               type="primary"
@@ -578,16 +478,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
             throw new Error(res)
           }
           else {
-            switch (type) {
-              case 'all':
-                return await payin(res);
-              case 'progress':
-                return await payin({...res, status: 'assigned'});
-              case 'drop':
-                return await payin({...res, status: 'dropped'});
-              case 'success':
-                return await payin({...res, status: 'success'});
-            }
+            return await payin(res);
           }
         }}
         columns={columns}
@@ -795,7 +686,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all'}) => {
         values={currentRow || {}}
       />
 
-      {(type === 'all' || type === 'success') && (
+      {utrImage && (
         <div style={{
           position: "fixed",
           top: "0",
