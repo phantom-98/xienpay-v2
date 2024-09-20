@@ -10,13 +10,16 @@ import { ApprovalModal, ConfirmModal, RejectModal } from '@/components/Modals';
 
 
 type PayoutType = {
-    type: 'all' | 'progress' | 'success',
+    title: string,
+    defaultTitle: string,
     table: string[],
     search: string[],
     download?: boolean,
     createPayout?: boolean,
     action?: boolean,
     confirm?: boolean,
+    uuid?: boolean,
+    reversed?: boolean,
     payout: (parems: API.PageParams & {
         pageSize?: number;
         current?: number;
@@ -24,7 +27,7 @@ type PayoutType = {
     }) => Promise<API.PayoutList>
 }
 
-const PayoutTable: React.FC<PayoutType> = ({type = 'all', table, search, download = false, createPayout = false, action = false, confirm = false, payout}) => {
+const PayoutTable: React.FC<PayoutType> = ({title, defaultTitle, table, search, download = false, createPayout = false, action = false, confirm = false, uuid = false, reversed = false, payout}) => {
     /**
      * @en-US Add node
      * @zh-CN 添加节点
@@ -34,7 +37,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all', table, search, downloa
         const hide = message.loading('Adding');
         try {
     
-            const response = await addPayout(type === 'success' ? {...fields} : { ...fields, merchant_order_id: crypto.randomUUID().toString() });
+            const response = await addPayout(uuid ? {...fields} : { ...fields, merchant_order_id: crypto.randomUUID().toString() });
             hide();
             const { payoutUrl } = response;
             if (payoutUrl !== null && payoutUrl !== undefined) {
@@ -205,7 +208,7 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all', table, search, downloa
                     ),
                     status: 'Error',
                 },
-                reversed: type === 'all' ? {
+                reversed: reversed ? {
                     text: (
                         <FormattedMessage id="pages.payoutTable.payoutStatus.reversed" defaultMessage="Reversed" />
                     ),
@@ -377,8 +380,8 @@ const PayoutTable: React.FC<PayoutType> = ({type = 'all', table, search, downloa
             {contextHolder}
             <ProTable<API.PayoutListItem, API.PageParams>
                 headerTitle={intl.formatMessage({
-                    id: 'pages.payoutTable.' + type === 'all' ? 'title' : type === 'progress' ? 'inProgress' : 'completed',
-                    defaultMessage: type === 'all' ? 'Payouts List' : type === 'progress' ? 'In Progress' : 'Completed',
+                    id: title,
+                    defaultMessage: defaultTitle,
                 })}
                 scroll={{ x: 'max-content' }}
                 actionRef={actionRef}

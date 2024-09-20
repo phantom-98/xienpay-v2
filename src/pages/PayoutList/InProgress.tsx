@@ -3,7 +3,8 @@ import PayoutTable from "./components/PayoutTable";
 
 const PayoutList: React.FC = () => {
     return <PayoutTable
-        type="progress"
+        title="pages.payoutTable.inProgress"
+        defaultTitle="In Progress"
         table={['id','merchant_order_id','merchant','user_id','status','amount','ac_name','uuid','updated_at','option']}
         search={['id','merchant_order_id','merchant','user_id','status','amount','bank_name','uuid']}
         download={true}

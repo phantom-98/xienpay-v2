@@ -5,7 +5,8 @@ const PayinList: React.FC = () => {
 
   return (
     <PayinTable
-      type="success"
+      title="pages.payinTable.completed"
+      defaultTitle="Completed"
       table={['id','agent_submitted_amount','commission','status','user_id','merchant','time_taken','utr_id','bank','merchant_order_id','uuid','updated_at']}
       search={['uuid','merchant_order_id','utr_id','time_taken','merchant','user_id','id','short_code','bank']}
       utrImage={true}

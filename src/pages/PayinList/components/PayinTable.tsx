@@ -8,11 +8,13 @@ import { BellOutlined, CheckCircleOutlined, ExclamationCircleOutlined, PictureOu
 import { utcToist, validateRequest } from '@/utils';
 
 type PayinType = {
-  type: 'all' | 'progress' | 'drop' | 'success',
+  title: string,
+  defaultTitle: string,
   table: string[],
   search: string[],
   createPayin?: boolean,
   utrImage?: boolean,
+  action?: boolean,
   payin: (parems: API.PageParams & {
     pageSize?: number;
     current?: number;
@@ -21,7 +23,7 @@ type PayinType = {
 };
 
 
-const PayinTable: React.FC<PayinType> = ({ type = 'all', table, search, createPayin = false, utrImage = false, payin}) => {
+const PayinTable: React.FC<PayinType> = ({ title, defaultTitle, table, search, createPayin = false, utrImage = false, action = false, payin}) => {
 
   /**
    * @en-US Add node
@@ -187,7 +189,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all', table, search, createPa
       copyable: true,
     },
     {
-      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage={type === 'all' ? "Confirmed" : "Amount"} />,
+      title: <FormattedMessage id="pages.payinTable.amount" defaultMessage={"Confirmed"} />,
       dataIndex: 'agent_submitted_amount',
       render: (_, record) => (
         <span>
@@ -434,8 +436,8 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all', table, search, createPa
       {contextHolder}
       <ProTable<API.PayinListItem, API.PageParams>
         headerTitle={intl.formatMessage({
-          id: 'pages.payinTable.' + type === 'all' ? 'title' : type === 'progress' ? 'inProgress' : type === 'drop' ? 'dropped' : 'completed',
-          defaultMessage: type === 'all' ? 'Payins List' : type === 'progress' ? 'In Progress' : type === 'drop' ? 'Dropped' : 'Completed',
+          id: title,
+          defaultMessage: defaultTitle,
         })}
         scroll={{ x: 'max-content' }}
         actionRef={actionRef}
@@ -510,7 +512,7 @@ const PayinTable: React.FC<PayinType> = ({ type = 'all', table, search, createPa
             </div>
           }
         >
-          {type === 'drop' ? (
+          {action ? (
             <Dropdown.Button menu={{
               items: [
                 {
